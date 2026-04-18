@@ -62,8 +62,7 @@ function createInterviewNote(round: string, date: string, questions: string[], r
   return { round, date, questions, reflection, result };
 }
 
-export function createMockMaterials(): Material[] {
-  const now = new Date();
+export function createMockMaterials(now: Date = new Date()): Material[] {
 
   return [
     {
@@ -123,10 +122,9 @@ export function createMockMaterials(): Material[] {
   ];
 }
 
-export function createMockJobs(): Job[] {
-  const now = new Date();
+export function createMockJobs(now: Date = new Date()): Job[] {
   const today = startOfToday(now);
-  const materials = createMockMaterials();
+  const materials = createMockMaterials(now);
 
   const baseJobs: Job[] = [
     {

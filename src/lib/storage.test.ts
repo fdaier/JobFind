@@ -27,4 +27,18 @@ describe('storage helpers', () => {
     expect(loadJobs()).toBeNull();
     expect(localStorage.getItem('jobfind.jobs')).toBeNull();
   });
+
+  it('rejects structurally invalid job arrays and removes the stored value', () => {
+    localStorage.setItem('jobfind.jobs', JSON.stringify([{}]));
+
+    expect(loadJobs()).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+  });
+
+  it('rejects structurally invalid material arrays and removes the stored value', () => {
+    localStorage.setItem('jobfind.materials', JSON.stringify([{ id: 'bad-material' }]));
+
+    expect(loadMaterials()).toBeNull();
+    expect(localStorage.getItem('jobfind.materials')).toBeNull();
+  });
 });

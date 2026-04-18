@@ -6,6 +6,10 @@ import { createMockJobs, createMockMaterials } from '../lib/mock-data';
 import { loadCompletedTaskIds, loadJobs, loadMaterials, saveCompletedTaskIds, saveJobs, saveMaterials } from '../lib/storage';
 import type { Job, JobStage, Material, TimelineEvent } from '../lib/types';
 
+const SEEDED_MOCK_DATE = new Date('2026-04-19T08:00:00.000Z');
+const SEEDED_JOBS = createMockJobs(SEEDED_MOCK_DATE);
+const SEEDED_MATERIALS = createMockMaterials(SEEDED_MOCK_DATE);
+
 interface JobFindStoreValue {
   jobs: Job[];
   materials: Material[];
@@ -30,16 +34,6 @@ interface StoreState {
 
 const JobFindStoreContext = createContext<JobFindStoreValue | null>(null);
 
-function createLoadedState(): StoreState {
-  return {
-    jobs: loadJobs() ?? createMockJobs(),
-    materials: loadMaterials() ?? createMockMaterials(),
-    selectedJobId: null,
-    isJDParserOpen: false,
-    completedTaskIds: loadCompletedTaskIds() ?? [],
-  };
-}
-
 function createTimelineEvent(stage: JobStage, description: string): TimelineEvent {
   const date = new Date().toISOString();
   return { date, stage, description };
@@ -47,28 +41,37 @@ function createTimelineEvent(stage: JobStage, description: string): TimelineEven
 
 export function JobFindProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<StoreState>({
-    jobs: [],
-    materials: [],
+    jobs: SEEDED_JOBS,
+    materials: SEEDED_MATERIALS,
     selectedJobId: null,
     isJDParserOpen: false,
     completedTaskIds: [],
   });
-  const [hydrated, setHydrated] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setState(createLoadedState());
-    setHydrated(true);
+    const loadedJobs = loadJobs();
+    const loadedMaterials = loadMaterials();
+    const loadedCompletedTaskIds = loadCompletedTaskIds();
+
+    setState((current) => ({
+      ...current,
+      jobs: loadedJobs ?? current.jobs,
+      materials: loadedMaterials ?? current.materials,
+      completedTaskIds: loadedCompletedTaskIds ?? current.completedTaskIds,
+    }));
+    setIsHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (!hydrated) {
+    if (!isHydrated) {
       return;
     }
 
     saveJobs(state.jobs);
     saveMaterials(state.materials);
     saveCompletedTaskIds(state.completedTaskIds);
-  }, [hydrated, state.jobs, state.materials, state.completedTaskIds]);
+  }, [isHydrated, state.jobs, state.materials, state.completedTaskIds]);
 
   const selectedJob = useMemo(() => {
     return state.selectedJobId ? state.jobs.find((job) => job.id === state.selectedJobId) ?? null : null;

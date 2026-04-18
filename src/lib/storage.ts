@@ -51,9 +51,102 @@ function loadStringArray(key: string): string[] | null {
   return value;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
+}
+
+function isTimelineEvent(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.date === 'string' &&
+    typeof value.stage === 'string' &&
+    typeof value.description === 'string'
+  );
+}
+
+function isInterviewNote(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.round === 'string' &&
+    typeof value.date === 'string' &&
+    isStringArray(value.questions) &&
+    typeof value.reflection === 'string' &&
+    (value.result === 'passed' || value.result === 'failed' || value.result === 'pending')
+  );
+}
+
+function isJob(value: unknown): value is Job {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.company === 'string' &&
+    typeof value.position === 'string' &&
+    typeof value.jobType === 'string' &&
+    typeof value.batch === 'string' &&
+    typeof value.channel === 'string' &&
+    typeof value.stage === 'string' &&
+    (typeof value.applicationDeadline === 'string' || value.applicationDeadline === null) &&
+    (typeof value.writtenTestDate === 'string' || value.writtenTestDate === null) &&
+    (typeof value.interviewDate === 'string' || value.interviewDate === null) &&
+    (typeof value.appliedDate === 'string' || value.appliedDate === null) &&
+    typeof value.jdText === 'string' &&
+    isStringArray(value.keywords) &&
+    isStringArray(value.requirements) &&
+    isStringArray(value.requiredMaterials) &&
+    isStringArray(value.boundMaterialIds) &&
+    (typeof value.contactName === 'string' || value.contactName === null) &&
+    (typeof value.contactInfo === 'string' || value.contactInfo === null) &&
+    Array.isArray(value.riskTags) &&
+    Array.isArray(value.aiSuggestions) &&
+    Array.isArray(value.timeline) &&
+    value.timeline.every(isTimelineEvent) &&
+    Array.isArray(value.interviewNotes) &&
+    value.interviewNotes.every(isInterviewNote) &&
+    typeof value.createdAt === 'string' &&
+    typeof value.updatedAt === 'string'
+  );
+}
+
+function isMaterial(value: unknown): value is Material {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.name === 'string' &&
+    typeof value.type === 'string' &&
+    typeof value.targetDirection === 'string' &&
+    typeof value.version === 'string' &&
+    typeof value.lastUpdated === 'string' &&
+    isStringArray(value.boundJobIds)
+  );
+}
+
+function loadValidatedArray<T>(key: string, predicate: (value: unknown) => value is T): T[] | null {
+  const value = loadJsonValue<unknown>(key);
+  if (!Array.isArray(value)) {
+    if (value !== null && hasWindow()) {
+      window.localStorage.removeItem(key);
+    }
+
+    return null;
+  }
+
+  if (!value.every(predicate)) {
+    if (hasWindow()) {
+      window.localStorage.removeItem(key);
+    }
+
+    return null;
+  }
+
+  return value;
+}
+
 export function loadJobs(): Job[] | null {
-  const value = loadJsonValue<unknown>(JOBS_KEY);
-  return Array.isArray(value) ? (value as Job[]) : null;
+  return loadValidatedArray(JOBS_KEY, isJob);
 }
 
 export function saveJobs(jobs: Job[]): void {
@@ -61,8 +154,7 @@ export function saveJobs(jobs: Job[]): void {
 }
 
 export function loadMaterials(): Material[] | null {
-  const value = loadJsonValue<unknown>(MATERIALS_KEY);
-  return Array.isArray(value) ? (value as Material[]) : null;
+  return loadValidatedArray(MATERIALS_KEY, isMaterial);
 }
 
 export function saveMaterials(materials: Material[]): void {
