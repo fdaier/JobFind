@@ -79,6 +79,33 @@ function isInterviewNote(value: unknown): boolean {
   );
 }
 
+function isRiskTag(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    (value.type === 'deadline' || value.type === 'material_gap' || value.type === 'silence' || value.type === 'interview_prep') &&
+    (value.level === 'critical' || value.level === 'warning' || value.level === 'normal') &&
+    typeof value.message === 'string'
+  );
+}
+
+function isAISuggestion(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.action === 'string' &&
+    typeof value.reason === 'string' &&
+    (value.priority === 'urgent' || value.priority === 'high' || value.priority === 'medium' || value.priority === 'low') &&
+    (value.actionType === 'submit_application' ||
+      value.actionType === 'bind_material' ||
+      value.actionType === 'prepare_interview' ||
+      value.actionType === 'follow_up' ||
+      value.actionType === 'take_test' ||
+      value.actionType === 'update_material' ||
+      value.actionType === 'review_interview') &&
+    typeof value.completed === 'boolean'
+  );
+}
+
 function isJob(value: unknown): value is Job {
   return (
     isRecord(value) &&
@@ -101,7 +128,9 @@ function isJob(value: unknown): value is Job {
     (typeof value.contactName === 'string' || value.contactName === null) &&
     (typeof value.contactInfo === 'string' || value.contactInfo === null) &&
     Array.isArray(value.riskTags) &&
+    value.riskTags.every(isRiskTag) &&
     Array.isArray(value.aiSuggestions) &&
+    value.aiSuggestions.every(isAISuggestion) &&
     Array.isArray(value.timeline) &&
     value.timeline.every(isTimelineEvent) &&
     Array.isArray(value.interviewNotes) &&

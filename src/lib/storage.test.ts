@@ -41,4 +41,31 @@ describe('storage helpers', () => {
     expect(loadMaterials()).toBeNull();
     expect(localStorage.getItem('jobfind.materials')).toBeNull();
   });
+
+  it('rejects jobs with invalid nested arrays and removes the stored value', () => {
+    const jobs = createMockJobs();
+    const [job] = jobs;
+
+    localStorage.setItem(
+      'jobfind.jobs',
+      JSON.stringify([
+        {
+          ...job,
+          riskTags: [123],
+          aiSuggestions: [123],
+          timeline: [
+            {
+              date: '2026-04-19T00:00:00.000Z',
+              stage: 'applied',
+              description: 'Submitted application',
+            },
+          ],
+          interviewNotes: [],
+        },
+      ]),
+    );
+
+    expect(loadJobs()).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+  });
 });
