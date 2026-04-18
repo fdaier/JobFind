@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobFind: AI 求职看板竞品分析报告</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --accent: #E879F9;
+            --bg: #F8FAFC;
+            --text-main: #1E293B;
+            --text-muted: #475569;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border-color: #E2E8F0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4fd 0%, #faecfa 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section {
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        h2 {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #0F172A;
+        }
+        h2::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.12);
+        }
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .card ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+            color: var(--text-muted);
+        }
+        .card li {
+            margin-bottom: 6px;
+        }
+        .table-wrap {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.5);
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        th {
+            font-weight: 600;
+            color: #1E293B;
+            background: var(--primary-light);
+            white-space: nowrap;
+        }
+        .highlight {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .summary-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(232, 121, 249, 0.05));
+            border-left: 4px solid var(--primary);
+            padding: 20px 25px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 40px;
+        }
+        .summary-box p {
+            margin: 0 0 10px 0;
+        }
+        .summary-box p:last-child {
+            margin-bottom: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .ul-styled {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .ul-styled li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+        .ul-styled li::before {
+            content: '•';
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="section">
+            <h1>求职申请管理看板 · 竞品分析报告</h1>
+            <p class="tagline">从“记录型看板”到面向大学生的“AI 求职项目经理”</p>
+        </header>
+
+        <section class="section">
+            <div class="summary-box">
+                <p><strong>结论摘要：</strong></p>
+                <p>现有求职申请管理类产品大多解决两类问题：一类是记录申请进度，另一类是提高投递效率。但本次测评题的关键场景是<strong>大学生在求职季同时面对多个截止日期、材料提交状态、笔试面试安排和不同招聘渠道时产生的混乱与焦虑。</strong></p>
+                <p>因此，本作品不应只做一个普通看板，而应定位为：<strong>帮助用户统一管理分散在招聘平台、邮件、日历和文件夹里的各类资产，并由 AI 自动识别风险、生成下一步行动。</strong> 不是另一个求职表格，而是学生的 AI 求职项目经理。</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>1. 竞品范围与概览</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>代表产品</th>
+                            <th>用户替代方案</th>
+                            <th>竞争焦点</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>直接竞品</strong></td>
+                            <td>Huntr、Teal、Simplify</td>
+                            <td>专业求职管理工具</td>
+                            <td>申请追踪、岗位保存、材料管理、AI 简历/辅助</td>
+                        </tr>
+                        <tr>
+                            <td><strong>间接竞品</strong></td>
+                            <td>Notion、Trello、Excel</td>
+                            <td>自建表格/看板</td>
+                            <td>灵活、低门槛、可自定义</td>
+                        </tr>
+                        <tr>
+                            <td><strong>本土替代</strong></td>
+                            <td>Boss 直聘、牛客、邮件、日历</td>
+                            <td>分散在多个平台</td>
+                            <td>信息来源分散，缺少统一进度视图</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-wrap" style="margin-top: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>竞品</th>
+                            <th>核心功能</th>
+                            <th>优势</th>
+                            <th>对学生用户的不足</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Huntr</strong></td>
+                            <td>看板、时间线、联系人、材料、指标、AI 建议</td>
+                            <td>功能完整，偏“求职 CRM”。支持一体化</td>
+                            <td>对学生的校招批次、网申 DDL、材料版本不够垂直</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Teal</strong></td>
+                            <td>岗位保存、阶段管理、关键词洞察、流程跟进</td>
+                            <td>强调匹配、关键词和流程</td>
+                            <td>偏通用职场，不突显学生海投、校招节奏提醒</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Simplify</strong></td>
+                            <td>自动填表、资料 Profile、推荐、申请追踪</td>
+                            <td>极强的“投递效率”，适合大量网申</td>
+                            <td>重心在“更快投递”而非“清晰掌控”，重在效率非进度管理</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Notion</strong></td>
+                            <td>表格、看板、日历、备注</td>
+                            <td>上手快，高度自定义</td>
+                            <td>纯手动，无主动提醒、AI 风险判断及建议</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>2. 竞品共性功能提取</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>模块</th>
+                            <th>竞品常见做法</th>
+                            <th>本作品应如何处理</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>申请看板</strong></td>
+                            <td>按阶段拖拽：收藏、投递、笔试、面试、Offer</td>
+                            <td>必须有，作为第一屏核心或次核心支撑</td>
+                        </tr>
+                        <tr>
+                            <td><strong>岗位信息</strong></td>
+                            <td>公司、岗位、地点、薪资、JD、来源链接</td>
+                            <td>必须有，且支持一键/极速录入</td>
+                        </tr>
+                        <tr>
+                            <td><strong>时间管理</strong></td>
+                            <td>DDL、面试时间、跟进时间</td>
+                            <td>必须有，<strong>放大成“风险雷达”重点展示</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>材料管理</strong></td>
+                            <td>简历、作品集、Cover Letter、附件</td>
+                            <td>必须有，学生极其容易材料混乱缺失</td>
+                        </tr>
+                        <tr>
+                            <td><strong>其他辅助</strong></td>
+                            <td>联系人池、数据指标转化、AI 生成简历</td>
+                            <td>加分项，需解释其如何帮助决策（非泛泛使用AI）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>3. 用户痛点洞察</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <h3>痛点 1：信息极度分散</h3>
+                    <p>渠道包含网申平台、牛客、微信等。用户痛的不是岗位少，而是不知道哪些投了、哪些快截至、哪些需补材料。</p>
+                </div>
+                <div class="card">
+                    <h3>痛点 2：流程节点易遗漏</h3>
+                    <p>网申截止、笔试、一二面时间等。普通记录只能看状态，不能主动判断“要过期了”。</p>
+                </div>
+                <div class="card">
+                    <h3>痛点 3：材料版本混乱</h3>
+                    <p>中文/英文、各种实习经历针对版的简历和作品集。最痛的是“忘了这个职位投的是哪个版本”。</p>
+                </div>
+                <div class="card">
+                    <h3>痛点 4：投后无复盘优化</h3>
+                    <p>海投后没有沉淀，不知道哪个渠道回复率高，哪版简历好用。越投越焦虑，缺乏策略。</p>
+                </div>
+                <div class="card" style="grid-column: span 1 / -1;">
+                    <h3>痛点 5：不知道“下一步做什么”</h3>
+                    <p>打开普通表格看到上百条记录，仍然要费脑判断优先级。最好的产品应该直接告诉他们：“这就是今天该做的。”</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>4. 关键机会点（核心差异化）</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>机会 1：从“记录型”升级为“行动型”</h3>
+                    <p>竞品回答“投了啥”，我们回答：“今天最该处理哪个？谁快到期？谁缺材料？”</p>
+                    <ul class="ul-styled">
+                        <li>今日必须完成的任务</li>
+                        <li>3 天内截止的申请</li>
+                        <li>材料不完整的岗位</li>
+                        <li>长时间无反馈的岗位</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>机会 2：紧扣学生“多批次/多平台”</h3>
+                    <p>大学生有校招特色的多线程管理需求。</p>
+                    <ul class="ul-styled">
+                        <li>批次：秋招、春招、日常、暑期实习</li>
+                        <li>渠道：官网、内推、实习僧、宣讲会</li>
+                        <li>节点：笔试、测评、多轮面试</li>
+                    </ul>
+                </div>
+                <!-- 调整后两块在一行 -->
+                <div class="card">
+                    <h3>机会 3：让 AI 成为“项目经理”</h3>
+                    <p>跳出“AI 写简历”的窠臼，让 AI 介入流程。</p>
+                    <ul class="ul-styled">
+                        <li>自动解析 JD 抽取 DDL、硬门槛</li>
+                        <li>判断并标记高风险卡片</li>
+                        <li>根据池子生成今日最优行动建议</li>
+                        <li>转化数据复盘</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>机会 4：转化焦虑为“健康度指标”</h3>
+                    <p>降噪，减负，把混乱变为把控感。</p>
+                    <ul class="ul-styled">
+                        <li>显示本周已完成行动数</li>
+                        <li>提示高风险数量 / 待准备面试数</li>
+                        <li>评估当前申请节奏是否过载</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>5. 推荐产品定位与结构</h2>
+            <div class="card" style="margin-bottom: 20px;">
+                <p><strong>产品名称：</strong> JobFind / 求职申请管理看板</p>
+                <p><strong>产品定位：</strong> 面向大学生求职季的 AI 申请管理看板，帮助用户清晰掌控申请进度、截止日期、材料状态和面试流程。</p>
+                <p><strong>目标用户：</strong> 正在找实习/校招的学生；同时投递多岗位；需管理多材料/多轮面试；对节奏感到混乱焦虑者。</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>一级模块</th>
+                            <th>核心目标</th>
+                            <th>典型核心功能</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>总览仪表盘</strong></td>
+                            <td>一眼知道求职状态与当下任务</td>
+                            <td>今日待办、临近 DDL、高风险、面试提醒、申请漏斗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>申请看板</strong></td>
+                            <td>管理全流程进度阶段</td>
+                            <td>感兴趣 > 待投递 > 已投递 > 笔/测评 > 面试 > 结果</td>
+                        </tr>
+                        <tr>
+                            <td><strong>岗位详情页</strong></td>
+                            <td>聚合单个岗位的资料池</td>
+                            <td>JD 原文、材料绑定、时间线、记录、AI 分析</td>
+                        </tr>
+                        <tr>
+                            <td><strong>材料中心</strong></td>
+                            <td>根除简历/作品集满天飞</td>
+                            <td>多版本汇聚、每个材料绑定了哪些岗位、缺口清单</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI 助理</strong></td>
+                            <td>降本增效、决策辅助</td>
+                            <td>JD 解析入库、预警检查、面试准备向导</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>6. MVP 范围界定</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">不建议做大而全的平台卡死自己。MVP 强烈聚焦 4 个页面及 1 条核心链路。</p>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>🖥 页 1：总览仪表盘 (重点)</h3>
+                    <p>今日待办 / 临近 DDL / 高风险岗位 / 面试提醒 / 申请漏斗 /求职健康度。</p>
+                </div>
+                <div class="card">
+                    <h3>📋 页 2：申请看板</h3>
+                    <p>标准全生命周期阶段管理拖拽面板。</p>
+                </div>
+                <div class="card">
+                    <h3>📄 页 3：材料中心</h3>
+                    <p>中心化管理多版本，直观展现哪个岗位缺哪个特定文件。</p>
+                </div>
+                <div class="card">
+                    <h3>🔍 页 4：详情抽屉 & 核心AI流</h3>
+                    <p><strong>核心路径：</strong>粘贴 JD &rarr; AI 生成卡片 &rarr; 提取 DDL/要求 &rarr; 标出材料缺口 &rarr; 推送今日待办。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>7. 设计展现：第一屏推荐方案</h2>
+            <div class="card">
+                <p><strong>设计法则：</strong> 从状态到行动，从单一到组合管理，从 AI 内容生成升级为 AI 流程把控。</p>
+                <p style="margin-top: 15px;"><strong>首屏（求职作战台）布局建议：</strong></p>
+                <ul class="ul-styled">
+                    <li><strong>顶部：</strong> 本周求职数据宏观摘要</li>
+                    <li><strong>左侧：</strong> 【今日优先任务】卡片流（例如：腾讯网申今晚 23:59 截止，急需补作品集）</li>
+                    <li><strong>中间：</strong> 核心的【阶梯/看板直观展示】</li>
+                    <li><strong>右侧：</strong> 【风险雷达】与 【AI 策略建议】（例如：Boss 回复率低，建议改投官网）</li>
+                    <li><strong>底部：</strong> 漏斗转化视图</li>
+                </ul>
+                <p style="margin-top:20px; font-weight:bold; color:var(--primary);">
+                    "最终优势：让用户通过 JobFind 不再迷茫该做什么，而是拿到清晰的执行蓝图。"
+                </p>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
