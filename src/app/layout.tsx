@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { JobFindProvider } from "@/hooks/use-jobfind-store";
 
 export const metadata: Metadata = {
   title: "JobFind",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body>
+        <JobFindProvider>{children}</JobFindProvider>
+      </body>
     </html>
   );
 }
