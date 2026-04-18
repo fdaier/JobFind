@@ -23,6 +23,14 @@ function getDaysSince(target: string, now: Date): number {
   return (now.getTime() - parseDate(target).getTime()) / MS_PER_DAY;
 }
 
+function formatOverdueDeadline(hoursLate: number): string {
+  if (hoursLate >= 24) {
+    return `网申已截止 ${Math.ceil(hoursLate / 24)} 天`;
+  }
+
+  return `网申已截止 ${Math.ceil(hoursLate)} 小时`;
+}
+
 function buildPriority(score: number): TaskPriority {
   if (score >= 130) {
     return 'urgent';
@@ -78,17 +86,23 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
   const deadlineEligible = job.stage === 'interested' || job.stage === 'to_apply' || job.stage === 'applied';
   if (deadlineEligible && job.applicationDeadline) {
     const hoursUntilDeadline = getHoursUntil(job.applicationDeadline, now);
-    if (hoursUntilDeadline >= 0 && hoursUntilDeadline <= 24) {
+    if (hoursUntilDeadline < 0) {
       risks.push({
         type: 'deadline',
         level: 'critical',
-        message: `Application deadline in ${Math.ceil(hoursUntilDeadline)} hours`,
+        message: formatOverdueDeadline(Math.abs(hoursUntilDeadline)),
+      });
+    } else if (hoursUntilDeadline <= 24) {
+      risks.push({
+        type: 'deadline',
+        level: 'critical',
+        message: `网申剩余 ${Math.ceil(hoursUntilDeadline)} 小时`,
       });
     } else if (hoursUntilDeadline > 24 && hoursUntilDeadline <= 72) {
       risks.push({
         type: 'deadline',
         level: 'warning',
-        message: `Application deadline in ${Math.ceil(hoursUntilDeadline / 24)} days`,
+        message: `网申剩余 ${Math.ceil(hoursUntilDeadline / 24)} 天`,
       });
     }
   }
@@ -104,11 +118,17 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
 
   if (job.stage === 'interviewing' && job.interviewDate) {
     const hoursUntilInterview = getHoursUntil(job.interviewDate, now);
-    if (hoursUntilInterview >= 0 && hoursUntilInterview <= 72) {
+    if (hoursUntilInterview < 0) {
       risks.push({
         type: 'interview_prep',
         level: 'critical',
-        message: `Interview in ${Math.ceil(hoursUntilInterview)} hours`,
+        message: '面试时间已过，请补充复盘',
+      });
+    } else if (hoursUntilInterview <= 72) {
+      risks.push({
+        type: 'interview_prep',
+        level: 'critical',
+        message: `面试还有 ${Math.ceil(hoursUntilInterview)} 小时`,
       });
     }
   }
@@ -174,6 +194,7 @@ export function generateTodayTasks(jobs: Job[], materials: Material[], now: Date
           reason,
           priority: buildPriority(score),
           actionType,
+          score,
           completed: false,
         },
         score,

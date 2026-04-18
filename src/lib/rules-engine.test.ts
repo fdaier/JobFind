@@ -88,6 +88,65 @@ describe('rules engine', () => {
     });
   });
 
+  it('treats invalid bound material ids as incomplete', () => {
+    const result = calculateMaterialCompleteness(
+      {
+        ...baseJob,
+        boundMaterialIds: ['missing-material-id'],
+      },
+      materials,
+    );
+
+    expect(result).toEqual({
+      percentage: 0,
+      missing: ['resume', 'portfolio', 'transcript'],
+    });
+  });
+
+  it('keeps overdue deadlines visible as critical risks', () => {
+    const risks = generateRiskTags(
+      {
+        ...baseJob,
+        stage: 'applied',
+        applicationDeadline: '2026-04-18T08:00:00.000Z',
+      },
+      materials,
+      now,
+    );
+
+    expect(risks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'deadline',
+          level: 'critical',
+          message: expect.stringContaining('网申已截止'),
+        }),
+      ]),
+    );
+  });
+
+  it('keeps overdue interviews visible as critical risks', () => {
+    const risks = generateRiskTags(
+      {
+        ...baseJob,
+        stage: 'interviewing',
+        interviewDate: '2026-04-19T09:00:00.000Z',
+      },
+      materials,
+      now,
+    );
+
+    expect(risks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'interview_prep',
+          level: 'critical',
+          message: '面试时间已过，请补充复盘',
+        }),
+      ]),
+    );
+  });
+
   it('generates today tasks sorted by priority, including submit_application and bind_material', () => {
     const jobs: Job[] = [
       {
@@ -117,6 +176,7 @@ describe('rules engine', () => {
     const tasks = generateTodayTasks(jobs, materials, now);
 
     expect(tasks.map((task) => task.actionType)).toEqual(['submit_application', 'bind_material']);
+    expect(tasks[0].score).toBeGreaterThan(tasks[1].score);
     expect(tasks[0].priority).toBe('urgent');
     expect(tasks[1].priority).toBe('medium');
   });

@@ -110,6 +110,7 @@ export interface TodayTask {
   reason: string;
   priority: TaskPriority;
   actionType: TaskActionType;
+  score: number;
   completed: boolean;
 }
 
