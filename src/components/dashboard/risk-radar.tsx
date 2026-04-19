@@ -36,10 +36,10 @@ export function RiskRadar() {
           <div>
             <div className="flex items-center gap-2">
               <ShieldAlert className="size-4 text-slate-700" aria-hidden="true" />
-              <h2 className="text-base font-semibold text-slate-950">风险雷达</h2>
+              <h2 className="text-base font-semibold text-slate-950">Agent 风险雷达</h2>
             </div>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              由规则引擎展开所有风险标签，先看红色项，再处理黄色项。
+              Agent 已识别 DDL、材料、面试和沉默风险，先看红色项，再处理黄色项。
             </p>
           </div>
           <Badge variant="outline" className="rounded-full border-slate-200 text-slate-500">

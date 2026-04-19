@@ -33,7 +33,7 @@ describe("JobCard", () => {
     expect(screen.getByTestId("job-card")).toBeInTheDocument();
     expect(screen.getByText("材料完成度")).toBeInTheDocument();
     expect(screen.getByText(/%/)).toBeInTheDocument();
-    expect(screen.getByText("风险")).toBeInTheDocument();
+    expect(screen.getByText("Agent 风险")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("job-card"));
 

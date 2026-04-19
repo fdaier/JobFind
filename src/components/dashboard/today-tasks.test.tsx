@@ -18,6 +18,8 @@ describe("TodayTasks", () => {
       </JobFindProvider>,
     );
 
+    expect(screen.getByRole("heading", { name: "Agent 今日指挥" })).toBeInTheDocument();
+    expect(screen.getByText(/Agent 已按风险和时间窗口排好今日优先级/)).toBeInTheDocument();
     expect(screen.getByText(/Agent 判断：为什么现在先做这件事/)).toBeInTheDocument();
   });
 });

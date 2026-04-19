@@ -117,7 +117,7 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-medium text-slate-700">风险</p>
+        <p className="text-xs font-medium text-slate-700">Agent 风险</p>
         <div className="flex flex-wrap gap-2">
           {riskTags.length === 0 ? (
             <span className="inline-flex items-center justify-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">

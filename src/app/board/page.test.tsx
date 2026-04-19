@@ -79,6 +79,7 @@ describe("BoardPage job detail sheet", () => {
     expect(aiPanel).toHaveTextContent("查看材料补齐建议");
     expect(aiPanel).toHaveTextContent("材料补齐建议");
     expect(within(aiPanel).getAllByRole("button", { name: "确认这一步" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Agent 风险").length).toBeGreaterThan(0);
   });
 
   it("only shows forward progression actions for the current stage", async () => {

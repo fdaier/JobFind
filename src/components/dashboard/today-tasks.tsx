@@ -54,10 +54,10 @@ export function TodayTasks() {
           <div>
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-slate-700" aria-hidden="true" />
-              <h2 className="text-base font-semibold text-slate-950">今日任务</h2>
+              <h2 className="text-base font-semibold text-slate-950">Agent 今日指挥</h2>
             </div>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              只展示最该先处理的前 5 项，已完成的任务会保留在列表里。
+              Agent 已按风险和时间窗口排好今日优先级，先处理最容易影响结果的动作。
             </p>
           </div>
           <Badge variant="outline" className="rounded-full border-slate-200 text-slate-500">
