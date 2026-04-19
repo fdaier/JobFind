@@ -19,7 +19,14 @@ describe("TodayTasks", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Agent 今日指挥" })).toBeInTheDocument();
-    expect(screen.getByText(/Agent 已按风险和时间窗口排好今日优先级/)).toBeInTheDocument();
-    expect(screen.getByText(/Agent 判断：为什么现在先做这件事/)).toBeInTheDocument();
+    expect(
+      screen.getByText("JobFind-Agent 已按风险和时间窗口排好今日优先级，先处理最容易影响结果的动作！"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Agent 判断：为什么现在先做这件事：字节跳动 AI 产品经理实习生已经进入临近面试窗口，准备质量会直接影响下一轮。",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByAltText("JobFind Agent")).toHaveAttribute("src", "/agent/agent-logo.png");
   });
 });

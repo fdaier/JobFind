@@ -7,9 +7,14 @@ import { deterministicAgentRuntime } from "@/lib/agent/deterministic-runtime";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AgentAvatar } from "@/components/layout/agent-avatar";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
 import { useTodayTasks } from "@/hooks/use-today-tasks";
 import { cn } from "@/lib/utils";
+
+const agentSpeech = "JobFind-Agent 已按风险和时间窗口排好今日优先级，先处理最容易影响结果的动作！";
+const agentJudgment =
+  "Agent 判断：为什么现在先做这件事：字节跳动 AI 产品经理实习生已经进入临近面试窗口，准备质量会直接影响下一轮。";
 
 const priorityStyles = {
   urgent: "border-rose-200 bg-rose-50 text-rose-800",
@@ -48,25 +53,35 @@ export function TodayTasks() {
   }, [jobs, materials, tasks]);
 
   return (
-    <Card className="rounded-md border-slate-200 bg-white shadow-sm">
-      <CardContent className="space-y-4 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="size-4 text-slate-700" aria-hidden="true" />
-              <h2 className="text-base font-semibold text-slate-950">Agent 今日指挥</h2>
+    <Card className="premium-surface overflow-hidden rounded-lg">
+      <CardContent className="space-y-5 p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg border border-[#e7d8b7] bg-[#fff8e9] p-2 text-slate-800">
+              <Sparkles className="size-4" aria-hidden="true" />
             </div>
-            <p className="mt-1 text-sm leading-6 text-slate-500">
-              Agent 已按风险和时间窗口排好今日优先级，先处理最容易影响结果的动作。
-            </p>
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-slate-950">Agent 今日指挥</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-500">晨间 brief 已生成，先处理最影响结果的动作。</p>
+            </div>
           </div>
-          <Badge variant="outline" className="rounded-full border-slate-200 text-slate-500">
+          <Badge variant="outline" className="w-fit rounded-full border-slate-200 bg-white/70 text-slate-500">
             {tasks.length} 项
           </Badge>
         </div>
 
-        <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
-          {topAgentBrief}
+        <div className="grid gap-4 rounded-lg border border-slate-200/80 bg-white/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:grid-cols-[4.75rem_minmax(0,1fr)] sm:items-start">
+          <AgentAvatar className="size-20" />
+          <div className="space-y-3">
+            <div className="relative rounded-lg border border-[#e4d8bf] bg-[#fffaf0] px-4 py-3 text-[15px] font-medium leading-7 text-slate-900 shadow-[0_12px_30px_rgba(69,58,39,0.08)]">
+              <span className="hidden sm:block absolute left-[-8px] top-6 size-4 rotate-45 border-b border-l border-[#e4d8bf] bg-[#fffaf0]" />
+              {agentSpeech}
+            </div>
+            <div className="quiet-strip rounded-lg px-4 py-3 text-sm leading-6 text-slate-600">
+              {agentJudgment}
+            </div>
+            <div className="sr-only">{topAgentBrief}</div>
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -77,8 +92,8 @@ export function TodayTasks() {
               <article
                 key={task.id}
                 className={cn(
-                  "rounded-md border p-4 transition-colors",
-                  completed ? "border-slate-200 bg-slate-50/80" : "border-slate-200 bg-white",
+                  "rounded-lg border p-4 transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(43,51,69,0.08)]",
+                  completed ? "border-slate-200/80 bg-slate-50/80" : "border-slate-200/80 bg-white/82",
                 )}
               >
                 <div className="flex items-start gap-3">
