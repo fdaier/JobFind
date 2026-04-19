@@ -17,7 +17,7 @@ export default function HomePage() {
 
       <StatsSummary />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.9fr)]">
         <TodayTasks />
         <RiskRadar />
       </div>

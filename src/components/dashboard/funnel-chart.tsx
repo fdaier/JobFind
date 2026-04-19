@@ -22,7 +22,7 @@ export function FunnelChart() {
   const maxCount = Math.max(...steps.map((step) => data[step.key]), 1);
 
   return (
-    <Card className="rounded-md border-slate-200 bg-white shadow-sm">
+    <Card className="editorial-panel rounded-lg">
       <CardContent className="space-y-4 p-5">
         <div>
           <h2 className="text-base font-semibold text-slate-950">转化漏斗</h2>
@@ -40,8 +40,11 @@ export function FunnelChart() {
                   <span className="font-medium text-slate-700">{step.label}</span>
                   <span className="text-slate-500">{count}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-slate-700 transition-[width]" style={{ width: `${width}%` }} />
+                <div className="h-2 overflow-hidden rounded-full bg-slate-200/80">
+                  <div
+                    className="h-full rounded-full bg-slate-800 transition-[width]"
+                    style={{ width: `${width}%` }}
+                  />
                 </div>
               </div>
             );

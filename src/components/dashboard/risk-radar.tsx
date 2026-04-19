@@ -30,7 +30,7 @@ export function RiskRadar() {
     });
 
   return (
-    <Card className="rounded-md border-slate-200 bg-white shadow-sm">
+    <Card className="editorial-panel rounded-lg">
       <CardContent className="space-y-4 p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -42,14 +42,14 @@ export function RiskRadar() {
               Agent 已识别 DDL、材料、面试和沉默风险，先看红色项，再处理黄色项。
             </p>
           </div>
-          <Badge variant="outline" className="rounded-full border-slate-200 text-slate-500">
+          <Badge variant="outline" className="rounded-full border-slate-200 bg-white/70 text-slate-500">
             {riskItems.length} 项
           </Badge>
         </div>
 
         <div className="space-y-3">
           {riskItems.length === 0 ? (
-            <div className="rounded-md border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+            <div className="rounded-lg border border-dashed border-slate-200 bg-white/55 p-4 text-sm text-slate-500">
               当前没有显性的风险标签。
             </div>
           ) : (
@@ -57,10 +57,10 @@ export function RiskRadar() {
               <article
                 key={risk.id}
                 className={cn(
-                  "rounded-md border p-4",
+                  "rounded-lg border p-4 shadow-[0_10px_28px_rgba(43,51,69,0.04)]",
                   risk.level === "critical"
-                    ? "border-rose-200 bg-rose-50/80"
-                    : "border-amber-200 bg-amber-50/70",
+                    ? "border-rose-200 bg-rose-50/72"
+                    : "border-[#ecd8ad] bg-[#fff7e5]/72",
                 )}
               >
                 <div className="flex items-start gap-3">
@@ -68,8 +68,8 @@ export function RiskRadar() {
                     className={cn(
                       "mt-0.5 rounded-md border p-2",
                       risk.level === "critical"
-                        ? "border-rose-200 bg-white text-rose-700"
-                        : "border-amber-200 bg-white text-amber-700",
+                        ? "border-rose-200 bg-white/85 text-rose-700"
+                        : "border-[#ecd8ad] bg-white/85 text-amber-700",
                     )}
                   >
                     <AlertTriangle className="size-4" aria-hidden="true" />
@@ -84,8 +84,8 @@ export function RiskRadar() {
                         className={cn(
                           "rounded-full",
                           risk.level === "critical"
-                            ? "border-rose-200 bg-white text-rose-700"
-                            : "border-amber-200 bg-white text-amber-700",
+                            ? "border-rose-200 bg-white/85 text-rose-700"
+                            : "border-[#ecd8ad] bg-white/85 text-amber-700",
                         )}
                       >
                         {risk.level === "critical" ? "紧急" : "提醒"}

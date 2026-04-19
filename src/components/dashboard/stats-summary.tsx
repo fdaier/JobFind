@@ -36,25 +36,25 @@ function toneClass(tone: MetricTone) {
   switch (tone) {
     case "warning":
       return {
-        icon: "text-amber-700",
-        value: "text-amber-950",
+        icon: "border-[#ead8ae] bg-[#fff7e5] text-amber-700",
+        value: "text-slate-950",
         label: "text-amber-700",
       };
     case "danger":
       return {
-        icon: "text-rose-700",
-        value: "text-rose-950",
+        icon: "border-rose-200 bg-rose-50 text-rose-700",
+        value: "text-slate-950",
         label: "text-rose-700",
       };
     case "success":
       return {
-        icon: "text-emerald-700",
-        value: "text-emerald-950",
+        icon: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        value: "text-slate-950",
         label: "text-emerald-700",
       };
     default:
       return {
-        icon: "text-slate-700",
+        icon: "border-slate-200 bg-white/80 text-slate-700",
         value: "text-slate-950",
         label: "text-slate-500",
       };
@@ -133,14 +133,14 @@ export function StatsSummary() {
         const tone = toneClass(metric.tone);
 
         return (
-          <Card key={metric.label} className="rounded-md border-slate-200 bg-white shadow-sm">
+          <Card key={metric.label} className="editorial-panel rounded-lg">
             <div className="flex h-full min-h-28 flex-col justify-between gap-4 p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className={`text-sm font-medium ${tone.label}`}>{metric.label}</div>
                   <div className={`text-3xl font-semibold tracking-tight ${tone.value}`}>{metric.value}</div>
                 </div>
-                <div className={`rounded-md border border-slate-200 bg-slate-50 p-2 ${tone.icon}`}>
+                <div className={`rounded-lg border p-2 ${tone.icon}`}>
                   <Icon className="size-4" aria-hidden="true" />
                 </div>
               </div>

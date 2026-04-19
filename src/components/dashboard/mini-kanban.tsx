@@ -20,7 +20,7 @@ export function MiniKanban() {
   const maxCount = Math.max(...counts, 1);
 
   return (
-    <Card className="rounded-md border-slate-200 bg-white shadow-sm">
+    <Card className="editorial-panel rounded-lg">
       <CardContent className="space-y-4 p-5">
         <div>
           <h2 className="text-base font-semibold text-slate-950">阶段看板</h2>
@@ -35,21 +35,21 @@ export function MiniKanban() {
             return (
               <div
                 key={stage.key}
-                className="flex min-h-24 flex-col justify-between rounded-md border border-slate-200 bg-slate-50 p-3"
+                className="flex min-h-24 flex-col justify-between rounded-lg border border-slate-200/80 bg-white/60 p-3"
               >
                 <div className="space-y-1">
                   <div className="text-xs font-medium text-slate-500">{stage.label}</div>
                   <div className="text-2xl font-semibold tracking-tight text-slate-950">{count}</div>
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+                <div className="h-1.5 overflow-hidden rounded-full bg-slate-200/75">
                   <div
                     className={cn(
                       "h-full rounded-full",
                       stage.key === "offer"
-                        ? "bg-emerald-500"
+                        ? "bg-emerald-600"
                         : stage.key === "rejected"
                           ? "bg-slate-400"
-                          : "bg-slate-700",
+                          : "bg-slate-800",
                     )}
                     style={{ width: `${width}%` }}
                   />
