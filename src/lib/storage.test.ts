@@ -86,4 +86,37 @@ describe('storage helpers', () => {
     expect(loadJobs()).toBeNull();
     expect(localStorage.getItem('jobfind.jobs')).toBeNull();
   });
+
+  it('rejects jobs with invalid persisted dates and removes the stored value', () => {
+    const jobs = createMockJobs();
+    const [job] = jobs;
+
+    localStorage.setItem(
+      'jobfind.jobs',
+      JSON.stringify([
+        {
+          ...job,
+          timeline: [
+            {
+              date: 'not-a-real-date',
+              stage: 'applied',
+              description: 'Submitted application',
+            },
+          ],
+          interviewNotes: [
+            {
+              round: 'First round',
+              date: 'still-not-a-date',
+              questions: ['Tell me about yourself'],
+              reflection: 'Need to prepare better',
+              result: 'pending',
+            },
+          ],
+        },
+      ]),
+    );
+
+    expect(loadJobs()).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+  });
 });

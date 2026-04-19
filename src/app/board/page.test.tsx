@@ -72,6 +72,23 @@ describe("BoardPage job detail sheet", () => {
     expect(within(aiPanel).getAllByRole("button", { name: "确认这一步" }).length).toBeGreaterThan(0);
   });
 
+  it("only shows forward progression actions for the current stage", async () => {
+    renderBoardPage();
+
+    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole("button", { name: "推进到 关注中" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "推进到 待投递" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "推进到 笔试" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "推进到 面试" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "推进到 录用" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "标记淘汰" })).toBeInTheDocument();
+  });
+
   it("clears the selected job when the sheet closes", async () => {
     renderBoardPage();
 

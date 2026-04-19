@@ -1,4 +1,5 @@
 import type { Job, Material } from './types';
+import { isValidDateString } from './date';
 
 const JOBS_KEY = 'jobfind.jobs';
 const MATERIALS_KEY = 'jobfind.materials';
@@ -62,7 +63,7 @@ function isStringArray(value: unknown): value is string[] {
 function isTimelineEvent(value: unknown): boolean {
   return (
     isRecord(value) &&
-    typeof value.date === 'string' &&
+    isValidDateString(value.date) &&
     typeof value.stage === 'string' &&
     typeof value.description === 'string'
   );
@@ -84,7 +85,7 @@ function isInterviewNote(value: unknown): boolean {
   return (
     isRecord(value) &&
     typeof value.round === 'string' &&
-    typeof value.date === 'string' &&
+    isValidDateString(value.date) &&
     isStringArray(value.questions) &&
     typeof value.reflection === 'string' &&
     (value.result === 'passed' || value.result === 'failed' || value.result === 'pending')

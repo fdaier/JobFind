@@ -3,6 +3,7 @@
 import React from "react";
 
 import { Separator } from "@/components/ui/separator";
+import { formatChineseDateTime } from "@/lib/date";
 import type { Job, TimelineEvent } from "@/lib/types";
 
 const STAGE_LABELS: Record<Job["stage"], string> = {
@@ -15,17 +16,6 @@ const STAGE_LABELS: Record<Job["stage"], string> = {
   rejected: "已淘汰",
 };
 
-function formatTimelineDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(value));
-}
-
 function TimelineRow({ event, isLast }: { event: TimelineEvent; isLast: boolean }) {
   return (
     <li className="space-y-3">
@@ -34,7 +24,7 @@ function TimelineRow({ event, isLast }: { event: TimelineEvent; isLast: boolean 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-slate-950">{STAGE_LABELS[event.stage]}</span>
-            <span className="text-xs text-slate-500">{formatTimelineDate(event.date)}</span>
+            <span className="text-xs text-slate-500">{formatChineseDateTime(event.date)}</span>
           </div>
           <p className="text-sm leading-6 text-slate-700">{event.description}</p>
         </div>

@@ -34,6 +34,7 @@ const STAGE_LABELS: Record<JobStage, string> = {
 };
 
 const STAGE_FLOW: JobStage[] = ["to_apply", "applied", "written_test", "interviewing", "offer", "rejected"];
+const STAGE_ORDER: JobStage[] = ["interested", "to_apply", "applied", "written_test", "interviewing", "offer", "rejected"];
 
 export function JobDetailSheet() {
   const { selectedJob, selectedJobId, setSelectedJobId, materials, advanceJobStage } = useJobfindStore();
@@ -50,8 +51,15 @@ export function JobDetailSheet() {
       return [];
     }
 
-    return STAGE_FLOW.filter((stage) => stage !== selectedJob.stage);
+    const currentStageIndex = STAGE_ORDER.indexOf(selectedJob.stage);
+    if (currentStageIndex < 0 || selectedJob.stage === "offer" || selectedJob.stage === "rejected") {
+      return [];
+    }
+
+    return STAGE_FLOW.filter((stage) => STAGE_ORDER.indexOf(stage) > currentStageIndex);
   }, [selectedJob]);
+
+  const canMarkRejected = selectedJob ? selectedJob.stage !== "offer" && selectedJob.stage !== "rejected" : false;
 
   return (
     <Sheet open={selectedJob !== null} onOpenChange={(open) => !open && setSelectedJobId(null)}>
@@ -117,11 +125,21 @@ export function JobDetailSheet() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => advanceJobStage(selectedJob.id, stage, `手动推进到${STAGE_LABELS[stage]}`)}
+                      onClick={() => advanceJobStage(selectedJob.id, stage, `推进到 ${STAGE_LABELS[stage]}`)}
                     >
-                      {STAGE_LABELS[stage]}
+                      {`推进到 ${STAGE_LABELS[stage]}`}
                     </Button>
                   ))}
+                  {canMarkRejected ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => advanceJobStage(selectedJob.id, "rejected", "标记淘汰")}
+                    >
+                      标记淘汰
+                    </Button>
+                  ) : null}
                 </div>
               </div>
               <Separator />

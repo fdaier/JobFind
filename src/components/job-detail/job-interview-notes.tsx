@@ -4,6 +4,7 @@ import React from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { formatChineseDateTime } from "@/lib/date";
 import type { InterviewNote, Job } from "@/lib/types";
 
 const RESULT_VARIANTS: Record<InterviewNote["result"], "default" | "secondary" | "destructive" | "outline"> = {
@@ -11,17 +12,6 @@ const RESULT_VARIANTS: Record<InterviewNote["result"], "default" | "secondary" |
   failed: "destructive",
   pending: "outline",
 };
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(value));
-}
 
 export function JobInterviewNotes({ job }: { job: Job }) {
   if (job.interviewNotes.length === 0) {
@@ -35,7 +25,7 @@ export function JobInterviewNotes({ job }: { job: Job }) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-slate-950">{note.round}</h3>
-              <p className="text-xs text-slate-500">{formatDate(note.date)}</p>
+              <p className="text-xs text-slate-500">{formatChineseDateTime(note.date)}</p>
             </div>
             <Badge variant={RESULT_VARIANTS[note.result]} className="rounded-md">
               {note.result === "passed" ? "通过" : note.result === "failed" ? "未通过" : "待定"}
