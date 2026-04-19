@@ -73,6 +73,7 @@ describe("BoardPage job detail sheet", () => {
     expect(aiPanel).toHaveTextContent("可展开帮助");
     expect(aiPanel).toHaveTextContent("查看排序依据");
     expect(aiPanel).toHaveTextContent("查看材料补齐建议");
+    expect(aiPanel).toHaveTextContent("材料补齐建议");
     expect(within(aiPanel).getAllByRole("button", { name: "确认这一步" }).length).toBeGreaterThan(0);
   });
 
@@ -123,6 +124,8 @@ describe("BoardPage job detail sheet", () => {
       const dialog = screen.getByRole("dialog");
       expect(dialog).toBeInTheDocument();
       expect(screen.getByLabelText("JD")).toHaveValue(sampleJD);
+      expect(screen.getByText("系统会先整理岗位关键信息，再把它纳入你的申请池和 Agent 判断。")).toBeInTheDocument();
+      expect(screen.queryByText("这是本地解析预览，不连接真实后端或 AI 接口。")).not.toBeInTheDocument();
 
       fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
       expect(screen.getByText("正在解析 JD")).toBeInTheDocument();

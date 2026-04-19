@@ -59,6 +59,26 @@ function buildSummary(job: Job, primaryRisk: RiskTag | null): string {
   return `${job.company}${job.position} 当前处于正常推进状态，Agent 会给出最稳妥的下一步建议。`;
 }
 
+function buildDashboardBrief(job: Job, primaryRisk: RiskTag | null): string {
+  if (primaryRisk?.type === "deadline") {
+    return `为什么现在先做这件事：${job.company}${job.position} 的网申时间最紧，再拖就会直接影响结果。`;
+  }
+
+  if (primaryRisk?.type === "interview_prep") {
+    return `为什么现在先做这件事：${job.company}${job.position} 已经进入临近面试窗口，准备质量会直接影响下一轮。`;
+  }
+
+  if (primaryRisk?.type === "silence") {
+    return `为什么现在先做这件事：${job.company}${job.position} 已经沉默了一段时间，现在适合低打扰跟进一次。`;
+  }
+
+  if (primaryRisk?.type === "material_gap") {
+    return `为什么现在先做这件事：${job.company}${job.position} 还有材料缺口，不补齐会卡住后续推进。`;
+  }
+
+  return `为什么现在先做这件事：${job.company}${job.position} 是当前申请池里最适合继续推进的机会之一。`;
+}
+
 function buildPerception(job: Job, risks: RiskTag[], rank: number, totalJobs: number): string[] {
   const bullets = [`当前阶段：${getStageLabel(job)}`, `在申请池中的紧急度排序：第 ${rank} / ${totalJobs}`];
 
@@ -153,6 +173,7 @@ export function buildDeterministicAgentResult(context: AgentRuntimeContext): Age
 
   return {
     summary: buildSummary(context.job, primaryRisk),
+    dashboardBrief: buildDashboardBrief(context.job, primaryRisk),
     perception: buildPerception(context.job, risks, rank, context.jobs.length),
     diagnosis: buildDiagnosis(context.job, primaryRisk, rank),
     recommendations: buildRecommendations(tasks, rank),

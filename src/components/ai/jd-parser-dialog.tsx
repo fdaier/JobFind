@@ -103,7 +103,7 @@ export function JDParserDialog() {
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>粘贴 JD 添加岗位</DialogTitle>
-          <DialogDescription>这是本地解析预览，不连接真实后端或 AI 接口。</DialogDescription>
+          <DialogDescription>系统会先整理岗位关键信息，再把它纳入你的申请池和 Agent 判断。</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

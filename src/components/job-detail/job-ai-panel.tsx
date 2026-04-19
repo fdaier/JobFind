@@ -20,6 +20,27 @@ const HELPER_LABELS: Record<HelperKey, string> = {
   materialGuidance: "查看材料补齐建议",
 };
 
+const HELPER_PRIORITY: HelperKey[] = [
+  "interviewPrepChecklist",
+  "followUpDraft",
+  "materialGuidance",
+  "rankingExplanation",
+];
+
+function getDefaultHelper(
+  availableHelpers: Array<[HelperKey, AgentArtifactSection]>,
+): HelperKey | null {
+  const availableKeys = new Set(availableHelpers.map(([key]) => key));
+
+  for (const key of HELPER_PRIORITY) {
+    if (availableKeys.has(key)) {
+      return key;
+    }
+  }
+
+  return null;
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
@@ -108,6 +129,21 @@ export function JobAIPanel({ job, materials }: { job: Job; materials: Material[]
   const availableHelpers = (Object.entries(result.helperArtifacts) as Array<[HelperKey, AgentArtifactSection | null]>).filter(
     (entry): entry is [HelperKey, AgentArtifactSection] => Boolean(entry[1]),
   );
+  const defaultHelper = useMemo(() => getDefaultHelper(availableHelpers), [availableHelpers]);
+
+  useEffect(() => {
+    setActiveHelper(defaultHelper);
+  }, [defaultHelper, job.id]);
+
+  useEffect(() => {
+    if (activeHelper && result.helperArtifacts[activeHelper]) {
+      return;
+    }
+
+    if (activeHelper !== defaultHelper) {
+      setActiveHelper(defaultHelper);
+    }
+  }, [activeHelper, defaultHelper, result.helperArtifacts]);
 
   return (
     <div className="space-y-5">
@@ -195,7 +231,7 @@ export function JobAIPanel({ job, materials }: { job: Job; materials: Material[]
             {activeHelper && result.helperArtifacts[activeHelper] ? (
               <ArtifactDetail artifact={result.helperArtifacts[activeHelper]} />
             ) : (
-              <p className="text-sm text-slate-500">点开一个帮助项，Agent 会给你展开对应的解释、草稿或清单。</p>
+              <p className="text-sm text-slate-500">当前岗位暂时没有可自动展开的帮助项，你也可以手动查看其他建议。</p>
             )}
           </div>
         ) : (

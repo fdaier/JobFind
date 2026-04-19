@@ -24,6 +24,7 @@ describe("buildDeterministicAgentResult", () => {
     expect(result).toEqual(
       expect.objectContaining({
         summary: expect.any(String),
+        dashboardBrief: expect.any(String),
         diagnosis: expect.objectContaining({
           headline: expect.any(String),
           reasons: expect.any(Array),
@@ -32,6 +33,8 @@ describe("buildDeterministicAgentResult", () => {
         helperArtifacts: expect.any(Object),
       }),
     );
+
+    expect(result.dashboardBrief).toContain("为什么");
   });
 
   it("explains Tencent as deadline plus missing portfolio focus", () => {

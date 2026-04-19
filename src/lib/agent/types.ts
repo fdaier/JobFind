@@ -29,6 +29,7 @@ export interface AgentHelperArtifacts {
 
 export interface AgentResult {
   summary: string;
+  dashboardBrief: string;
   perception: string[];
   diagnosis: AgentDiagnosis;
   recommendations: AgentRecommendation[];

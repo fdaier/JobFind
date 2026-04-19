@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { JobFindProvider, useJobfindStore } from "../../hooks/use-jobfind-store";
 import { createMockJobs, createMockMaterials } from "../../lib/mock-data";
@@ -61,5 +61,35 @@ describe("JobCard", () => {
 
     expect(screen.getByText("已过期")).toBeInTheDocument();
     expect(screen.queryByText("关键下一时间")).not.toBeInTheDocument();
+  });
+
+  it("uses the current time when now is omitted", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-21T08:00:00.000Z"));
+
+    try {
+      const materials = createMockMaterials(new Date("2026-04-19T08:00:00.000Z"));
+      const overdueJob = {
+        ...createMockJobs(new Date("2026-04-19T08:00:00.000Z"))[0],
+        id: "default-now-overdue",
+        company: "测试公司",
+        position: "默认时间岗位",
+        stage: "applied" as const,
+        applicationDeadline: "2026-04-20T09:00:00.000Z",
+        writtenTestDate: null,
+        interviewDate: null,
+      };
+
+      render(
+        <JobFindProvider>
+          <JobCard job={overdueJob} materials={materials} />
+        </JobFindProvider>,
+      );
+
+      expect(screen.getByText("已过期")).toBeInTheDocument();
+      expect(screen.queryByText("关键下一时间")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

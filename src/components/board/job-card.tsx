@@ -23,8 +23,6 @@ const STAGE_LABELS: Record<Job["stage"], string> = {
   rejected: "已淘汰",
 };
 
-const BOARD_REFERENCE_NOW = new Date("2026-04-19T08:00:00.000Z");
-
 function formatDate(dateValue: string) {
   const date = new Date(dateValue);
   return new Intl.DateTimeFormat("zh-CN", {
@@ -66,7 +64,7 @@ function getMilestoneState(job: Job, now: Date) {
   };
 }
 
-export function JobCard({ job, materials, now = BOARD_REFERENCE_NOW }: JobCardProps) {
+export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
   const { setSelectedJobId } = useJobfindStore();
 
   const completeness = useMemo(() => calculateMaterialCompleteness(job, materials), [job, materials]);
