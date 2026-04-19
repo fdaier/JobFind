@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "../../lib/utils";
+import { AgentAvatar } from "./agent-avatar";
 
 const navItems = [
   {
@@ -35,11 +36,19 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r border-slate-200 bg-white md:flex md:flex-col">
+    <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r border-slate-200/70 bg-[#fbf8f1]/88 backdrop-blur-xl md:flex md:flex-col">
       <div className="flex h-full flex-col px-4 py-5">
-        <div className="space-y-1 border-b border-slate-200 pb-5">
-          <div className="text-lg font-semibold tracking-tight text-slate-950">JobFind</div>
-          <p className="text-sm leading-6 text-slate-500">学生的 AI 求职项目经理</p>
+        <div className="border-b border-slate-200/70 pb-5">
+          <div className="flex items-center gap-3">
+            <AgentAvatar className="size-12 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-lg font-semibold tracking-tight text-slate-950">JobFind</div>
+              <p className="text-xs leading-5 text-slate-500">学生的 AI 求职项目经理</p>
+            </div>
+          </div>
+          <div className="mt-4 rounded-lg border border-slate-200/80 bg-white/60 px-3 py-2 text-xs leading-5 text-slate-600">
+            Agent 正在整理今日优先级、材料缺口和面试窗口。
+          </div>
         </div>
 
         <nav className="mt-5 flex flex-1 flex-col gap-1">
@@ -52,11 +61,13 @@ export function AppSidebar() {
                 href={href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  isActive ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
+                  isActive
+                    ? "bg-slate-950 text-white shadow-[0_12px_28px_rgba(22,28,40,0.16)]"
+                    : "text-slate-600 hover:bg-white/72 hover:text-slate-950",
                 )}
               >
-                <Icon className="size-4 shrink-0" />
+                <Icon className={cn("size-4 shrink-0", isActive ? "text-[#f4d28f]" : "text-slate-400 group-hover:text-slate-700")} />
                 <span>{label}</span>
               </Link>
             );
