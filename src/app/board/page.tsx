@@ -1,6 +1,9 @@
 "use client";
 
+import React from "react";
+
 import { KanbanBoard } from "@/components/board/kanban-board";
+import { JobDetailSheet } from "@/components/job-detail/job-detail-sheet";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
@@ -20,6 +23,7 @@ export default function BoardPage() {
         }
       />
       <KanbanBoard />
+      <JobDetailSheet />
     </div>
   );
 }
