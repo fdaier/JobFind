@@ -39,4 +39,27 @@ describe("JobCard", () => {
 
     expect(screen.getByTestId("selected-job-id")).toHaveTextContent("tencent");
   });
+
+  it("does not label an overdue milestone as the next time", () => {
+    const materials = createMockMaterials();
+    const overdueJob = {
+      ...createMockJobs()[0],
+      id: "overdue",
+      company: "测试公司",
+      position: "测试岗位",
+      stage: "applied" as const,
+      applicationDeadline: "2026-04-18T09:00:00.000Z",
+      writtenTestDate: null,
+      interviewDate: null,
+    };
+
+    render(
+      <JobFindProvider>
+        <JobCard job={overdueJob} materials={materials} now={new Date("2026-04-19T08:00:00.000Z")} />
+      </JobFindProvider>,
+    );
+
+    expect(screen.getByText("已过期")).toBeInTheDocument();
+    expect(screen.queryByText("关键下一时间")).not.toBeInTheDocument();
+  });
 });

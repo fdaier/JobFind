@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react";
-
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 
 import { useJobfindStore } from "../../hooks/use-jobfind-store";
 import { calculateMaterialCompleteness, generateRiskTags } from "../../lib/rules-engine";
@@ -12,6 +10,7 @@ import { cn } from "../../lib/utils";
 interface JobCardProps {
   job: Job;
   materials: Material[];
+  now?: Date;
 }
 
 const STAGE_LABELS: Record<Job["stage"], string> = {
@@ -24,6 +23,8 @@ const STAGE_LABELS: Record<Job["stage"], string> = {
   rejected: "已淘汰",
 };
 
+const BOARD_REFERENCE_NOW = new Date("2026-04-19T08:00:00.000Z");
+
 function formatDate(dateValue: string) {
   const date = new Date(dateValue);
   return new Intl.DateTimeFormat("zh-CN", {
@@ -35,8 +36,7 @@ function formatDate(dateValue: string) {
   }).format(date);
 }
 
-function getNextMilestone(job: Job) {
-  const now = Date.now();
+function getMilestoneState(job: Job, now: Date) {
   const milestones = [
     job.applicationDeadline ? { label: "DDL", value: job.applicationDeadline } : null,
     job.writtenTestDate ? { label: "笔试", value: job.writtenTestDate } : null,
@@ -44,24 +44,34 @@ function getNextMilestone(job: Job) {
   ].filter((item): item is { label: string; value: string } => Boolean(item));
 
   if (milestones.length === 0) {
-    return null;
+    return {
+      label: job.stage === "offer" || job.stage === "rejected" ? "已结束" : "暂无关键时间",
+      milestone: null as { label: string; value: string } | null,
+    };
   }
 
-  const future = milestones
+  const ordered = milestones
     .map((milestone) => ({ ...milestone, time: new Date(milestone.value).getTime() }))
     .filter((milestone) => Number.isFinite(milestone.time))
     .sort((left, right) => left.time - right.time);
 
-  const nextUpcoming = future.find((milestone) => milestone.time >= now);
-  return nextUpcoming ?? future[future.length - 1] ?? null;
+  const nextUpcoming = ordered.find((milestone) => milestone.time >= now.getTime());
+  if (nextUpcoming) {
+    return { label: "关键下一时间", milestone: nextUpcoming };
+  }
+
+  return {
+    label: job.stage === "offer" || job.stage === "rejected" ? "已结束" : "已过期",
+    milestone: ordered[ordered.length - 1] ?? null,
+  };
 }
 
-export function JobCard({ job, materials }: JobCardProps) {
+export function JobCard({ job, materials, now = BOARD_REFERENCE_NOW }: JobCardProps) {
   const { setSelectedJobId } = useJobfindStore();
 
   const completeness = useMemo(() => calculateMaterialCompleteness(job, materials), [job, materials]);
   const riskTags = useMemo(() => generateRiskTags(job, materials), [job, materials]);
-  const nextMilestone = useMemo(() => getNextMilestone(job), [job]);
+  const milestoneState = useMemo(() => getMilestoneState(job, now), [job, now]);
 
   return (
     <button
@@ -85,8 +95,8 @@ export function JobCard({ job, materials }: JobCardProps) {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3 text-xs text-slate-600">
-          <span className="font-medium text-slate-700">关键下一时间</span>
-          <span>{nextMilestone ? `${nextMilestone.label} ${formatDate(nextMilestone.value)}` : "暂无关键时间"}</span>
+          <span className="font-medium text-slate-700">{milestoneState.label}</span>
+          <span>{milestoneState.milestone ? `${milestoneState.milestone.label} ${formatDate(milestoneState.milestone.value)}` : "—"}</span>
         </div>
 
         <div className="space-y-1.5">

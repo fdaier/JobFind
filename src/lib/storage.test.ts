@@ -68,4 +68,22 @@ describe('storage helpers', () => {
     expect(loadJobs()).toBeNull();
     expect(localStorage.getItem('jobfind.jobs')).toBeNull();
   });
+
+  it('rejects jobs with invalid stages and removes the stored value', () => {
+    const jobs = createMockJobs();
+    const [job] = jobs;
+
+    localStorage.setItem(
+      'jobfind.jobs',
+      JSON.stringify([
+        {
+          ...job,
+          stage: 'archived',
+        },
+      ]),
+    );
+
+    expect(loadJobs()).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+  });
 });

@@ -68,6 +68,18 @@ function isTimelineEvent(value: unknown): boolean {
   );
 }
 
+function isJobStage(value: unknown): value is Job['stage'] {
+  return (
+    value === 'interested' ||
+    value === 'to_apply' ||
+    value === 'applied' ||
+    value === 'written_test' ||
+    value === 'interviewing' ||
+    value === 'offer' ||
+    value === 'rejected'
+  );
+}
+
 function isInterviewNote(value: unknown): boolean {
   return (
     isRecord(value) &&
@@ -115,7 +127,7 @@ function isJob(value: unknown): value is Job {
     typeof value.jobType === 'string' &&
     typeof value.batch === 'string' &&
     typeof value.channel === 'string' &&
-    typeof value.stage === 'string' &&
+    isJobStage(value.stage) &&
     (typeof value.applicationDeadline === 'string' || value.applicationDeadline === null) &&
     (typeof value.writtenTestDate === 'string' || value.writtenTestDate === null) &&
     (typeof value.interviewDate === 'string' || value.interviewDate === null) &&
