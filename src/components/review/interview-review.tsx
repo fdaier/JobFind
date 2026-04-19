@@ -11,7 +11,7 @@ export function InterviewReview() {
   const insights = buildInterviewInsights(jobs);
 
   return (
-    <Card className="rounded-md border-slate-200 bg-white shadow-sm">
+    <Card className="editorial-panel rounded-lg">
       <CardContent className="space-y-4 p-5">
         <div className="space-y-1">
           <h2 className="text-base font-semibold text-slate-950">面试复盘沉淀</h2>
@@ -19,11 +19,11 @@ export function InterviewReview() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
             <p className="text-xs text-slate-500">已记录复盘</p>
             <p className="mt-1 text-2xl font-semibold text-slate-950">{insights.totalNotes}</p>
           </div>
-          <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
             <p className="text-xs text-slate-500">覆盖岗位</p>
             <p className="mt-1 text-2xl font-semibold text-slate-950">{insights.reviewedJobs}</p>
           </div>
@@ -35,7 +35,7 @@ export function InterviewReview() {
             <ul className="space-y-1 text-sm leading-6 text-slate-700">
               {insights.commonQuestions.map((question) => (
                 <li key={question} className="flex items-start gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#c9a24c]" />
                   <span>{question}</span>
                 </li>
               ))}

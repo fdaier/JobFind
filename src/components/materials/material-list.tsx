@@ -17,23 +17,25 @@ export function MaterialList() {
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-md border-slate-200 bg-white shadow-sm">
+      <Card className="premium-surface rounded-lg">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-center gap-2">
-            <FileStack className="size-4 text-slate-700" aria-hidden="true" />
+            <div className="rounded-lg border border-[#e7d8b7] bg-[#fff8e9] p-2 text-slate-800">
+              <FileStack className="size-4" aria-hidden="true" />
+            </div>
             <h2 className="text-base font-semibold text-slate-950">Agent 材料调度</h2>
           </div>
           <p className="text-sm leading-6 text-slate-700">{insights.recommendation}</p>
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+            <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
               <p className="text-xs text-slate-500">材料总数</p>
               <p className="mt-1 text-2xl font-semibold text-slate-950">{insights.totalMaterials}</p>
             </div>
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+            <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
               <p className="text-xs text-slate-500">覆盖最广</p>
               <p className="mt-1 text-sm font-semibold text-slate-950">{insights.topMaterial?.name ?? "暂无材料"}</p>
             </div>
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+            <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
               <p className="text-xs text-slate-500">当前最大缺口</p>
               <p className="mt-1 text-sm font-semibold text-slate-950">
                 {primaryGap ? `${primaryGap.materialLabel} · 影响 ${primaryGap.jobs.length} 个岗位` : "暂无缺口"}
