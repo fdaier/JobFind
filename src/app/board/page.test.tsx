@@ -86,6 +86,7 @@ describe("BoardPage job detail sheet", () => {
     expect(screen.getByRole("button", { name: "推进到 笔试" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "推进到 面试" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "推进到 录用" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "推进到 已淘汰" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "标记淘汰" })).toBeInTheDocument();
   });
 

@@ -33,7 +33,7 @@ const STAGE_LABELS: Record<JobStage, string> = {
   rejected: "已淘汰",
 };
 
-const STAGE_FLOW: JobStage[] = ["to_apply", "applied", "written_test", "interviewing", "offer", "rejected"];
+const STAGE_FLOW: JobStage[] = ["to_apply", "applied", "written_test", "interviewing", "offer"];
 const STAGE_ORDER: JobStage[] = ["interested", "to_apply", "applied", "written_test", "interviewing", "offer", "rejected"];
 
 export function JobDetailSheet() {
