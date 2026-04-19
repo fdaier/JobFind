@@ -10,7 +10,7 @@ const stages = [
   { key: "applied", label: "已投递" },
   { key: "written_test", label: "笔试" },
   { key: "interviewing", label: "面试" },
-  { key: "offer", label: "已获 Offer" },
+  { key: "offer", label: "录用" },
   { key: "rejected", label: "已淘汰" },
 ] as const;
 
