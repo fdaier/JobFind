@@ -112,6 +112,46 @@ describe("BoardPage job detail sheet", () => {
     expect(screen.getByTestId("selected-job-id")).toHaveTextContent("none");
   });
 
+  it("adds a new interview note from the detail sheet", async () => {
+    renderBoardPage();
+
+    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "面试复盘" }));
+    fireEvent.click(screen.getByRole("tab", { name: "面试复盘" }));
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: "面试复盘", selected: true })).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByLabelText("轮次"), {
+      target: { value: "一面" },
+    });
+    fireEvent.change(screen.getByLabelText("面试时间"), {
+      target: { value: "2026-04-19T15:30" },
+    });
+    fireEvent.change(screen.getByLabelText("高频问题"), {
+      target: { value: "为什么想做 AI 产品\n你最满意的项目是什么" },
+    });
+    fireEvent.change(screen.getByLabelText("复盘"), {
+      target: { value: "表达还可以，但案例结果讲得不够具体。" },
+    });
+    fireEvent.change(screen.getByLabelText("结果"), {
+      target: { value: "pending" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "保存复盘" }));
+
+    const notesPanel = screen.getByRole("tabpanel", { name: "面试复盘" });
+    expect(notesPanel).toHaveTextContent("一面");
+    expect(notesPanel).toHaveTextContent("为什么想做 AI 产品");
+    expect(notesPanel).toHaveTextContent("表达还可以，但案例结果讲得不够具体。");
+    expect(notesPanel).toHaveTextContent("待定");
+  });
+
   it("opens the JD parser, previews the parsed job, and saves it to the board", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-04-19T08:00:00.000Z"));

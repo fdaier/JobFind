@@ -129,16 +129,41 @@ describe('JobFind store', () => {
       result.current.setJDParserOpen(true);
       result.current.advanceJobStage('new-job', 'applied', 'Submitted application');
       result.current.markTaskComplete('task-42');
+      result.current.addInterviewNote('new-job', {
+        round: '一面',
+        date: '2026-04-19T10:00:00.000Z',
+        questions: ['介绍一个你做过的项目'],
+        reflection: '需要把项目结果讲得更具体。',
+        result: 'pending',
+      });
     });
 
     expect(result.current.selectedJob?.id).toBe('new-job');
     expect(result.current.isJDParserOpen).toBe(true);
     expect(result.current.jobs[0].stage).toBe('applied');
+    expect(result.current.jobs[0].interviewNotes[0]).toMatchObject({
+      round: '一面',
+      reflection: '需要把项目结果讲得更具体。',
+      result: 'pending',
+    });
     expect(result.current.jobs[0].timeline[0]).toMatchObject({
       stage: 'applied',
-      description: 'Submitted application',
+      description: '补充面试复盘：一面',
     });
+    expect(result.current.jobs[0].timeline).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          stage: 'applied',
+          description: 'Submitted application',
+        }),
+      ]),
+    );
     expect(result.current.completedTaskIds).toContain('task-42');
     expect(JSON.parse(localStorage.getItem('jobfind.completedTasks') ?? '[]')).toEqual(['task-42']);
+    expect(JSON.parse(localStorage.getItem('jobfind.jobs') ?? '[]')[0].interviewNotes[0]).toMatchObject({
+      round: '一面',
+      reflection: '需要把项目结果讲得更具体。',
+      result: 'pending',
+    });
   });
 });

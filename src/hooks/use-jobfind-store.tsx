@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 
 import { createMockJobs, createMockMaterials } from '../lib/mock-data';
 import { loadCompletedTaskIds, loadJobs, loadMaterials, saveCompletedTaskIds, saveJobs, saveMaterials } from '../lib/storage';
-import type { Job, JobStage, Material, TimelineEvent } from '../lib/types';
+import type { InterviewNote, Job, JobStage, Material, TimelineEvent } from '../lib/types';
 
 const SEEDED_MOCK_DATE = new Date('2026-04-19T08:00:00.000Z');
 const SEEDED_JOBS = createMockJobs(SEEDED_MOCK_DATE);
@@ -21,6 +21,7 @@ interface JobFindStoreValue {
   setJDParserOpen: (isOpen: boolean) => void;
   addJob: (job: Job) => void;
   advanceJobStage: (jobId: string, stage: JobStage, description?: string) => void;
+  addInterviewNote: (jobId: string, note: InterviewNote) => void;
   markTaskComplete: (taskId: string) => void;
 }
 
@@ -118,6 +119,24 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
               stage,
               updatedAt,
               timeline: [createTimelineEvent(stage, description), ...job.timeline],
+            };
+          }),
+        }));
+      },
+      addInterviewNote: (jobId, note) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => {
+            if (job.id !== jobId) {
+              return job;
+            }
+
+            const updatedAt = new Date().toISOString();
+            return {
+              ...job,
+              updatedAt,
+              interviewNotes: [note, ...job.interviewNotes],
+              timeline: [createTimelineEvent(job.stage, `补充面试复盘：${note.round}`), ...job.timeline],
             };
           }),
         }));

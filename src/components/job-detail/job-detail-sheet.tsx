@@ -41,10 +41,10 @@ export function JobDetailSheet() {
   const [tabValue, setTabValue] = useState("info");
 
   useEffect(() => {
-    if (selectedJob) {
+    if (selectedJobId) {
       setTabValue("info");
     }
-  }, [selectedJobId, selectedJob]);
+  }, [selectedJobId]);
 
   const canAdvanceStages = useMemo(() => {
     if (!selectedJob) {

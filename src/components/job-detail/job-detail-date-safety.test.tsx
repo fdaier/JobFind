@@ -2,6 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { JobFindProvider } from "@/hooks/use-jobfind-store";
+
 import { createMockJobs } from "../../lib/mock-data";
 import { JobInterviewNotes } from "./job-interview-notes";
 import { JobTimeline } from "./job-timeline";
@@ -38,7 +40,11 @@ describe("job detail date safety", () => {
       ],
     };
 
-    render(<JobInterviewNotes job={job} />);
+    render(
+      <JobFindProvider>
+        <JobInterviewNotes job={job} />
+      </JobFindProvider>,
+    );
 
     expect(screen.getByText("日期待确认")).toBeInTheDocument();
   });
