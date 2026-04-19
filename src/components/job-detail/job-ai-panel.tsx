@@ -6,8 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { generateTodayTasks } from "@/lib/rules-engine";
-import type { Job, Material, TodayTask } from "@/lib/types";
+import type { Job, Material, TaskPriority, TodayTask } from "@/lib/types";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
+
+const priorityLabels: Record<TaskPriority, string> = {
+  urgent: "紧急",
+  high: "高",
+  medium: "中",
+  low: "低",
+};
 
 function TaskRow({
   task,
@@ -30,22 +37,22 @@ function TaskRow({
           </div>
         </div>
         <Badge variant="outline" className="rounded-md">
-          {task.priority}
+          {priorityLabels[task.priority]}
         </Badge>
       </div>
 
       <dl className="grid gap-3 text-sm sm:grid-cols-3">
         <div className="space-y-1">
-          <dt className="text-xs text-slate-500">Action</dt>
+          <dt className="text-xs text-slate-500">动作</dt>
           <dd className="text-slate-700">{task.action}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-xs text-slate-500">Reason</dt>
+          <dt className="text-xs text-slate-500">原因</dt>
           <dd className="text-slate-700">{task.reason}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-xs text-slate-500">Priority</dt>
-          <dd className="text-slate-700">{task.priority}</dd>
+          <dt className="text-xs text-slate-500">优先级</dt>
+          <dd className="text-slate-700">{priorityLabels[task.priority]}</dd>
         </div>
       </dl>
 

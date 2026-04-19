@@ -67,9 +67,9 @@ describe("BoardPage job detail sheet", () => {
       expect(screen.getByRole("tab", { name: "AI 建议", selected: true })).toBeInTheDocument();
     });
     const aiPanel = screen.getByRole("tabpanel", { name: "AI 建议" });
-    expect(aiPanel).toHaveTextContent("Action");
-    expect(aiPanel).toHaveTextContent("Reason");
-    expect(aiPanel).toHaveTextContent("Priority");
+    expect(aiPanel).toHaveTextContent("动作");
+    expect(aiPanel).toHaveTextContent("原因");
+    expect(aiPanel).toHaveTextContent("优先级");
     expect(within(aiPanel).getAllByRole("button", { name: "确认这一步" }).length).toBeGreaterThan(0);
   });
 
@@ -132,8 +132,8 @@ describe("BoardPage job detail sheet", () => {
       const preview = within(dialog);
       expect(preview.getByText("B站")).toBeInTheDocument();
       expect(preview.getAllByText("AI 产品实习生").length).toBeGreaterThan(0);
-      expect(preview.getByText("resume")).toBeInTheDocument();
-      expect(preview.getByText("portfolio")).toBeInTheDocument();
+      expect(preview.getByText("简历（resume）")).toBeInTheDocument();
+      expect(preview.getByText("作品集（portfolio）")).toBeInTheDocument();
 
       const saveButton = screen.getByRole("button", { name: "保存到看板" });
       await act(async () => {

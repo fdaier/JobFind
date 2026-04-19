@@ -2,17 +2,42 @@
 
 import React from "react";
 
-import type { Job } from "@/lib/types";
+import type { Job, JobType, MaterialType, RecruitBatch, SourceChannel } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-const MATTER_LABELS: Record<string, string> = {
+const MATERIAL_LABELS: Record<MaterialType, string> = {
   resume: "简历",
   portfolio: "作品集",
   transcript: "成绩单",
   certificate: "证书",
   cover_letter: "求职信",
   other: "其他",
+};
+
+const JOB_TYPE_LABELS: Record<JobType, string> = {
+  campus: "校招",
+  intern: "实习",
+  management_trainee: "管培生",
+  social: "社招",
+};
+
+const BATCH_LABELS: Record<RecruitBatch, string> = {
+  autumn: "秋招",
+  spring: "春招",
+  supplementary: "补录",
+  summer_intern: "暑期实习",
+  daily_intern: "日常实习",
+};
+
+const CHANNEL_LABELS: Record<SourceChannel, string> = {
+  official_site: "官网",
+  boss: "BOSS 直聘",
+  shixiseng: "实习僧",
+  nowcoder: "牛客",
+  school_career: "学校就业网",
+  referral: "内推",
+  campus_talk: "宣讲会",
 };
 
 function SectionBlock({ title, children }: { title: string; children: React.ReactNode }) {
@@ -83,19 +108,19 @@ export function JobInfoSection({ job }: { job: Job }) {
         <div className="grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
           <div>
             <p className="text-slate-500">岗位类型</p>
-            <p>{job.jobType}</p>
+            <p>{JOB_TYPE_LABELS[job.jobType]}</p>
           </div>
           <div>
             <p className="text-slate-500">投递批次</p>
-            <p>{job.batch}</p>
+            <p>{BATCH_LABELS[job.batch]}</p>
           </div>
           <div>
             <p className="text-slate-500">投递渠道</p>
-            <p>{job.channel}</p>
+            <p>{CHANNEL_LABELS[job.channel]}</p>
           </div>
           <div>
             <p className="text-slate-500">期望材料</p>
-            <p>{job.requiredMaterials.map((type) => MATTER_LABELS[type] ?? type).join("、")}</p>
+            <p>{job.requiredMaterials.map((type) => MATERIAL_LABELS[type]).join("、")}</p>
           </div>
         </div>
       </SectionBlock>

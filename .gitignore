@@ -5,3 +5,5 @@ out/
 coverage/
 .env*.local
 *.tsbuildinfo
+.playwright-cli/
+jobfind-dev-server*.log

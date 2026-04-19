@@ -88,7 +88,7 @@ export function RiskRadar() {
                             : "border-amber-200 bg-white text-amber-700",
                         )}
                       >
-                        {risk.level === "critical" ? "Critical" : "Warning"}
+                        {risk.level === "critical" ? "紧急" : "提醒"}
                       </Badge>
                     </div>
                     <p className={cn("text-sm leading-6", risk.level === "critical" ? "text-rose-900" : "text-amber-900")}>

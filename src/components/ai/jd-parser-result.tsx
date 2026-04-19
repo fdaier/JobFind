@@ -3,7 +3,7 @@
 import React from "react";
 import type { ReactNode } from "react";
 
-import type { Job } from "@/lib/types";
+import type { Job, JobStage, MaterialType } from "@/lib/types";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,25 @@ const DATE_FORMAT = new Intl.DateTimeFormat("zh-CN", {
   minute: "2-digit",
   hour12: false,
 });
+
+const stageLabels: Record<JobStage, string> = {
+  interested: "关注中",
+  to_apply: "待投递",
+  applied: "已投递",
+  written_test: "笔试",
+  interviewing: "面试",
+  offer: "录用",
+  rejected: "已淘汰",
+};
+
+const materialLabels: Record<MaterialType, string> = {
+  resume: "简历",
+  portfolio: "作品集",
+  transcript: "成绩单",
+  certificate: "证书",
+  cover_letter: "求职信",
+  other: "其他材料",
+};
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -56,15 +75,15 @@ export function JDParserResult({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Company" value={job.company} />
-        <Field label="Position" value={job.position} />
-        <Field label="Stage" value={job.stage} />
+        <Field label="公司" value={job.company} />
+        <Field label="岗位" value={job.position} />
+        <Field label="阶段" value={stageLabels[job.stage]} />
         <Field label="DDL" value={`${deadline}（3 天内）`} />
       </div>
 
       <Separator />
 
-      <Section title="Keywords">
+      <Section title="关键词">
         <div className="flex flex-wrap gap-2">
           {job.keywords.map((keyword) => (
             <Badge key={keyword} variant="outline" className="rounded-md">
@@ -76,11 +95,11 @@ export function JDParserResult({
 
       <Separator />
 
-      <Section title="Required materials">
+      <Section title="所需材料">
         <div className="flex flex-wrap gap-2">
           {job.requiredMaterials.map((material) => (
             <Badge key={material} variant="outline" className="rounded-md">
-              {material}
+              {materialLabels[material]}（{material}）
             </Badge>
           ))}
         </div>

@@ -48,7 +48,16 @@ function buildPriority(score: number): TaskPriority {
 }
 
 function materialName(type: MaterialType): string {
-  return type.replace('_', ' ');
+  const labels: Record<MaterialType, string> = {
+    resume: '简历',
+    portfolio: '作品集',
+    transcript: '成绩单',
+    certificate: '证书',
+    cover_letter: '求职信',
+    other: '其他材料',
+  };
+
+  return labels[type];
 }
 
 function getBoundMaterialTypes(job: Job, materials: Material[]): MaterialType[] {
@@ -112,7 +121,7 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
     risks.push({
       type: 'material_gap',
       level: 'warning',
-      message: `Missing materials: ${missingMaterials.map(materialName).join(', ')}`,
+      message: `缺少材料：${missingMaterials.map(materialName).join('、')}`,
     });
   }
 
@@ -139,7 +148,7 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
       risks.push({
         type: 'silence',
         level: 'warning',
-        message: `No response for ${Math.floor(daysSinceApplied)} days`,
+        message: `已投递 ${Math.floor(daysSinceApplied)} 天未收到反馈`,
       });
     }
   }
@@ -159,28 +168,28 @@ export function generateTodayTasks(jobs: Job[], materials: Material[], now: Date
         case 'deadline':
           score += 50;
           actionType = 'submit_application';
-          action = `Submit application for ${job.company} ${job.position}`;
+          action = `提交 ${job.company} ${job.position} 申请`;
           reason = riskTag.message;
           break;
         case 'material_gap':
           actionType = 'bind_material';
-          action = `Bind materials for ${job.company} ${job.position}`;
+          action = `补齐 ${job.company} ${job.position} 材料`;
           reason = riskTag.message;
           break;
         case 'interview_prep':
           score += 30;
           actionType = 'prepare_interview';
-          action = `Prepare interview for ${job.company} ${job.position}`;
+          action = `准备 ${job.company} ${job.position} 面试`;
           reason = riskTag.message;
           break;
         case 'silence':
           actionType = 'follow_up';
-          action = `Follow up with ${job.company} ${job.position}`;
+          action = `跟进 ${job.company} ${job.position} 进展`;
           reason = riskTag.message;
           break;
         default:
           actionType = 'update_material';
-          action = `Review ${job.company} ${job.position}`;
+          action = `复盘 ${job.company} ${job.position}`;
           reason = riskTag.message;
       }
 
