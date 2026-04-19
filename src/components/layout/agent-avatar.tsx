@@ -22,7 +22,7 @@ export function AgentAvatar({ className, imageClassName }: AgentAvatarProps) {
         fill
         sizes="96px"
         unoptimized
-        priority={false}
+        priority
         className={cn("object-cover object-[50%_28%]", imageClassName)}
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0)_50%,rgba(248,244,236,0.45)_100%)]" />

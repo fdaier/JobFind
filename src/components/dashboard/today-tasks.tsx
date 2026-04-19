@@ -43,7 +43,6 @@ export function TodayTasks() {
             </div>
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-slate-950">Agent 今日指挥</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-500">晨间 brief 已生成，先处理最影响结果的动作。</p>
             </div>
           </div>
           <Badge variant="outline" className="w-fit rounded-full border-slate-200 bg-white/70 text-slate-500">
@@ -51,16 +50,16 @@ export function TodayTasks() {
           </Badge>
         </div>
 
-        <div className="grid gap-4 rounded-lg border border-slate-200/80 bg-white/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:grid-cols-[4.75rem_minmax(0,1fr)] sm:items-start">
-          <AgentAvatar className="size-20" />
+        <div className="grid gap-4 rounded-lg border border-slate-200/80 bg-white/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:grid-cols-[8.75rem_minmax(0,1fr)] sm:items-start">
+          <AgentAvatar className="h-32 w-32 sm:h-36 sm:w-36" />
           <div className="space-y-3">
             <div className="relative rounded-lg border border-[#e4d8bf] bg-[#fffaf0] px-4 py-3 text-[15px] font-medium leading-7 text-slate-900 shadow-[0_12px_30px_rgba(69,58,39,0.08)]">
               <span className="hidden sm:block absolute left-[-8px] top-6 size-4 rotate-45 border-b border-l border-[#e4d8bf] bg-[#fffaf0]" />
               {agentSpeech}
             </div>
-            <div className="quiet-strip rounded-lg px-4 py-3 text-sm leading-6 text-slate-600">
-              {agentJudgment}
-            </div>
+          </div>
+          <div className="col-span-full border-t border-slate-200/70 pt-3 text-sm leading-6 text-slate-600">
+            {agentJudgment}
           </div>
         </div>
 

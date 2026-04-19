@@ -28,5 +28,6 @@ describe("TodayTasks", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByAltText("JobFind Agent")).toHaveAttribute("src", "/agent/agent-logo.png");
+    expect(screen.queryByText("晨间 brief 已生成，先处理最影响结果的动作。")).not.toBeInTheDocument();
   });
 });
