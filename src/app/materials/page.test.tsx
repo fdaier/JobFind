@@ -19,6 +19,9 @@ describe("MaterialsPage", () => {
     expect(screen.getByRole("heading", { name: "Agent 材料调度" })).toBeInTheDocument();
     expect(screen.getByText(/优先补齐作品集/)).toBeInTheDocument();
     expect(screen.getAllByText("本科成绩单").length).toBeGreaterThan(0);
+    expect(screen.getByText("v2.3")).toBeInTheDocument();
+    expect(screen.getAllByText("方向：产品经理").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/最近更新/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/覆盖 8 个岗位/).length).toBeGreaterThan(0);
   });
 });

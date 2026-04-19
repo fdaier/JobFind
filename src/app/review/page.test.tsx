@@ -21,5 +21,6 @@ describe("ReviewPage", () => {
     expect(screen.getByText(/Agent 记忆：渠道策略/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "渠道复盘" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "面试复盘沉淀" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "转化漏斗" })).toBeInTheDocument();
   });
 });

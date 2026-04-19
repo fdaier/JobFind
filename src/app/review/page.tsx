@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import { FunnelChart } from "@/components/dashboard/funnel-chart";
 import { PageHeader } from "@/components/layout/page-header";
 import { AgentMemory } from "@/components/review/agent-memory";
 import { ChannelReview } from "@/components/review/channel-review";
@@ -19,6 +20,7 @@ export default function ReviewPage() {
         <ChannelReview />
         <InterviewReview />
       </div>
+      <FunnelChart />
     </div>
   );
 }

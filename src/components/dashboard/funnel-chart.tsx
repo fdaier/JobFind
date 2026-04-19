@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
 import { calculateFunnelData } from "@/lib/rules-engine";

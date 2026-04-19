@@ -32,6 +32,9 @@ export interface MaterialUsageInsight {
   id: string;
   name: string;
   typeLabel: string;
+  targetDirection: string;
+  version: string;
+  lastUpdated: string;
   boundJobCount: number;
   boundJobs: Array<{ id: string; company: string; position: string }>;
   usageNote: string;
@@ -95,6 +98,9 @@ function buildUsageInsight(material: Material, jobs: Job[]): MaterialUsageInsigh
     id: material.id,
     name: material.name,
     typeLabel: MATERIAL_LABELS[material.type],
+    targetDirection: material.targetDirection,
+    version: material.version,
+    lastUpdated: material.lastUpdated,
     boundJobCount: boundJobs.length,
     boundJobs,
     usageNote: getMaterialUsageNote(boundJobs.length),
