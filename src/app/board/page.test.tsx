@@ -1,9 +1,10 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import BoardPage from "./page";
 import { JobFindProvider, useJobfindStore } from "../../hooks/use-jobfind-store";
+import { sampleJD } from "../../lib/mock-data";
 
 function SelectedJobProbe() {
   const { selectedJobId } = useJobfindStore();
@@ -105,5 +106,47 @@ describe("BoardPage job detail sheet", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
     expect(screen.getByTestId("selected-job-id")).toHaveTextContent("none");
+  });
+
+  it("opens the JD parser, previews the parsed job, and saves it to the board", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-19T08:00:00.000Z"));
+
+    try {
+      renderBoardPage();
+
+      fireEvent.click(screen.getByRole("button", { name: "粘贴 JD 添加岗位" }));
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toBeInTheDocument();
+      expect(screen.getByLabelText("JD")).toHaveValue(sampleJD);
+
+      fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
+      expect(screen.getByText("正在解析 JD")).toBeInTheDocument();
+      expect(screen.queryByText("B站")).not.toBeInTheDocument();
+
+      await act(async () => {
+        vi.advanceTimersByTime(800);
+      });
+
+      const preview = within(dialog);
+      expect(preview.getByText("B站")).toBeInTheDocument();
+      expect(preview.getAllByText("AI 产品实习生").length).toBeGreaterThan(0);
+      expect(preview.getByText("resume")).toBeInTheDocument();
+      expect(preview.getByText("portfolio")).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "保存到看板" }));
+      });
+
+      expect(screen.queryByLabelText("JD")).not.toBeInTheDocument();
+
+      const toApplyColumn = screen.getByTestId("kanban-column-to_apply");
+      expect(within(toApplyColumn).getAllByTestId("job-card")).toHaveLength(2);
+      expect(within(toApplyColumn).getByText("B站")).toBeInTheDocument();
+      expect(screen.getByTestId("selected-job-id")).not.toHaveTextContent("none");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

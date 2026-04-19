@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createMockJobs, createMockMaterials, sampleJD } from './mock-data';
+import { createMockJobs, createMockMaterials, createParsedJDJob, sampleJD } from './mock-data';
 
 const HOUR = 60 * 60 * 1000;
 
@@ -64,5 +64,18 @@ describe('mock data', () => {
 
     expect((new Date(jobsById.get('kuaishou')!.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeGreaterThan(24 * 6);
     expect((new Date(jobsById.get('kuaishou')!.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeLessThan(24 * 8);
+  });
+
+  it('creates the parsed JD job with the previewed B站 details', () => {
+    const job = createParsedJDJob();
+
+    expect(job.company).toBe('B站');
+    expect(job.position).toBe('AI 产品实习生');
+    expect(job.stage).toBe('to_apply');
+    expect(job.requiredMaterials).toEqual(['resume', 'portfolio']);
+    expect(job.boundMaterialIds).toEqual(['resume-pm']);
+    expect(job.applicationDeadline).not.toBeNull();
+    expect((new Date(job.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeGreaterThan(24 * 2);
+    expect((new Date(job.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeLessThan(24 * 4);
   });
 });

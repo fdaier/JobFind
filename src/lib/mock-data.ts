@@ -411,3 +411,50 @@ export function createMockJobs(now: Date = new Date()): Job[] {
     riskTags: generateRiskTags(job, materials, now),
   }));
 }
+
+export function createParsedJDJob(now: Date = new Date()): Job {
+  const materials = createMockMaterials(now);
+  const createdAt = now.toISOString();
+  const updatedAt = createdAt;
+  const applicationDeadline = new Date(now.getTime() + 3 * DAY).toISOString();
+
+  const job: Job = {
+    id: `bilibili-jd-${now.getTime()}`,
+    company: 'B站',
+    position: 'AI 产品实习生',
+    jobType: 'intern',
+    batch: 'summer_intern',
+    channel: 'official_site',
+    stage: 'to_apply',
+    applicationDeadline,
+    writtenTestDate: null,
+    interviewDate: null,
+    appliedDate: null,
+    jdText: sampleJD,
+    keywords: ['推荐系统', '内容社区', '用户增长'],
+    requirements: ['熟悉内容产品流程', '能整理需求和方案', '有 AI 产品作品更好'],
+    requiredMaterials: ['resume', 'portfolio'],
+    boundMaterialIds: ['resume-pm'],
+    contactName: null,
+    contactInfo: null,
+    riskTags: [],
+    aiSuggestions: [
+      createSuggestion(
+        'bilibili-jd-next-step',
+        '保存到看板后补齐 AI 产品作品集',
+        '当前是待投递状态，先把作品集和岗位材料对齐，再推进申请更稳。',
+        'high',
+        'bind_material',
+      ),
+    ],
+    timeline: [createTimelineEvent(createdAt, 'to_apply', 'JD 解析生成待投递岗位')],
+    interviewNotes: [],
+    createdAt,
+    updatedAt,
+  };
+
+  return {
+    ...job,
+    riskTags: generateRiskTags(job, materials, now),
+  };
+}

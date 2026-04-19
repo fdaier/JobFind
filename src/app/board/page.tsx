@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import { JDParserDialog } from "@/components/ai/jd-parser-dialog";
 import { KanbanBoard } from "@/components/board/kanban-board";
 import { JobDetailSheet } from "@/components/job-detail/job-detail-sheet";
 import { PageHeader } from "@/components/layout/page-header";
@@ -24,6 +25,7 @@ export default function BoardPage() {
       />
       <KanbanBoard />
       <JobDetailSheet />
+      <JDParserDialog />
     </div>
   );
 }
