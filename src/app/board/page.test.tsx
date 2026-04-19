@@ -135,8 +135,10 @@ describe("BoardPage job detail sheet", () => {
       expect(preview.getByText("resume")).toBeInTheDocument();
       expect(preview.getByText("portfolio")).toBeInTheDocument();
 
+      const saveButton = screen.getByRole("button", { name: "保存到看板" });
       await act(async () => {
-        fireEvent.click(screen.getByRole("button", { name: "保存到看板" }));
+        fireEvent.click(saveButton);
+        fireEvent.click(saveButton);
       });
 
       expect(screen.queryByLabelText("JD")).not.toBeInTheDocument();

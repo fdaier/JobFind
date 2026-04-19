@@ -45,9 +45,11 @@ function Section({
 export function JDParserResult({
   job,
   onSave,
+  isSaving = false,
 }: {
   job: Job;
   onSave: () => void;
+  isSaving?: boolean;
 }) {
   const deadline = job.applicationDeadline ? DATE_FORMAT.format(new Date(job.applicationDeadline)) : "暂无";
 
@@ -91,8 +93,8 @@ export function JDParserResult({
       </Section>
 
       <div className="flex justify-end">
-        <Button type="button" onClick={onSave}>
-          保存到看板
+        <Button type="button" onClick={onSave} disabled={isSaving}>
+          {isSaving ? "保存中..." : "保存到看板"}
         </Button>
       </div>
     </div>

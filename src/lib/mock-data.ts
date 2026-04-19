@@ -62,6 +62,19 @@ function createInterviewNote(round: string, date: string, questions: string[], r
   return { round, date, questions, reflection, result };
 }
 
+const PARSED_JD_ID_PREFIX = 'bilibili-jd';
+let parsedJDIdFallbackCounter = 0;
+
+function createParsedJDJobId(now: Date): string {
+  const cryptoId = globalThis.crypto?.randomUUID?.();
+  if (cryptoId) {
+    return `${PARSED_JD_ID_PREFIX}-${now.getTime()}-${cryptoId}`;
+  }
+
+  parsedJDIdFallbackCounter += 1;
+  return `${PARSED_JD_ID_PREFIX}-${now.getTime()}-${parsedJDIdFallbackCounter}`;
+}
+
 export function createMockMaterials(now: Date = new Date()): Material[] {
 
   return [
@@ -412,14 +425,14 @@ export function createMockJobs(now: Date = new Date()): Job[] {
   }));
 }
 
-export function createParsedJDJob(now: Date = new Date()): Job {
+export function createParsedJDJob(now: Date = new Date(), id?: string): Job {
   const materials = createMockMaterials(now);
   const createdAt = now.toISOString();
   const updatedAt = createdAt;
   const applicationDeadline = new Date(now.getTime() + 3 * DAY).toISOString();
 
   const job: Job = {
-    id: `bilibili-jd-${now.getTime()}`,
+    id: id ?? createParsedJDJobId(now),
     company: 'B站',
     position: 'AI 产品实习生',
     jobType: 'intern',

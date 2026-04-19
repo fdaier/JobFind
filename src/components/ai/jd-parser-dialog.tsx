@@ -26,8 +26,10 @@ export function JDParserDialog() {
   const { isJDParserOpen, setJDParserOpen, addJob } = useJobfindStore();
   const [mode, setMode] = useState<ParserState>("input");
   const [jdText, setJDText] = useState(sampleJD);
+  const [isSaving, setIsSaving] = useState(false);
   const timeoutRef = useRef<number | null>(null);
   const parsedAtRef = useRef<Date | null>(null);
+  const saveGuardRef = useRef(false);
 
   const clearTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
@@ -39,6 +41,8 @@ export function JDParserDialog() {
   const resetToInput = useCallback(() => {
     clearTimer();
     parsedAtRef.current = null;
+    saveGuardRef.current = false;
+    setIsSaving(false);
     setMode("input");
     setJDText(sampleJD);
   }, [clearTimer]);
@@ -82,10 +86,15 @@ export function JDParserDialog() {
   };
 
   const handleSave = () => {
+    if (saveGuardRef.current) {
+      return;
+    }
+
+    saveGuardRef.current = true;
+    setIsSaving(true);
     const parsedAt = parsedAtRef.current ?? new Date();
     addJob(createParsedJDJob(parsedAt));
     toast.success("岗位已添加到看板");
-    resetToInput();
     setJDParserOpen(false);
   };
 
@@ -136,7 +145,9 @@ export function JDParserDialog() {
             </div>
           ) : null}
 
-          {mode === "preview" && parsedJob ? <JDParserResult job={parsedJob} onSave={handleSave} /> : null}
+          {mode === "preview" && parsedJob ? (
+            <JDParserResult job={parsedJob} onSave={handleSave} isSaving={isSaving} />
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

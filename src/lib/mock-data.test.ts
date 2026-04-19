@@ -78,4 +78,15 @@ describe('mock data', () => {
     expect((new Date(job.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeGreaterThan(24 * 2);
     expect((new Date(job.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeLessThan(24 * 4);
   });
+
+  it('generates unique parsed JD ids for the same timestamp', () => {
+    const now = new Date('2026-04-19T08:00:00.000Z');
+
+    const first = createParsedJDJob(now);
+    const second = createParsedJDJob(now);
+
+    expect(first.id).not.toBe(second.id);
+    expect(first.id.startsWith('bilibili-jd-')).toBe(true);
+    expect(second.id.startsWith('bilibili-jd-')).toBe(true);
+  });
 });
