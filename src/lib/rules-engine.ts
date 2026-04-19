@@ -47,7 +47,18 @@ function buildPriority(score: number): TaskPriority {
   return 'low';
 }
 
-function materialName(type: MaterialType): string {
+export function getTaskPriorityLabel(priority: TaskPriority): string {
+  const labels: Record<TaskPriority, string> = {
+    urgent: '紧急',
+    high: '高',
+    medium: '中',
+    low: '低',
+  };
+
+  return labels[priority];
+}
+
+export function getMaterialTypeLabel(type: MaterialType): string {
   const labels: Record<MaterialType, string> = {
     resume: '简历',
     portfolio: '作品集',
@@ -69,7 +80,7 @@ function getBoundMaterialTypes(job: Job, materials: Material[]): MaterialType[] 
     .map((material) => material.type);
 }
 
-function getMissingMaterials(job: Job, materials: Material[]): MaterialType[] {
+export function getMissingMaterials(job: Job, materials: Material[]): MaterialType[] {
   const boundTypes = new Set(getBoundMaterialTypes(job, materials));
 
   return job.requiredMaterials.filter((type) => !boundTypes.has(type));
@@ -121,7 +132,7 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
     risks.push({
       type: 'material_gap',
       level: 'warning',
-      message: `缺少材料：${missingMaterials.map(materialName).join('、')}`,
+      message: `缺少材料：${missingMaterials.map(getMaterialTypeLabel).join('、')}`,
     });
   }
 
@@ -154,6 +165,44 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
   }
 
   return risks;
+}
+
+function scoreJobUrgency(job: Job, materials: Material[], now: Date): number {
+  return generateRiskTags(job, materials, now).reduce((score, riskTag) => {
+    let next = score + (riskTag.level === 'critical' ? 100 : 50);
+
+    switch (riskTag.type) {
+      case 'deadline':
+        next += 50;
+        break;
+      case 'interview_prep':
+        next += 30;
+        break;
+      default:
+        break;
+    }
+
+    return next;
+  }, 0);
+}
+
+export function getTopJobTasks(job: Job, materials: Material[], now: Date = new Date()): TodayTask[] {
+  return generateTodayTasks([job], materials, now);
+}
+
+export function getJobUrgencyRank(job: Job, jobs: Job[], materials: Material[], now: Date = new Date()): number {
+  const rankedJobs = [...jobs].sort((left, right) => {
+    const scoreDelta = scoreJobUrgency(right, materials, now) - scoreJobUrgency(left, materials, now);
+    if (scoreDelta !== 0) {
+      return scoreDelta;
+    }
+
+    return left.id.localeCompare(right.id);
+  });
+
+  const index = rankedJobs.findIndex((item) => item.id === job.id);
+
+  return index < 0 ? rankedJobs.length + 1 : index + 1;
 }
 
 export function generateTodayTasks(jobs: Job[], materials: Material[], now: Date = new Date()): TodayTask[] {

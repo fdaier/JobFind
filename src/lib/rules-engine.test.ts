@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   calculateFunnelData,
   calculateMaterialCompleteness,
+  getJobUrgencyRank,
   generateRiskTags,
   generateTodayTasks,
 } from './rules-engine';
@@ -179,6 +180,34 @@ describe('rules engine', () => {
     expect(tasks[0].score).toBeGreaterThan(tasks[1].score);
     expect(tasks[0].priority).toBe('urgent');
     expect(tasks[1].priority).toBe('medium');
+  });
+
+  it('ranks Tencent-style deadline pressure above a normal to-apply job', () => {
+    const urgentJob: Job = {
+      ...baseJob,
+      id: 'urgent-job',
+      company: '腾讯',
+      stage: 'applied',
+      applicationDeadline: '2026-04-19T20:00:00.000Z',
+      requiredMaterials: ['resume', 'portfolio'],
+      boundMaterialIds: ['resume-1'],
+    };
+
+    const normalJob: Job = {
+      ...baseJob,
+      id: 'normal-job',
+      company: '快手',
+      stage: 'to_apply',
+      applicationDeadline: '2026-04-26T12:00:00.000Z',
+      appliedDate: null,
+      requiredMaterials: ['resume'],
+      boundMaterialIds: ['resume-1'],
+    };
+
+    const urgentRank = getJobUrgencyRank(urgentJob, [urgentJob, normalJob], materials, now);
+    const normalRank = getJobUrgencyRank(normalJob, [urgentJob, normalJob], materials, now);
+
+    expect(urgentRank).toBeLessThan(normalRank);
   });
 
   it('groups funnel data by stage', () => {
