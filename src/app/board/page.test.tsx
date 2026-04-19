@@ -67,9 +67,12 @@ describe("BoardPage job detail sheet", () => {
       expect(screen.getByRole("tab", { name: "AI 建议", selected: true })).toBeInTheDocument();
     });
     const aiPanel = screen.getByRole("tabpanel", { name: "AI 建议" });
-    expect(aiPanel).toHaveTextContent("动作");
-    expect(aiPanel).toHaveTextContent("原因");
-    expect(aiPanel).toHaveTextContent("优先级");
+    expect(aiPanel).toHaveTextContent("Agent 判断");
+    expect(aiPanel).toHaveTextContent("为什么现在重要");
+    expect(aiPanel).toHaveTextContent("下一步建议");
+    expect(aiPanel).toHaveTextContent("可展开帮助");
+    expect(aiPanel).toHaveTextContent("查看排序依据");
+    expect(aiPanel).toHaveTextContent("查看材料补齐建议");
     expect(within(aiPanel).getAllByRole("button", { name: "确认这一步" }).length).toBeGreaterThan(0);
   });
 
