@@ -88,37 +88,12 @@ function getMaterialUsageNote(count: number) {
   return "暂无绑定岗位，适合先确认是否还需要维护。";
 }
 
-function getTypeBoundJobs(jobs: Job[], type: MaterialType) {
-  return jobs.filter((job) => job.requiredMaterials.includes(type)).map(getJobSummary);
-}
-
-function getCoverageName(material: Material) {
-  if (material.targetDirection === "通用") {
-    return material.name;
-  }
-
-  return `${material.targetDirection}通用${MATERIAL_LABELS[material.type]}`;
-}
-
 function buildUsageInsight(material: Material, jobs: Job[]): MaterialUsageInsight {
   const boundJobs = jobs.filter((job) => job.boundMaterialIds.includes(material.id)).map(getJobSummary);
 
   return {
     id: material.id,
     name: material.name,
-    typeLabel: MATERIAL_LABELS[material.type],
-    boundJobCount: boundJobs.length,
-    boundJobs,
-    usageNote: getMaterialUsageNote(boundJobs.length),
-  };
-}
-
-function buildTypeCoverageInsight(material: Material, jobs: Job[]): MaterialUsageInsight {
-  const boundJobs = getTypeBoundJobs(jobs, material.type);
-
-  return {
-    id: material.id,
-    name: getCoverageName(material),
     typeLabel: MATERIAL_LABELS[material.type],
     boundJobCount: boundJobs.length,
     boundJobs,
@@ -136,25 +111,10 @@ export function getChannelLabel(channel: SourceChannel): string {
 
 export function buildMaterialInsights(jobs: Job[], materials: Material[]): MaterialInsights {
   const materialsById = new Map(materials.map((material) => [material.id, material] as const));
-  const materialIndexById = new Map(materials.map((material, index) => [material.id, index] as const));
 
   const usages = materials
     .map((material) => buildUsageInsight(material, jobs))
     .sort((left, right) => right.boundJobCount - left.boundJobCount || left.name.localeCompare(right.name, "zh-CN"));
-
-  const typeCoverage = [...new Set(materials.map((material) => material.type))]
-    .map((type) => {
-      const representative = materials.find((material) => material.type === type);
-      const representativeIndex = representative ? materialIndexById.get(representative.id) ?? Number.POSITIVE_INFINITY : Number.POSITIVE_INFINITY;
-
-      return representative ? { insight: buildTypeCoverageInsight(representative, jobs), representativeIndex } : null;
-    })
-    .filter((item): item is { insight: MaterialUsageInsight; representativeIndex: number } => item !== null)
-    .sort(
-      (left, right) =>
-        right.insight.boundJobCount - left.insight.boundJobCount || left.representativeIndex - right.representativeIndex,
-    )
-    .map(({ insight }) => insight);
 
   const gapMap = new Map<MaterialType, Array<{ id: string; company: string; position: string }>>();
   jobs.forEach((job) => {
@@ -181,7 +141,7 @@ export function buildMaterialInsights(jobs: Job[], materials: Material[]): Mater
 
   return {
     totalMaterials: materials.length,
-    topMaterial: typeCoverage[0] ?? null,
+    topMaterial: usages[0] ?? null,
     materials: usages,
     gaps,
     recommendation,
