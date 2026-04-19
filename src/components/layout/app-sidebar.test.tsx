@@ -16,6 +16,8 @@ describe("AppSidebar", () => {
     expect(screen.getByText("学生的 AI 求职项目经理")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "今日作战台" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "申请看板" })).toHaveAttribute("href", "/board");
+    expect(screen.getByRole("link", { name: "材料中心" })).toHaveAttribute("href", "/materials");
+    expect(screen.getByRole("link", { name: "复盘中心" })).toHaveAttribute("href", "/review");
     expect(screen.getByRole("link", { name: "申请看板" })).toHaveAttribute("aria-current", "page");
   });
 });
