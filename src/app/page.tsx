@@ -1,7 +1,7 @@
 export default function HomePage() {
   return (
-    <main>
+    <section>
       <p>JobFind 初始化完成</p>
-    </main>
+    </section>
   );
 }
