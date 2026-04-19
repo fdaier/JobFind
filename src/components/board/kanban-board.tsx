@@ -34,8 +34,8 @@ export function KanbanBoard() {
   }, [jobs]);
 
   return (
-    <section aria-label="申请看板" className="w-full">
-      <div className="flex gap-4 overflow-x-auto pb-2">
+    <section aria-label="申请看板" className="editorial-panel w-full rounded-lg p-3">
+      <div className="flex gap-4 overflow-x-auto pb-2 [scrollbar-color:#b7c0cc_transparent]">
         {STAGES.map(({ stage, title }) => (
           <KanbanColumn
             key={stage}

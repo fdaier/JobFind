@@ -77,8 +77,8 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
       data-testid="job-card"
       onClick={() => setSelectedJobId(job.id)}
       className={cn(
-        "flex w-full flex-col gap-3 rounded-md border border-slate-200 bg-white p-4 text-left",
-        "transition hover:border-slate-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+        "flex w-full flex-col gap-3 rounded-lg border border-slate-200/85 bg-white/88 p-4 text-left",
+        "transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-[0_16px_32px_rgba(43,51,69,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -86,7 +86,7 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{job.company}</p>
           <h3 className="mt-1 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
         </div>
-        <span className="inline-flex items-center justify-center rounded-full border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+        <span className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50/80 px-2 py-0.5 text-[11px] font-medium text-slate-600">
           {STAGE_LABELS[job.stage]}
         </span>
       </div>
@@ -109,9 +109,9 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
             aria-valuenow={completeness.percentage}
             aria-valuemin={0}
             aria-valuemax={100}
-            className="h-1.5 overflow-hidden rounded-full bg-slate-100"
+            className="h-1.5 overflow-hidden rounded-full bg-slate-200/70"
           >
-            <div className="h-full rounded-full bg-primary" style={{ width: `${completeness.percentage}%` }} />
+            <div className="h-full rounded-full bg-slate-900" style={{ width: `${completeness.percentage}%` }} />
           </div>
         </div>
       </div>
@@ -120,9 +120,9 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
         <p className="text-xs font-medium text-slate-700">Agent 风险</p>
         <div className="flex flex-wrap gap-2">
           {riskTags.length === 0 ? (
-            <span className="inline-flex items-center justify-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-              暂无风险
-            </span>
+              <span className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                暂无风险
+              </span>
           ) : (
             riskTags.map((tag) => (
               <span
