@@ -18,11 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body suppressHydrationWarning className="bg-slate-50 text-slate-950 antialiased">
+      <body suppressHydrationWarning className="text-slate-950 antialiased">
         <JobFindProvider>
           <AppSidebar />
           <main className="min-h-screen md:pl-64">
-            <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto flex min-h-screen w-full max-w-[90rem] flex-col px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
               {children}
             </div>
           </main>
