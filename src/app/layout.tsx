@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="bg-slate-50 text-slate-950 antialiased">
+      <body suppressHydrationWarning className="bg-slate-50 text-slate-950 antialiased">
         <JobFindProvider>
           <AppSidebar />
           <main className="min-h-screen md:pl-64">
