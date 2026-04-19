@@ -38,11 +38,11 @@ const STAGE_ORDER: JobStage[] = ["interested", "to_apply", "applied", "written_t
 
 export function JobDetailSheet() {
   const { selectedJob, selectedJobId, setSelectedJobId, materials, advanceJobStage } = useJobfindStore();
-  const [tabValue, setTabValue] = useState("info");
+  const [tabValue, setTabValue] = useState("ai");
 
   useEffect(() => {
     if (selectedJobId) {
-      setTabValue("info");
+      setTabValue("ai");
     }
   }, [selectedJobId]);
 
@@ -79,34 +79,34 @@ export function JobDetailSheet() {
                 </Badge>
               </div>
               <SheetDescription className="text-sm leading-6 text-slate-600">
-                先看信息，再看材料和建议，最后再推进下一步。
+                Agent 会先判断风险和下一步，你再确认是否推进。
               </SheetDescription>
             </SheetHeader>
 
             <Tabs value={tabValue} onValueChange={setTabValue} className="flex min-h-0 flex-1 gap-0 px-6 py-5">
               <TabsList variant="line" className="w-full justify-start rounded-none border-b border-slate-200 pb-0">
+                <TabsTrigger value="ai">Agent 作战台</TabsTrigger>
                 <TabsTrigger value="info">基本信息</TabsTrigger>
-                <TabsTrigger value="timeline">时间线</TabsTrigger>
                 <TabsTrigger value="materials">材料</TabsTrigger>
-                <TabsTrigger value="ai">AI 建议</TabsTrigger>
+                <TabsTrigger value="timeline">时间线</TabsTrigger>
                 <TabsTrigger value="notes">面试复盘</TabsTrigger>
               </TabsList>
 
               <ScrollArea className="mt-5 min-h-0 flex-1 pr-3">
-                <TabsContent value="info" className="mt-0">
-                  <JobInfoSection job={selectedJob} />
+                <TabsContent value="ai" className="mt-0">
+                  <JobAIPanel job={selectedJob} materials={materials} />
                 </TabsContent>
 
-                <TabsContent value="timeline" className="mt-0">
-                  <JobTimeline job={selectedJob} />
+                <TabsContent value="info" className="mt-0">
+                  <JobInfoSection job={selectedJob} />
                 </TabsContent>
 
                 <TabsContent value="materials" className="mt-0">
                   <JobMaterials job={selectedJob} materials={materials} />
                 </TabsContent>
 
-                <TabsContent value="ai" className="mt-0">
-                  <JobAIPanel job={selectedJob} materials={materials} />
+                <TabsContent value="timeline" className="mt-0">
+                  <JobTimeline job={selectedJob} />
                 </TabsContent>
 
                 <TabsContent value="notes" className="mt-0">

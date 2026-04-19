@@ -26,7 +26,7 @@ describe("BoardPage job detail sheet", () => {
     localStorage.clear();
   });
 
-  it("opens Tencent detail sheet with five tabs after clicking the card", async () => {
+  it("opens Tencent detail sheet with Agent workspace as the first default tab", async () => {
     renderBoardPage();
 
     fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
@@ -35,11 +35,15 @@ describe("BoardPage job detail sheet", () => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("tab", { name: "基本信息" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "时间线" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "材料" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "AI 建议" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "面试复盘" })).toBeInTheDocument();
+    const tabs = screen.getAllByRole("tab").map((tab) => tab.textContent);
+    expect(tabs).toEqual(["Agent 作战台", "基本信息", "材料", "时间线", "面试复盘"]);
+    expect(screen.getByRole("tab", { name: "Agent 作战台", selected: true })).toBeInTheDocument();
+
+    const agentPanel = screen.getByRole("tabpanel", { name: "Agent 作战台" });
+    expect(agentPanel).toHaveTextContent("Agent 岗位快照");
+    expect(agentPanel).toHaveTextContent("腾讯 · AI 产品实习生 · 已投递");
+    expect(agentPanel).toHaveTextContent("Agent 判断");
+    expect(screen.getByText("Agent 会先判断风险和下一步，你再确认是否推进。")).toBeInTheDocument();
   });
 
   it("shows missing Tencent portfolio material and confirmable AI suggestions", async () => {
@@ -61,12 +65,12 @@ describe("BoardPage job detail sheet", () => {
     expect(materialPanel).toHaveTextContent("作品集");
     expect(materialPanel).toHaveTextContent("缺少的材料");
 
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "AI 建议" }));
-    fireEvent.click(screen.getByRole("tab", { name: "AI 建议" }));
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Agent 作战台" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Agent 作战台" }));
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "AI 建议", selected: true })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Agent 作战台", selected: true })).toBeInTheDocument();
     });
-    const aiPanel = screen.getByRole("tabpanel", { name: "AI 建议" });
+    const aiPanel = screen.getByRole("tabpanel", { name: "Agent 作战台" });
     expect(aiPanel).toHaveTextContent("Agent 判断");
     expect(aiPanel).toHaveTextContent("为什么现在重要");
     expect(aiPanel).toHaveTextContent("下一步建议");

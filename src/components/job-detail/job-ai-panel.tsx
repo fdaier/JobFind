@@ -20,6 +20,16 @@ const HELPER_LABELS: Record<HelperKey, string> = {
   materialGuidance: "查看材料补齐建议",
 };
 
+const STAGE_LABELS: Record<Job["stage"], string> = {
+  interested: "关注中",
+  to_apply: "待投递",
+  applied: "已投递",
+  written_test: "笔试",
+  interviewing: "面试",
+  offer: "录用",
+  rejected: "已淘汰",
+};
+
 const HELPER_PRIORITY: HelperKey[] = [
   "interviewPrepChecklist",
   "followUpDraft",
@@ -147,6 +157,15 @@ export function JobAIPanel({ job, materials }: { job: Job; materials: Material[]
 
   return (
     <div className="space-y-5">
+      <section className="rounded-md border border-slate-200 bg-slate-50 p-4">
+        <p className="text-xs font-medium text-slate-500">Agent 岗位快照</p>
+        <h3 className="mt-2 text-base font-semibold text-slate-950">
+          {job.company} · {job.position} · {STAGE_LABELS[job.stage]}
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{result.summary}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{result.dashboardBrief}</p>
+      </section>
+
       <Section title="Agent 判断">
         <Card className="rounded-md border-slate-200 bg-white shadow-none">
           <CardContent className="space-y-3 p-4">
