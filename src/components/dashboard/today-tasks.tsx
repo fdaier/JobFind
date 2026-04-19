@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { CheckCircle2, Circle, Sparkles } from "lucide-react";
 
-import { deterministicAgentRuntime } from "@/lib/agent/deterministic-runtime";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,25 +31,7 @@ const priorityLabels = {
 
 export function TodayTasks() {
   const tasks = useTodayTasks();
-  const { jobs, materials, markTaskComplete } = useJobfindStore();
-
-  const topAgentBrief = useMemo(() => {
-    const topTask = tasks.find((task) => !task.completed) ?? tasks[0];
-    const topJob = topTask ? jobs.find((job) => job.id === topTask.jobId) : null;
-
-    if (!topJob) {
-      return "Agent 判断：当前没有需要立刻推进的事项，先保持节奏并关注新的关键节点。";
-    }
-
-    const result = deterministicAgentRuntime.buildResult({
-      job: topJob,
-      jobs,
-      materials,
-      completedTaskIds: tasks.filter((task) => task.completed).map((task) => task.id),
-    });
-
-    return `Agent 判断：${result.dashboardBrief}`;
-  }, [jobs, materials, tasks]);
+  const { markTaskComplete } = useJobfindStore();
 
   return (
     <Card className="premium-surface overflow-hidden rounded-lg">
@@ -80,7 +61,6 @@ export function TodayTasks() {
             <div className="quiet-strip rounded-lg px-4 py-3 text-sm leading-6 text-slate-600">
               {agentJudgment}
             </div>
-            <div className="sr-only">{topAgentBrief}</div>
           </div>
         </div>
 

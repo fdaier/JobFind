@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
@@ -15,10 +16,14 @@ export function AgentAvatar({ className, imageClassName }: AgentAvatarProps) {
         className,
       )}
     >
-      <img
+      <Image
         src="/agent/agent-logo.png"
         alt="JobFind Agent"
-        className={cn("h-full w-full object-cover object-[50%_28%]", imageClassName)}
+        fill
+        sizes="96px"
+        unoptimized
+        priority={false}
+        className={cn("object-cover object-[50%_28%]", imageClassName)}
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0)_50%,rgba(248,244,236,0.45)_100%)]" />
     </div>
