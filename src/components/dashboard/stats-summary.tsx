@@ -36,25 +36,25 @@ function toneClass(tone: MetricTone) {
   switch (tone) {
     case "warning":
       return {
-        icon: "border-[#ead8ae] bg-[#fff7e5] text-amber-700",
+        icon: "border-[#ead8ae]/65 bg-[#fff7e5]/46 text-amber-700",
         value: "text-slate-950",
         label: "text-amber-700",
       };
     case "danger":
       return {
-        icon: "border-rose-200 bg-rose-50 text-rose-700",
+        icon: "border-rose-200/65 bg-rose-50/46 text-rose-700",
         value: "text-slate-950",
         label: "text-rose-700",
       };
     case "success":
       return {
-        icon: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        icon: "border-emerald-200/65 bg-emerald-50/46 text-emerald-700",
         value: "text-slate-950",
         label: "text-emerald-700",
       };
     default:
       return {
-        icon: "border-slate-200 bg-white/80 text-slate-700",
+        icon: "border-white/55 bg-white/34 text-slate-700",
         value: "text-slate-950",
         label: "text-slate-500",
       };
@@ -127,24 +127,24 @@ export function StatsSummary() {
   }, [completedTaskIds, jobs, materials]);
 
   return (
-    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => {
         const Icon = metric.icon;
         const tone = toneClass(metric.tone);
 
         return (
-          <Card key={metric.label} className="editorial-panel rounded-lg">
-            <div className="flex h-full min-h-28 flex-col justify-between gap-4 p-5">
+          <Card key={metric.label} className="editorial-panel rounded-lg py-0">
+            <div className="flex h-full flex-col gap-2 px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className={`text-sm font-medium ${tone.label}`}>{metric.label}</div>
-                  <div className={`text-3xl font-semibold tracking-tight ${tone.value}`}>{metric.value}</div>
+                  <div className={`text-2xl font-semibold tracking-tight ${tone.value}`}>{metric.value}</div>
                 </div>
-                <div className={`rounded-lg border p-2 ${tone.icon}`}>
+                <div className={`rounded-lg border p-1.5 ${tone.icon}`}>
                   <Icon className="size-4" aria-hidden="true" />
                 </div>
               </div>
-              <div className="text-sm leading-6 text-slate-500">{metric.hint}</div>
+              <div className="text-sm leading-4 text-slate-500">{metric.hint}</div>
             </div>
           </Card>
         );

@@ -24,7 +24,7 @@ export function AgentMemory() {
 
         <div className="grid gap-3 md:grid-cols-2">
           {memories.map((memory) => (
-            <article key={memory.title} className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
+            <article key={memory.title} className="rounded-lg border border-white/48 bg-white/34 p-4">
               <h3 className="text-sm font-semibold text-slate-950">{memory.title}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-700">{memory.body}</p>
             </article>

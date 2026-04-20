@@ -4,9 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.965 0.018 285);
+  --background: #f2eef8;
   --foreground: oklch(0.215 0.025 258);
-  --card: oklch(0.992 0.006 285);
+  --card: rgba(255, 255, 255, 0.36);
   --card-foreground: oklch(0.215 0.025 258);
   --popover: oklch(0.992 0.006 285);
   --popover-foreground: oklch(0.215 0.025 258);
@@ -20,8 +20,8 @@
   --accent-foreground: oklch(0.255 0.032 258);
   --destructive: oklch(0.55 0.13 25);
   --destructive-foreground: oklch(0.985 0.008 85);
-  --border: oklch(0.86 0.018 248);
-  --input: oklch(0.86 0.018 248);
+  --border: rgba(214, 210, 226, 0.56);
+  --input: rgba(214, 210, 226, 0.56);
   --ring: oklch(0.62 0.055 250);
   --radius: 0.625rem;
   --sidebar: hsl(250 34% 96%);
@@ -109,11 +109,12 @@ html {
 body {
   margin: 0;
   background:
-    linear-gradient(115deg, rgba(223, 231, 250, 0.72) 0%, rgba(250, 251, 255, 0.7) 38%, rgba(248, 224, 235, 0.64) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(246, 248, 253, 0.46) 46%, rgba(255, 255, 255, 0.58) 100%),
-    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.88) 0 16rem, rgba(255, 255, 255, 0) 34rem),
-    radial-gradient(circle at 86% 28%, rgba(240, 221, 239, 0.46) 0 17rem, rgba(240, 221, 239, 0) 38rem),
-    linear-gradient(135deg, #edf2fb 0%, #f8f9fd 48%, #f8e8f0 100%);
+    radial-gradient(circle at 8% 0%, rgba(222, 216, 240, 0.88) 0 20rem, rgba(222, 216, 240, 0) 44rem),
+    radial-gradient(circle at 96% 0%, rgba(247, 235, 248, 0.86) 0 22rem, rgba(247, 235, 248, 0) 46rem),
+    radial-gradient(circle at 3% 96%, rgba(239, 223, 240, 0.58) 0 20rem, rgba(239, 223, 240, 0) 46rem),
+    radial-gradient(circle at 54% 34%, rgba(255, 255, 255, 0.74) 0 28rem, rgba(255, 255, 255, 0) 58rem),
+    linear-gradient(180deg, #efeaf7 0%, #fbfafd 28%, #f8f5fc 62%, #eee9f6 100%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
@@ -126,25 +127,57 @@ body::before {
   pointer-events: none;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 38%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.42), rgba(239, 243, 253, 0.18), rgba(255, 255, 255, 0.32));
-  opacity: 0.92;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(231, 225, 243, 0.2), rgba(255, 255, 255, 0.24));
+  opacity: 0.68;
+}
+
+.jobfind-card-surface {
+  border-color: rgba(255, 255, 255, 0.58);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.46), rgba(246, 243, 252, 0.28)),
+    rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.82),
+    inset -1px -1px 0 rgba(198, 190, 215, 0.16),
+    0 1px 1px rgba(84, 75, 104, 0.035),
+    0 16px 34px rgba(74, 66, 94, 0.05);
+  backdrop-filter: blur(22px);
 }
 
 .premium-surface {
-  border: 1px solid rgba(171, 181, 196, 0.62);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(249, 250, 255, 0.72));
-  box-shadow: 0 18px 55px rgba(43, 51, 69, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(246, 243, 252, 0.3)),
+    rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.84),
+    inset -1px -1px 0 rgba(198, 190, 215, 0.17),
+    0 1px 1px rgba(84, 75, 104, 0.035),
+    0 18px 38px rgba(74, 66, 94, 0.052);
+  backdrop-filter: blur(22px);
 }
 
 .editorial-panel {
-  border: 1px solid rgba(177, 185, 198, 0.64);
-  background: rgba(255, 255, 255, 0.64);
-  box-shadow: 0 12px 36px rgba(43, 51, 69, 0.06);
-  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.44), rgba(246, 243, 252, 0.26)),
+    rgba(255, 255, 255, 0.24);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.78),
+    inset -1px -1px 0 rgba(198, 190, 215, 0.15),
+    0 1px 1px rgba(84, 75, 104, 0.03),
+    0 14px 30px rgba(74, 66, 94, 0.046);
+  backdrop-filter: blur(22px);
 }
 
 .quiet-strip {
-  border: 1px solid rgba(191, 198, 209, 0.56);
-  background: rgba(245, 248, 249, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.34), rgba(246, 243, 252, 0.2)),
+    rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.68),
+    inset -1px -1px 0 rgba(198, 190, 215, 0.12);
+  backdrop-filter: blur(18px);
 }

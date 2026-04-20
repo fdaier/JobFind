@@ -77,8 +77,8 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
       data-testid="job-card"
       onClick={() => setSelectedJobId(job.id)}
       className={cn(
-        "flex w-full flex-col gap-3 rounded-lg border border-slate-200/85 bg-white/88 p-4 text-left",
-        "transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-[0_16px_32px_rgba(43,51,69,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+        "flex w-full flex-col gap-3 rounded-lg border border-white/52 bg-white/36 p-4 text-left",
+        "transition hover:-translate-y-0.5 hover:border-white/70 hover:bg-white/48 hover:shadow-[0_16px_32px_rgba(43,51,69,0.045)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -86,7 +86,7 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{job.company}</p>
           <h3 className="mt-1 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
         </div>
-        <span className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50/80 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+        <span className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/30 px-2 py-0.5 text-[11px] font-medium text-slate-600">
           {STAGE_LABELS[job.stage]}
         </span>
       </div>

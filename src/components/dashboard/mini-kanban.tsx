@@ -35,7 +35,7 @@ export function MiniKanban() {
             return (
               <div
                 key={stage.key}
-                className="flex min-h-24 flex-col justify-between rounded-lg border border-slate-200/80 bg-white/60 p-3"
+                className="flex min-h-24 flex-col justify-between rounded-lg border border-white/48 bg-white/34 p-3"
               >
                 <div className="space-y-1">
                   <div className="text-xs font-medium text-slate-500">{stage.label}</div>

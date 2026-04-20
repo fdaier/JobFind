@@ -19,11 +19,11 @@ export function InterviewReview() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
+          <div className="rounded-lg border border-white/48 bg-white/34 p-4">
             <p className="text-xs text-slate-500">已记录复盘</p>
             <p className="mt-1 text-2xl font-semibold text-slate-950">{insights.totalNotes}</p>
           </div>
-          <div className="rounded-lg border border-slate-200/80 bg-white/62 p-4">
+          <div className="rounded-lg border border-white/48 bg-white/34 p-4">
             <p className="text-xs text-slate-500">覆盖岗位</p>
             <p className="mt-1 text-2xl font-semibold text-slate-950">{insights.reviewedJobs}</p>
           </div>

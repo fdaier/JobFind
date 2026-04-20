@@ -34,32 +34,41 @@ export function TodayTasks() {
   const { markTaskComplete } = useJobfindStore();
 
   return (
-    <Card className="premium-surface overflow-hidden rounded-lg">
-      <CardContent className="space-y-5 p-5 sm:p-6">
+    <Card className="premium-surface overflow-hidden rounded-lg py-0">
+      <CardContent className="space-y-5 px-5 pb-5 pt-3.5 sm:px-6 sm:pb-6 sm:pt-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#d8ddf0] bg-white/58 p-2 text-slate-700 shadow-[0_10px_24px_rgba(82,91,122,0.06)]">
+            <div className="rounded-lg border border-white/50 bg-white/32 p-2 text-slate-700 shadow-[0_10px_24px_rgba(82,91,122,0.035)]">
               <Sparkles className="size-4" aria-hidden="true" />
             </div>
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-slate-950">Agent 今日指挥</h2>
             </div>
           </div>
-          <Badge variant="outline" className="w-fit rounded-full border-slate-200 bg-white/70 text-slate-500">
+          <Badge variant="outline" className="w-fit rounded-full border-white/50 bg-white/36 text-slate-500">
             {tasks.length} 项
           </Badge>
         </div>
 
-        <div className="grid gap-4 rounded-lg border border-slate-200/75 bg-white/58 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_18px_42px_rgba(83,91,122,0.07)] backdrop-blur sm:grid-cols-[8.75rem_minmax(0,1fr)] sm:items-start">
-          <AgentAvatar className="h-32 w-32 sm:h-36 sm:w-36" />
-          <div className="space-y-3">
-            <div className="relative rounded-lg border border-[#d9ddf0] bg-white/76 px-4 py-3 text-[15px] font-medium leading-7 text-slate-900 shadow-[0_14px_32px_rgba(82,91,122,0.08)]">
-              <span className="hidden sm:block absolute left-[-8px] top-6 size-4 rotate-45 border-b border-l border-[#d9ddf0] bg-white/76" />
-              {agentSpeech}
+        <div className="relative overflow-hidden rounded-lg border border-white/48 bg-[linear-gradient(112deg,rgba(219,228,243,0.58)_0%,rgba(255,255,255,0.54)_38%,rgba(247,242,250,0.38)_100%)] shadow-[inset_1px_1px_0_rgba(255,255,255,0.78),inset_-1px_-1px_0_rgba(190,181,206,0.14),0_18px_42px_rgba(83,91,122,0.04)] backdrop-blur-xl">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-52 bg-[radial-gradient(circle_at_38%_36%,rgba(162,190,218,0.32),rgba(162,190,218,0)_58%),linear-gradient(90deg,rgba(211,222,240,0.52),rgba(211,222,240,0))]" />
+          <div className="relative grid gap-4 p-4 sm:grid-cols-[11.5rem_minmax(0,1fr)] sm:items-center">
+            <div className="relative h-36 overflow-hidden rounded-lg border border-white/55 bg-[#dbe8f3]/70 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),0_16px_34px_rgba(65,82,108,0.08)]">
+              <AgentAvatar
+                className="absolute inset-0 h-full w-full rounded-none border-0 bg-transparent shadow-none"
+                imageClassName="object-cover object-[50%_30%] scale-110"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0)_58%,rgba(255,255,255,0.58)_100%)]" />
             </div>
-          </div>
-          <div className="col-span-full border-t border-slate-200/70 pt-3 text-sm leading-6 text-slate-600">
-            {agentJudgment}
+            <div>
+              <div className="relative rounded-lg border border-white/62 bg-white/56 px-5 py-4 text-[15px] font-medium leading-7 text-slate-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.82),0_12px_28px_rgba(82,91,122,0.045)]">
+                <span className="hidden sm:block absolute left-[-9px] top-7 size-4 rotate-45 border-b border-l border-white/62 bg-white/56" />
+                {agentSpeech}
+              </div>
+            </div>
+            <div className="col-span-full border-t border-white/48 pt-3 text-sm leading-6 text-slate-600">
+              {agentJudgment}
+            </div>
           </div>
         </div>
 
@@ -71,8 +80,8 @@ export function TodayTasks() {
               <article
                 key={task.id}
                 className={cn(
-                  "rounded-lg border p-4 transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(43,51,69,0.08)]",
-                  completed ? "border-slate-200/80 bg-slate-50/80" : "border-slate-200/80 bg-white/82",
+                  "rounded-lg border p-4 transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(43,51,69,0.045)]",
+                  completed ? "border-white/45 bg-white/24" : "border-white/50 bg-white/38",
                 )}
               >
                 <div className="flex items-start gap-3">
