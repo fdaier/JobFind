@@ -20,7 +20,7 @@ export function MaterialList() {
       <Card className="premium-surface rounded-lg">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-center gap-2">
-            <div className="rounded-lg border border-[#e7d8b7] bg-[#fff8e9] p-2 text-slate-800">
+            <div className="rounded-lg border border-[#d8ddf0] bg-white/58 p-2 text-slate-700 shadow-[0_10px_24px_rgba(82,91,122,0.06)]">
               <FileStack className="size-4" aria-hidden="true" />
             </div>
             <h2 className="text-base font-semibold text-slate-950">Agent 材料调度</h2>

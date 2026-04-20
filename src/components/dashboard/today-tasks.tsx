@@ -38,7 +38,7 @@ export function TodayTasks() {
       <CardContent className="space-y-5 p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#e7d8b7] bg-[#fff8e9] p-2 text-slate-800">
+            <div className="rounded-lg border border-[#d8ddf0] bg-white/58 p-2 text-slate-700 shadow-[0_10px_24px_rgba(82,91,122,0.06)]">
               <Sparkles className="size-4" aria-hidden="true" />
             </div>
             <div>
@@ -50,11 +50,11 @@ export function TodayTasks() {
           </Badge>
         </div>
 
-        <div className="grid gap-4 rounded-lg border border-slate-200/80 bg-white/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:grid-cols-[8.75rem_minmax(0,1fr)] sm:items-start">
+        <div className="grid gap-4 rounded-lg border border-slate-200/75 bg-white/58 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_18px_42px_rgba(83,91,122,0.07)] backdrop-blur sm:grid-cols-[8.75rem_minmax(0,1fr)] sm:items-start">
           <AgentAvatar className="h-32 w-32 sm:h-36 sm:w-36" />
           <div className="space-y-3">
-            <div className="relative rounded-lg border border-[#e4d8bf] bg-[#fffaf0] px-4 py-3 text-[15px] font-medium leading-7 text-slate-900 shadow-[0_12px_30px_rgba(69,58,39,0.08)]">
-              <span className="hidden sm:block absolute left-[-8px] top-6 size-4 rotate-45 border-b border-l border-[#e4d8bf] bg-[#fffaf0]" />
+            <div className="relative rounded-lg border border-[#d9ddf0] bg-white/76 px-4 py-3 text-[15px] font-medium leading-7 text-slate-900 shadow-[0_14px_32px_rgba(82,91,122,0.08)]">
+              <span className="hidden sm:block absolute left-[-8px] top-6 size-4 rotate-45 border-b border-l border-[#d9ddf0] bg-white/76" />
               {agentSpeech}
             </div>
           </div>

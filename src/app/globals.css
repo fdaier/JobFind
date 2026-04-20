@@ -27,7 +27,7 @@
   --sidebar: hsl(250 34% 96%);
   --sidebar-foreground: hsl(226 20% 24%);
   --sidebar-primary: hsl(225 24% 18%);
-  --sidebar-primary-foreground: hsl(42 40% 98%);
+  --sidebar-primary-foreground: hsl(248 44% 98%);
   --sidebar-accent: hsl(248 32% 92%);
   --sidebar-accent-foreground: hsl(225 24% 18%);
   --sidebar-border: hsl(220 18% 86%);
@@ -109,10 +109,11 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.96) 0 16rem, rgba(255, 255, 255, 0) 34rem),
-    radial-gradient(circle at 88% 22%, rgba(246, 219, 232, 0.52) 0 15rem, rgba(246, 219, 232, 0) 32rem),
-    radial-gradient(circle at 28% 92%, rgba(221, 230, 250, 0.68) 0 18rem, rgba(221, 230, 250, 0) 38rem),
-    linear-gradient(135deg, #eef2fa 0%, #f7f8fc 44%, #f8e7ee 100%);
+    linear-gradient(115deg, rgba(223, 231, 250, 0.72) 0%, rgba(250, 251, 255, 0.7) 38%, rgba(248, 224, 235, 0.64) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(246, 248, 253, 0.46) 46%, rgba(255, 255, 255, 0.58) 100%),
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.88) 0 16rem, rgba(255, 255, 255, 0) 34rem),
+    radial-gradient(circle at 86% 28%, rgba(240, 221, 239, 0.46) 0 17rem, rgba(240, 221, 239, 0) 38rem),
+    linear-gradient(135deg, #edf2fb 0%, #f8f9fd 48%, #f8e8f0 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
@@ -125,9 +126,9 @@ body::before {
   pointer-events: none;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 38%),
-    radial-gradient(circle at 72% 10%, rgba(235, 229, 251, 0.42), rgba(235, 229, 251, 0) 26rem);
-  opacity: 0.88;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.42), rgba(239, 243, 253, 0.18), rgba(255, 255, 255, 0.32));
+  opacity: 0.92;
 }
 
 .premium-surface {

@@ -35,7 +35,7 @@ export function InterviewReview() {
             <ul className="space-y-1 text-sm leading-6 text-slate-700">
               {insights.commonQuestions.map((question) => (
                 <li key={question} className="flex items-start gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#c9a24c]" />
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#a7a2df]" />
                   <span>{question}</span>
                 </li>
               ))}
