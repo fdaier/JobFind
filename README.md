@@ -4,15 +4,11 @@ JobFind 是一个面向学生求职场景的 AI 求职项目经理。它把岗�
 
 ## 立即体验
 
-当前可用线上入口：
-
-[https://jobfind-core-loop.vercel.app](https://jobfind-core-loop.vercel.app)
-
 阿里云访问链接：
 
-项目已预留阿里云域名绑定说明，但当前仓库中还没有记录已绑定完成的阿里云正式域名。阿里云域名绑定完成后，请把正式链接放在这里，读者就可以直接通过阿里云域名使用 JobFind。
+[https://jobfind.fdaier.xyz](https://jobfind.fdaier.xyz)
 
-部署和域名绑定步骤见 [docs/JobFind-Vercel-Deployment.md](docs/JobFind-Vercel-Deployment.md)。
+打开链接即可直接使用 JobFind，无需安装或登录。
 
 ## 产品亮点
 
