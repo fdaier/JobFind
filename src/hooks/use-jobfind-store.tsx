@@ -3,10 +3,20 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { createMockJobs, createMockMaterials } from '../lib/mock-data';
-import { loadCompletedTaskIds, loadJobs, loadMaterials, saveCompletedTaskIds, saveJobs, saveMaterials } from '../lib/storage';
+import {
+  loadCompletedTaskIds,
+  loadDemoDataVersion,
+  loadJobs,
+  loadMaterials,
+  saveCompletedTaskIds,
+  saveDemoDataVersion,
+  saveJobs,
+  saveMaterials,
+} from '../lib/storage';
 import type { InterviewNote, Job, JobStage, Material, TimelineEvent } from '../lib/types';
 
 const SEEDED_MOCK_DATE = new Date('2026-04-19T08:00:00.000Z');
+const DEMO_DATA_VERSION = '2026-04-20-rich-ai-pm-pool';
 const SEEDED_JOBS = createMockJobs(SEEDED_MOCK_DATE);
 const SEEDED_MATERIALS = createMockMaterials(SEEDED_MOCK_DATE);
 
@@ -51,15 +61,16 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    const isCurrentDemoData = loadDemoDataVersion() === DEMO_DATA_VERSION;
     const loadedJobs = loadJobs();
     const loadedMaterials = loadMaterials();
     const loadedCompletedTaskIds = loadCompletedTaskIds();
 
     setState((current) => ({
       ...current,
-      jobs: loadedJobs ?? current.jobs,
-      materials: loadedMaterials ?? current.materials,
-      completedTaskIds: loadedCompletedTaskIds ?? current.completedTaskIds,
+      jobs: isCurrentDemoData ? (loadedJobs ?? current.jobs) : current.jobs,
+      materials: isCurrentDemoData ? (loadedMaterials ?? current.materials) : current.materials,
+      completedTaskIds: isCurrentDemoData ? (loadedCompletedTaskIds ?? current.completedTaskIds) : current.completedTaskIds,
     }));
     setIsHydrated(true);
   }, []);
@@ -72,6 +83,7 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
     saveJobs(state.jobs);
     saveMaterials(state.materials);
     saveCompletedTaskIds(state.completedTaskIds);
+    saveDemoDataVersion(DEMO_DATA_VERSION);
   }, [isHydrated, state.jobs, state.materials, state.completedTaskIds]);
 
   const selectedJob = useMemo(() => {

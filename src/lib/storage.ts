@@ -4,6 +4,7 @@ import { isValidDateString } from './date';
 const JOBS_KEY = 'jobfind.jobs';
 const MATERIALS_KEY = 'jobfind.materials';
 const COMPLETED_TASK_IDS_KEY = 'jobfind.completedTasks';
+const DEMO_DATA_VERSION_KEY = 'jobfind.demoDataVersion';
 
 function hasWindow(): boolean {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
@@ -209,4 +210,13 @@ export function loadCompletedTaskIds(): string[] | null {
 
 export function saveCompletedTaskIds(completedTaskIds: string[]): void {
   saveJsonValue(COMPLETED_TASK_IDS_KEY, completedTaskIds);
+}
+
+export function loadDemoDataVersion(): string | null {
+  const value = loadJsonValue<unknown>(DEMO_DATA_VERSION_KEY);
+  return typeof value === 'string' ? value : null;
+}
+
+export function saveDemoDataVersion(version: string): void {
+  saveJsonValue(DEMO_DATA_VERSION_KEY, version);
 }

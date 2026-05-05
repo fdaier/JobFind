@@ -19,24 +19,26 @@ describe('mock data', () => {
     expect(sampleJD).toContain('AI');
   });
 
-  it('creates the approved six materials', () => {
+  it('creates the approved eight AI product manager materials', () => {
     const materials = createMockMaterials();
 
-    expect(materials).toHaveLength(6);
+    expect(materials).toHaveLength(8);
     expect(materials.map((material) => material.id)).toEqual([
       'resume-pm',
-      'resume-ops',
+      'resume-ai-pm',
       'portfolio-ai',
       'transcript',
-      'portfolio-game',
+      'case-ai-assistant',
       'cet6',
+      'cover-letter-ai-pm',
+      'internship-proof',
     ]);
   });
 
-  it('creates the approved eight jobs with the required relative dates', () => {
+  it('creates the expanded AI product manager job pool with the required relative dates', () => {
     const jobs = createMockJobs();
 
-    expect(jobs).toHaveLength(8);
+    expect(jobs).toHaveLength(13);
     expect(jobs.map((job) => job.id)).toEqual([
       'tencent',
       'bytedance',
@@ -46,6 +48,11 @@ describe('mock data', () => {
       'netease',
       'jd',
       'kuaishou',
+      'baidu',
+      'ant',
+      'bilibili',
+      'tme',
+      'mihoyo',
     ]);
 
     const jobsById = new Map(jobs.map((job) => [job.id, job] as const));
@@ -64,6 +71,15 @@ describe('mock data', () => {
 
     expect((new Date(jobsById.get('kuaishou')!.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeGreaterThan(24 * 6);
     expect((new Date(jobsById.get('kuaishou')!.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeLessThan(24 * 8);
+
+    expect((new Date(jobsById.get('baidu')!.interviewDate!).getTime() - Date.now()) / HOUR).toBeGreaterThan(48);
+    expect((new Date(jobsById.get('baidu')!.interviewDate!).getTime() - Date.now()) / HOUR).toBeLessThan(72);
+
+    expect((new Date(jobsById.get('ant')!.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeGreaterThan(24);
+    expect((new Date(jobsById.get('ant')!.applicationDeadline!).getTime() - Date.now()) / HOUR).toBeLessThan(72);
+
+    expect((new Date(jobsById.get('mihoyo')!.writtenTestDate!).getTime() - Date.now()) / HOUR).toBeGreaterThan(24);
+    expect((new Date(jobsById.get('mihoyo')!.writtenTestDate!).getTime() - Date.now()) / HOUR).toBeLessThan(48);
   });
 
   it('creates the parsed JD job with the previewed B站 details', () => {

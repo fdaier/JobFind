@@ -18,11 +18,12 @@ describe('JobFind store', () => {
   it('shows seeded mock data on the first render', () => {
     const { result } = renderHook(() => useJobfindStore(), { wrapper: createWrapper() });
 
-    expect(result.current.materials).toHaveLength(6);
-    expect(result.current.jobs).toHaveLength(8);
+    expect(result.current.materials).toHaveLength(8);
+    expect(result.current.jobs).toHaveLength(13);
   });
 
   it('hydrates valid persisted state after mount without losing the seeded first paint', async () => {
+    localStorage.setItem('jobfind.demoDataVersion', JSON.stringify('2026-04-20-rich-ai-pm-pool'));
     localStorage.setItem(
       'jobfind.jobs',
       JSON.stringify([
@@ -83,14 +84,29 @@ describe('JobFind store', () => {
       </JobFindProvider>,
     );
 
-    expect(snapshots[0]).toEqual({ jobs: 8, materials: 6 });
+    expect(snapshots[0]).toEqual({ jobs: 13, materials: 8 });
 
     await waitFor(() => {
       expect(snapshots[snapshots.length - 1]).toEqual({ jobs: 1, materials: 1 });
     });
   });
 
+  it('ignores older persisted demo data when the seed version changes', async () => {
+    localStorage.setItem('jobfind.demoDataVersion', JSON.stringify('old-demo-data'));
+    localStorage.setItem('jobfind.jobs', JSON.stringify([]));
+    localStorage.setItem('jobfind.materials', JSON.stringify([]));
+
+    const { result } = renderHook(() => useJobfindStore(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(localStorage.getItem('jobfind.demoDataVersion')).not.toBeNull());
+
+    expect(result.current.jobs).toHaveLength(13);
+    expect(result.current.materials).toHaveLength(8);
+    expect(JSON.parse(localStorage.getItem('jobfind.demoDataVersion') ?? 'null')).toBe('2026-04-20-rich-ai-pm-pool');
+  });
+
   it('persists store mutations after hydration', async () => {
+    localStorage.setItem('jobfind.demoDataVersion', JSON.stringify('2026-04-20-rich-ai-pm-pool'));
     localStorage.setItem('jobfind.jobs', JSON.stringify([]));
     localStorage.setItem('jobfind.materials', JSON.stringify([]));
 
