@@ -105,10 +105,10 @@ Create `package.json` with these scripts and dependencies:
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "serve out",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -139,6 +139,7 @@ Create `package.json` with these scripts and dependencies:
     "eslint-config-next": "^15.3.0",
     "jsdom": "^25.0.1",
     "postcss": "^8.4.49",
+    "serve": "^14.2.4",
     "tailwindcss": "^4.0.0",
     "tw-animate-css": "^1.2.4",
     "typescript": "^5.7.2",
