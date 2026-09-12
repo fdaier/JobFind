@@ -3,6 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { JobFindProvider } from "../../hooks/use-jobfind-store";
+import { createMockJobs } from "../../lib/mock-data";
 import { KanbanBoard } from "./kanban-board";
 
 describe("KanbanBoard", () => {
@@ -25,13 +26,13 @@ describe("KanbanBoard", () => {
     expect(screen.getByRole("heading", { name: "录用" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "已淘汰" })).toBeInTheDocument();
 
-    expect(screen.getAllByTestId("job-card")).toHaveLength(8);
-    expect(within(screen.getByTestId("kanban-column-interested")).getByTestId("kanban-count-interested")).toHaveTextContent("1");
-    expect(within(screen.getByTestId("kanban-column-to_apply")).getByTestId("kanban-count-to_apply")).toHaveTextContent("1");
-    expect(within(screen.getByTestId("kanban-column-applied")).getByTestId("kanban-count-applied")).toHaveTextContent("2");
-    expect(within(screen.getByTestId("kanban-column-written_test")).getByTestId("kanban-count-written_test")).toHaveTextContent("1");
-    expect(within(screen.getByTestId("kanban-column-interviewing")).getByTestId("kanban-count-interviewing")).toHaveTextContent("1");
-    expect(within(screen.getByTestId("kanban-column-offer")).getByTestId("kanban-count-offer")).toHaveTextContent("1");
-    expect(within(screen.getByTestId("kanban-column-rejected")).getByTestId("kanban-count-rejected")).toHaveTextContent("1");
+    const jobs = createMockJobs();
+    expect(screen.getAllByTestId("job-card")).toHaveLength(jobs.length);
+
+    for (const stage of ["interested", "to_apply", "applied", "written_test", "interviewing", "offer", "rejected"] as const) {
+      expect(within(screen.getByTestId(`kanban-column-${stage}`)).getByTestId(`kanban-count-${stage}`)).toHaveTextContent(
+        String(jobs.filter((job) => job.stage === stage).length),
+      );
+    }
   });
 });

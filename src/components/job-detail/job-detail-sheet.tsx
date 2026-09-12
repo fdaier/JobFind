@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { JobAIPanel } from "@/components/job-detail/job-ai-panel";
 import { JobInfoSection } from "@/components/job-detail/job-info-section";
@@ -9,6 +9,14 @@ import { JobMaterials } from "@/components/job-detail/job-materials";
 import { JobTimeline } from "@/components/job-detail/job-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Sheet,
   SheetContent,
@@ -37,13 +45,17 @@ const STAGE_FLOW: JobStage[] = ["to_apply", "applied", "written_test", "intervie
 const STAGE_ORDER: JobStage[] = ["interested", "to_apply", "applied", "written_test", "interviewing", "offer", "rejected"];
 
 export function JobDetailSheet() {
-  const { selectedJob, selectedJobId, setSelectedJobId, materials, advanceJobStage } = useJobfindStore();
+  const { selectedJob, selectedJobId, setSelectedJobId, materials, advanceJobStage, deleteJob } = useJobfindStore();
   const [tabValue, setTabValue] = useState("ai");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const cancelDeleteButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (selectedJobId) {
       setTabValue("ai");
     }
+
+    setIsDeleteDialogOpen(false);
   }, [selectedJobId]);
 
   const canAdvanceStages = useMemo(() => {
@@ -143,10 +155,45 @@ export function JobDetailSheet() {
                 </div>
               </div>
               <Separator />
-              <Button type="button" variant="secondary" onClick={() => setSelectedJobId(null)}>
-                关闭详情
-              </Button>
+              <div className="flex items-center justify-between gap-3">
+                <Button type="button" variant="secondary" onClick={() => setSelectedJobId(null)}>
+                  关闭详情
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="px-2 text-rose-700 hover:bg-rose-50 hover:text-rose-800"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  删除该岗位
+                </Button>
+              </div>
             </SheetFooter>
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <DialogContent
+                onOpenAutoFocus={(event) => {
+                  event.preventDefault();
+                  cancelDeleteButtonRef.current?.focus();
+                }}
+              >
+                <DialogHeader>
+                  <DialogTitle>{`删除「${selectedJob.company} · ${selectedJob.position}」？`}</DialogTitle>
+                  <DialogDescription>
+                    将永久删除该岗位、申请时间线和面试复盘，并解除关联材料中的岗位引用。此操作无法恢复。
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button ref={cancelDeleteButtonRef} type="button" variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                    取消
+                  </Button>
+                  <Button type="button" variant="destructive" onClick={() => deleteJob(selectedJob.id)}>
+                    删除岗位
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         ) : null}
       </SheetContent>

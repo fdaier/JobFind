@@ -30,6 +30,7 @@ interface JobFindStoreValue {
   setSelectedJobId: (jobId: string | null) => void;
   setJDParserOpen: (isOpen: boolean) => void;
   addJob: (job: Job) => void;
+  deleteJob: (jobId: string) => void;
   advanceJobStage: (jobId: string, stage: JobStage, description?: string) => void;
   addInterviewNote: (jobId: string, note: InterviewNote) => void;
   markTaskComplete: (taskId: string) => void;
@@ -116,6 +117,23 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
           jobs: [job, ...current.jobs],
           selectedJobId: job.id,
         }));
+      },
+      deleteJob: (jobId) => {
+        setState((current) => {
+          if (!current.jobs.some((job) => job.id === jobId)) {
+            return current;
+          }
+
+          return {
+            ...current,
+            jobs: current.jobs.filter((job) => job.id !== jobId),
+            materials: current.materials.map((material) => ({
+              ...material,
+              boundJobIds: material.boundJobIds.filter((boundJobId) => boundJobId !== jobId),
+            })),
+            selectedJobId: current.selectedJobId === jobId ? null : current.selectedJobId,
+          };
+        });
       },
       advanceJobStage: (jobId, stage, description = `推进到 ${stage}`) => {
         setState((current) => ({

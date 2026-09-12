@@ -11,15 +11,13 @@ describe('useTodayTasks', () => {
   });
 
   it('overlays completed state from the store', async () => {
+    localStorage.setItem('jobfind.demoDataVersion', JSON.stringify('2026-04-20-rich-ai-pm-pool'));
     localStorage.setItem('jobfind.completedTasks', JSON.stringify(['tencent-deadline']));
 
     const { result } = renderHook(() => useTodayTasks(), {
       wrapper: ({ children }) => <JobFindProvider>{children}</JobFindProvider>,
     });
 
-    await waitFor(() => expect(result.current.length).toBeGreaterThan(0));
-
-    expect(result.current[0].id).toBe('tencent-deadline');
-    expect(result.current[0].completed).toBe(true);
+    await waitFor(() => expect(result.current.find((task) => task.id === 'tencent-deadline')?.completed).toBe(true));
   });
 });

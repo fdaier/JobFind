@@ -21,6 +21,17 @@ function renderBoardPage() {
   );
 }
 
+function getJobCard(company: string, stage: string) {
+  const column = screen.getByTestId(`kanban-column-${stage}`);
+  const card = within(column).getAllByTestId("job-card").find((candidate) => candidate.textContent?.includes(company));
+
+  if (!card) {
+    throw new Error(`Expected a ${company} job card in ${stage}.`);
+  }
+
+  return card;
+}
+
 describe("BoardPage job detail sheet", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -29,7 +40,7 @@ describe("BoardPage job detail sheet", () => {
   it("opens Tencent detail sheet with Agent workspace as the first default tab", async () => {
     renderBoardPage();
 
-    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+    fireEvent.click(getJobCard("腾讯", "applied"));
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -49,7 +60,7 @@ describe("BoardPage job detail sheet", () => {
   it("shows missing Tencent portfolio material and confirmable AI suggestions", async () => {
     renderBoardPage();
 
-    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+    fireEvent.click(getJobCard("腾讯", "applied"));
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -85,7 +96,7 @@ describe("BoardPage job detail sheet", () => {
   it("only shows forward progression actions for the current stage", async () => {
     renderBoardPage();
 
-    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+    fireEvent.click(getJobCard("腾讯", "applied"));
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -103,7 +114,7 @@ describe("BoardPage job detail sheet", () => {
   it("clears the selected job when the sheet closes", async () => {
     renderBoardPage();
 
-    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+    fireEvent.click(getJobCard("腾讯", "applied"));
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -117,10 +128,44 @@ describe("BoardPage job detail sheet", () => {
     expect(screen.getByTestId("selected-job-id")).toHaveTextContent("none");
   });
 
+  it.each([
+    ["网易", "录用"],
+    ["京东", "已淘汰"],
+  ])("lets a %s job in the %s stage be deleted after confirmation", async (company, stage) => {
+    renderBoardPage();
+
+    fireEvent.click(getJobCard(company, stage === "录用" ? "offer" : "rejected"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("dialog")).toHaveTextContent(stage);
+
+    fireEvent.click(screen.getByRole("button", { name: "删除该岗位" }));
+
+    expect(screen.getByRole("heading", { name: new RegExp(`删除「${company}`) })).toBeInTheDocument();
+    expect(screen.getByText(/此操作无法恢复/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "取消" }));
+    expect(getJobCard(company, stage === "录用" ? "offer" : "rejected")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "删除该岗位" }));
+    fireEvent.click(screen.getByRole("button", { name: "删除岗位" }));
+
+    await waitFor(() => {
+      expect(
+        within(screen.getByTestId(`kanban-column-${stage === "录用" ? "offer" : "rejected"}`)).queryAllByTestId("job-card").some(
+          (card) => card.textContent?.includes(company),
+        ),
+      ).toBe(false);
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("adds a new interview note from the detail sheet", async () => {
     renderBoardPage();
 
-    fireEvent.click(screen.getByRole("button", { name: /腾讯/ }));
+    fireEvent.click(getJobCard("腾讯", "applied"));
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -163,6 +208,8 @@ describe("BoardPage job detail sheet", () => {
 
     try {
       renderBoardPage();
+      const toApplyColumn = screen.getByTestId("kanban-column-to_apply");
+      const initialToApplyCardCount = within(toApplyColumn).getAllByTestId("job-card").length;
 
       fireEvent.click(screen.getByRole("button", { name: "粘贴 JD 添加岗位" }));
 
@@ -174,7 +221,7 @@ describe("BoardPage job detail sheet", () => {
 
       fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
       expect(screen.getByText("正在解析 JD")).toBeInTheDocument();
-      expect(screen.queryByText("B站")).not.toBeInTheDocument();
+      expect(screen.getByText("正在解析 JD")).toBeInTheDocument();
 
       await act(async () => {
         vi.advanceTimersByTime(800);
@@ -194,9 +241,8 @@ describe("BoardPage job detail sheet", () => {
 
       expect(screen.queryByLabelText("JD")).not.toBeInTheDocument();
 
-      const toApplyColumn = screen.getByTestId("kanban-column-to_apply");
-      expect(within(toApplyColumn).getAllByTestId("job-card")).toHaveLength(2);
-      expect(within(toApplyColumn).getByText("B站")).toBeInTheDocument();
+      expect(within(toApplyColumn).getAllByTestId("job-card")).toHaveLength(initialToApplyCardCount + 1);
+      expect(within(toApplyColumn).getAllByText("B站")).toHaveLength(2);
       expect(screen.getByTestId("selected-job-id")).not.toHaveTextContent("none");
     } finally {
       vi.useRealTimers();

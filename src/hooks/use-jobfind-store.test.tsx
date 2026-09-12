@@ -182,4 +182,31 @@ describe('JobFind store', () => {
       result: 'pending',
     });
   });
+
+  it('deletes a job, clears its material references, closes its detail, and persists the change', async () => {
+    const { result } = renderHook(() => useJobfindStore(), { wrapper: createWrapper() });
+    const targetJobId = 'netease';
+
+    await waitFor(() => expect(localStorage.getItem('jobfind.jobs')).not.toBeNull());
+
+    expect(result.current.jobs.some((job) => job.id === targetJobId)).toBe(true);
+    expect(result.current.materials.some((material) => material.boundJobIds.includes(targetJobId))).toBe(true);
+
+    act(() => {
+      result.current.setSelectedJobId(targetJobId);
+      result.current.deleteJob(targetJobId);
+    });
+
+    expect(result.current.selectedJob).toBeNull();
+    expect(result.current.jobs.some((job) => job.id === targetJobId)).toBe(false);
+    expect(result.current.materials.every((material) => !material.boundJobIds.includes(targetJobId))).toBe(true);
+
+    await waitFor(() => {
+      const persistedJobs = JSON.parse(localStorage.getItem('jobfind.jobs') ?? '[]');
+      const persistedMaterials = JSON.parse(localStorage.getItem('jobfind.materials') ?? '[]');
+
+      expect(persistedJobs.some((job: { id: string }) => job.id === targetJobId)).toBe(false);
+      expect(persistedMaterials.every((material: { boundJobIds: string[] }) => !material.boundJobIds.includes(targetJobId))).toBe(true);
+    });
+  });
 });
