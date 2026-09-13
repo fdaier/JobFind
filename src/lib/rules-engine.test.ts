@@ -130,7 +130,7 @@ describe('rules engine', () => {
     const risks = generateRiskTags(
       {
         ...baseJob,
-        stage: 'interviewing',
+        stage: 'first_interview',
         interviewDate: '2026-04-19T09:00:00.000Z',
       },
       materials,
@@ -212,22 +212,25 @@ describe('rules engine', () => {
 
   it('groups funnel data by stage', () => {
     const jobs: Job[] = [
-      { ...baseJob, stage: 'interested' },
+      { ...baseJob, stage: 'to_apply' },
       { ...baseJob, id: 'job-2', stage: 'to_apply' },
       { ...baseJob, id: 'job-3', stage: 'applied' },
       { ...baseJob, id: 'job-4', stage: 'written_test' },
-      { ...baseJob, id: 'job-5', stage: 'interviewing' },
+      { ...baseJob, id: 'job-5', stage: 'first_interview' },
       { ...baseJob, id: 'job-6', stage: 'offer' },
       { ...baseJob, id: 'job-7', stage: 'rejected' },
       { ...baseJob, id: 'job-8', stage: 'applied' },
     ];
 
     expect(calculateFunnelData(jobs)).toEqual({
-      interested: 1,
-      toApply: 1,
+      toApply: 2,
       applied: 2,
+      assessment: 0,
       writtenTest: 1,
-      interviewing: 1,
+      firstInterview: 1,
+      secondInterview: 0,
+      thirdInterview: 0,
+      hrInterview: 0,
       offer: 1,
       rejected: 1,
     });

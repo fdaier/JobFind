@@ -3,7 +3,8 @@
 import React, { useMemo } from "react";
 
 import { useJobfindStore } from "../../hooks/use-jobfind-store";
-import { calculateMaterialCompleteness, generateRiskTags } from "../../lib/rules-engine";
+import { generateRiskTags } from "../../lib/rules-engine";
+import { JOB_STAGE_LABELS } from "../../lib/job-stages";
 import type { Job, Material } from "../../lib/types";
 import { cn } from "../../lib/utils";
 
@@ -12,16 +13,6 @@ interface JobCardProps {
   materials: Material[];
   now?: Date;
 }
-
-const STAGE_LABELS: Record<Job["stage"], string> = {
-  interested: "关注中",
-  to_apply: "待投递",
-  applied: "已投递",
-  written_test: "笔试",
-  interviewing: "面试",
-  offer: "录用",
-  rejected: "已淘汰",
-};
 
 function formatDate(dateValue: string) {
   const date = new Date(dateValue);
@@ -67,7 +58,6 @@ function getMilestoneState(job: Job, now: Date) {
 export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
   const { setSelectedJobId } = useJobfindStore();
 
-  const completeness = useMemo(() => calculateMaterialCompleteness(job, materials), [job, materials]);
   const riskTags = useMemo(() => generateRiskTags(job, materials), [job, materials]);
   const milestoneState = useMemo(() => getMilestoneState(job, now), [job, now]);
 
@@ -87,7 +77,7 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
           <h3 className="mt-1 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
         </div>
         <span className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/30 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-          {STAGE_LABELS[job.stage]}
+          {JOB_STAGE_LABELS[job.stage]}
         </span>
       </div>
 
@@ -95,24 +85,6 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
         <div className="flex items-center justify-between gap-3 text-xs text-slate-600">
           <span className="font-medium text-slate-700">{milestoneState.label}</span>
           <span>{milestoneState.milestone ? `${milestoneState.milestone.label} ${formatDate(milestoneState.milestone.value)}` : "—"}</span>
-        </div>
-
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-slate-600">
-            <span className="font-medium text-slate-700">材料完成度</span>
-            <span>
-              {completeness.percentage}%{completeness.missing.length > 0 ? ` · 缺 ${completeness.missing.length} 项` : ""}
-            </span>
-          </div>
-          <div
-            role="progressbar"
-            aria-valuenow={completeness.percentage}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            className="h-1.5 overflow-hidden rounded-full bg-slate-200/70"
-          >
-            <div className="h-full rounded-full bg-slate-900" style={{ width: `${completeness.percentage}%` }} />
-          </div>
         </div>
       </div>
 
@@ -141,6 +113,11 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
             ))
           )}
         </div>
+      </div>
+
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-slate-700">备注</p>
+        <p className="min-h-5 text-xs leading-5 text-slate-600">{job.note?.trim() || "未添加备注"}</p>
       </div>
     </button>
   );

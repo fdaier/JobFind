@@ -5,7 +5,7 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `22a85ea feat: simplify JD intake deadline fields`
+- 稳定分支与当前产品提交：`main` / `待提交：申请看板十阶段、备注与详情编辑`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
@@ -20,13 +20,30 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 | 路径 | 当前能力 |
 | --- | --- |
 | `/` | 今日作战台、任务排序、风险雷达、转化漏斗 |
-| `/board` | 七阶段申请看板、真实 JD 导入（公司/岗位名称/JD）、详情、阶段推进与删除 |
+| `/board` | 十阶段校招申请看板、真实 JD 导入（公司/岗位名称/JD）、备注、详情编辑、阶段推进与删除 |
 | `/materials` | 材料版本、覆盖关系与缺口提示 |
 | `/review` | 渠道、材料、面试与 Agent 策略复盘 |
 
 技术栈为 Next.js App Router、React、TypeScript、Tailwind CSS、Radix UI、Vitest。应用使用静态导出和浏览器 localStorage；没有账号、后端、跨设备同步或真实 LLM API。当前 Agent 是可解释的确定性规则运行时。
 
-## 最近完成：岗位删除
+## 最近完成：申请看板 V3（待生产发布）
+
+已按确认的 V3 草案完成本地实现：
+
+- 看板流程更新为待投递、已投递、测评、笔试、一面、二面、三面、HR面、录用、已淘汰；阶段推进会保留时间线，终态仍可删除。
+- 卡片只展示关键时间、Agent 风险与 20 字以内的备注；材料完成度仅保留在详情的材料页。
+- 详情抽屉中，Agent 作战台保持只读；基本信息、材料、时间线与面试复盘均有独立编辑入口、取消和保存。材料关联双向同步。
+- 读取旧 localStorage 岗位时，先备份原始 JSON 至 `jobfind.jobs.backup.v3`，再将 `关注中 → 待投递`、`面试 → 一面`（含时间线）做幂等迁移，并补空备注；结构异常数据保留原始值而不再清空整个岗位数组。
+- JD 标签改名为“JD 命中的术语（可编辑）”，移除了过宽的 `AI`、`增长`、`原型`匹配规则；当前仍是本地规则，不是 LLM/语义分析。
+
+正式依据：
+
+- `docs/superpowers/specs/2026-09-14-jobfind-board-workflow-and-editing-design.md`
+- `docs/superpowers/plans/2026-09-14-jobfind-board-workflow-and-editing.md`
+
+本地已完成 18 个测试文件、55 个测试，`tsc --noEmit`、`npm run lint` 与静态生产构建；浏览器已验证十列、卡片备注和基本信息编辑保存。下一步是提交、Vercel 发布并验证生产域名。
+
+## 历史完成：岗位删除
 
 岗位进入“录用”或“已淘汰”后不再卡死在终态列：所有七个阶段均可从详情抽屉底部删除岗位。入口低强调度、删除前二次确认；删除会移除岗位自身的时间线和面试复盘、清理材料的 `boundJobIds`，并通过既有 localStorage 流程持久化。
 
@@ -43,7 +60,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 ## 后续优先级与边界
 
-1. **待确认草案**：`DRAFT-PRD-JobFind-V3-Board-Workflow-and-Editing.md`。内容为十阶段校招流程、20 字备注、详情四页编辑、卡片三信号摘要与本地术语提取优化；尚未改动产品或用户数据。实施时必须先备份并兼容迁移旧阶段，不能清空 localStorage。
+1. V3 已在本地实现并通过验证，待提交和生产发布。用户已有数据的安全迁移是发布阻断项，禁止跳过 `jobfind.jobs.backup.v3` 备份。
 2. 真实 JD 导入的正式依据：`superpowers/specs/2026-09-14-jobfind-real-jd-intake-design.md` 与对应计划。它是单浏览器、本地存储的申请管理能力，不是自动投递或真实 LLM。
 3. 生产浏览器校验时发现一条 React hydration 警告（minified #418）；真实 JD 表单及保存流程未受影响，原因尚未归因。下次前端迭代前应复现并消除该警告。
 4. 若推进 V2，下一优先级为 `DRAFT-PRD-JobFind-V2-Review-Center.md` 的结构化复盘输入；它目前尚未实施。

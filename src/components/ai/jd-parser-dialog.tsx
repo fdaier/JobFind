@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
 import { createEmptyJDIntakeDraft, createJobFromJDIntake, organizeJDIntake, type JDIntakeDraft } from "@/lib/jd-intake";
+import { JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "@/lib/job-stages";
 
 type IntakeState = "input" | "preview";
 type IntakeErrors = Partial<Record<"company" | "position" | "jdText", string>>;
@@ -88,7 +89,7 @@ export function JDParserDialog() {
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>导入 JD 添加岗位</DialogTitle>
-          <DialogDescription>填写公司、岗位名称和 JD；系统基于文本整理标签和材料建议，保存前请确认。</DialogDescription>
+          <DialogDescription>填写公司、岗位名称和 JD；系统会提取可编辑的 JD 术语和材料建议，保存前请确认。</DialogDescription>
         </DialogHeader>
 
         {mode === "input" ? (
@@ -116,7 +117,7 @@ export function JDParserDialog() {
               <div className="space-y-2">
                 <label htmlFor="jd-intake-stage" className="text-sm font-medium text-slate-950">当前阶段</label>
                 <select id="jd-intake-stage" value={draft.stage} onChange={(event) => updateField("stage", event.target.value as JDIntakeDraft["stage"])} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                  <option value="interested">关注中</option><option value="to_apply">待投递</option><option value="applied">已投递</option><option value="written_test">笔试</option><option value="interviewing">面试</option><option value="offer">录用</option><option value="rejected">已淘汰</option>
+                  {JOB_STAGE_ORDER.map((stage) => <option key={stage} value={stage}>{JOB_STAGE_LABELS[stage]}</option>)}
                 </select>
               </div>
             </div>

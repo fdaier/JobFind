@@ -21,7 +21,7 @@ describe("job detail date safety", () => {
       ],
     };
 
-    render(<JobTimeline job={job} />);
+    render(<JobFindProvider><JobTimeline job={job} /></JobFindProvider>);
 
     expect(screen.getByText("日期待确认")).toBeInTheDocument();
   });

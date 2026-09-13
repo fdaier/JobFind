@@ -21,28 +21,28 @@ describe('storage helpers', () => {
     expect(loadCompletedTaskIds()).toEqual(['task-1', 'task-2']);
   });
 
-  it('removes invalid JSON when loading', () => {
+  it('preserves invalid JSON when loading so it can be recovered', () => {
     localStorage.setItem('jobfind.jobs', '{bad json');
 
     expect(loadJobs()).toBeNull();
-    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).toBe('{bad json');
   });
 
-  it('rejects structurally invalid job arrays and removes the stored value', () => {
+  it('rejects structurally invalid job arrays without removing the stored value', () => {
     localStorage.setItem('jobfind.jobs', JSON.stringify([{}]));
 
     expect(loadJobs()).toBeNull();
-    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).toBe(JSON.stringify([{}]));
   });
 
-  it('rejects structurally invalid material arrays and removes the stored value', () => {
+  it('rejects structurally invalid material arrays without removing the stored value', () => {
     localStorage.setItem('jobfind.materials', JSON.stringify([{ id: 'bad-material' }]));
 
     expect(loadMaterials()).toBeNull();
-    expect(localStorage.getItem('jobfind.materials')).toBeNull();
+    expect(localStorage.getItem('jobfind.materials')).toBe(JSON.stringify([{ id: 'bad-material' }]));
   });
 
-  it('rejects jobs with invalid nested arrays and removes the stored value', () => {
+  it('rejects jobs with invalid nested arrays without removing the stored value', () => {
     const jobs = createMockJobs();
     const [job] = jobs;
 
@@ -66,10 +66,10 @@ describe('storage helpers', () => {
     );
 
     expect(loadJobs()).toBeNull();
-    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).not.toBeNull();
   });
 
-  it('rejects jobs with invalid stages and removes the stored value', () => {
+  it('rejects jobs with invalid stages without removing the stored value', () => {
     const jobs = createMockJobs();
     const [job] = jobs;
 
@@ -84,10 +84,10 @@ describe('storage helpers', () => {
     );
 
     expect(loadJobs()).toBeNull();
-    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).not.toBeNull();
   });
 
-  it('rejects jobs with invalid persisted dates and removes the stored value', () => {
+  it('rejects jobs with invalid persisted dates without removing the stored value', () => {
     const jobs = createMockJobs();
     const [job] = jobs;
 
@@ -117,6 +117,24 @@ describe('storage helpers', () => {
     );
 
     expect(loadJobs()).toBeNull();
-    expect(localStorage.getItem('jobfind.jobs')).toBeNull();
+    expect(localStorage.getItem('jobfind.jobs')).not.toBeNull();
+  });
+
+  it('backs up and migrates legacy stages without losing JD, materials, timeline, or interview notes', () => {
+    const [job] = createMockJobs();
+    const legacy = {
+      ...job,
+      stage: 'interviewing',
+      note: undefined,
+      timeline: [{ ...job.timeline[0], stage: 'interested' }],
+    };
+    localStorage.setItem('jobfind.jobs', JSON.stringify([legacy]));
+
+    const migrated = loadJobs();
+
+    expect(migrated).toHaveLength(1);
+    expect(migrated![0]).toMatchObject({ id: job.id, stage: 'first_interview', note: '', jdText: job.jdText, boundMaterialIds: job.boundMaterialIds, interviewNotes: job.interviewNotes });
+    expect(migrated![0].timeline[0].stage).toBe('to_apply');
+    expect(localStorage.getItem('jobfind.jobs.backup.v3')).toBe(JSON.stringify([legacy]));
   });
 });

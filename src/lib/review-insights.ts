@@ -20,7 +20,7 @@ const CHANNEL_LABELS: Record<SourceChannel, string> = {
   campus_talk: "宣讲会",
 };
 
-const ADVANCED_STAGES = new Set<Job["stage"]>(["written_test", "interviewing", "offer"]);
+const ADVANCED_STAGES = new Set<Job["stage"]>(["assessment", "written_test", "first_interview", "second_interview", "third_interview", "hr_interview", "offer"]);
 
 export interface MaterialGapInsight {
   type: MaterialType;

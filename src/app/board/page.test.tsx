@@ -73,7 +73,7 @@ describe("BoardPage job detail sheet", () => {
     const materialPanel = screen.getByRole("tabpanel", { name: "材料" });
     expect(materialPanel).toHaveTextContent("材料完成度");
     expect(materialPanel).toHaveTextContent("作品集");
-    expect(materialPanel).toHaveTextContent("缺少的材料");
+    expect(materialPanel).toHaveTextContent("还缺：");
 
     fireEvent.mouseDown(screen.getByRole("tab", { name: "Agent 作战台" }));
     fireEvent.click(screen.getByRole("tab", { name: "Agent 作战台" }));
@@ -101,12 +101,9 @@ describe("BoardPage job detail sheet", () => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
-    expect(screen.queryByRole("button", { name: "推进到 关注中" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "推进到 待投递" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "推进到 笔试" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "推进到 面试" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "推进到 录用" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "推进到 已淘汰" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "推进到 测评" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "调整阶段" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "调整阶段" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "标记淘汰" })).toBeInTheDocument();
   });
 
@@ -176,23 +173,25 @@ describe("BoardPage job detail sheet", () => {
       expect(screen.getByRole("tab", { name: "面试复盘", selected: true })).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText("轮次"), {
+    fireEvent.click(screen.getByRole("button", { name: "编辑" }));
+
+    fireEvent.change(screen.getByPlaceholderText("轮次，例如一面"), {
       target: { value: "一面" },
     });
-    fireEvent.change(screen.getByLabelText("面试时间"), {
-      target: { value: "2026-04-19T15:30" },
+    fireEvent.change(screen.getByLabelText("面试日期"), {
+      target: { value: "2026-04-19" },
     });
-    fireEvent.change(screen.getByLabelText("高频问题"), {
+    fireEvent.change(screen.getByPlaceholderText("高频问题，每行一条"), {
       target: { value: "为什么想做 AI 产品\n你最满意的项目是什么" },
     });
-    fireEvent.change(screen.getByLabelText("复盘"), {
+    fireEvent.change(screen.getByPlaceholderText("复盘"), {
       target: { value: "表达还可以，但案例结果讲得不够具体。" },
     });
     fireEvent.change(screen.getByLabelText("结果"), {
       target: { value: "pending" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "保存复盘" }));
+    fireEvent.click(screen.getByRole("button", { name: "添加复盘" }));
 
     const notesPanel = screen.getByRole("tabpanel", { name: "面试复盘" });
     expect(notesPanel).toHaveTextContent("一面");

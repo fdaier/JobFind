@@ -7,6 +7,7 @@ import type {
   TaskPriority,
   TodayTask,
 } from './types';
+import { isInterviewStage } from './job-stages';
 
 const MS_PER_HOUR = 60 * 60 * 1000;
 const MS_PER_DAY = 24 * MS_PER_HOUR;
@@ -103,7 +104,7 @@ export function calculateMaterialCompleteness(job: Job, materials: Material[]): 
 export function generateRiskTags(job: Job, materials: Material[], now: Date = new Date()): RiskTag[] {
   const risks: RiskTag[] = [];
 
-  const deadlineEligible = job.stage === 'interested' || job.stage === 'to_apply' || job.stage === 'applied';
+  const deadlineEligible = job.stage === 'to_apply' || job.stage === 'applied';
   if (deadlineEligible && job.applicationDeadline) {
     const hoursUntilDeadline = getHoursUntil(job.applicationDeadline, now);
     if (hoursUntilDeadline < 0) {
@@ -136,7 +137,7 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
     });
   }
 
-  if (job.stage === 'interviewing' && job.interviewDate) {
+  if (isInterviewStage(job.stage) && job.interviewDate) {
     const hoursUntilInterview = getHoursUntil(job.interviewDate, now);
     if (hoursUntilInterview < 0) {
       risks.push({
@@ -275,31 +276,43 @@ export function generateTodayTasks(jobs: Job[], materials: Material[], now: Date
 
 export function calculateFunnelData(jobs: Job[]): FunnelData {
   const data: FunnelData = {
-    interested: 0,
     toApply: 0,
     applied: 0,
+    assessment: 0,
     writtenTest: 0,
-    interviewing: 0,
+    firstInterview: 0,
+    secondInterview: 0,
+    thirdInterview: 0,
+    hrInterview: 0,
     offer: 0,
     rejected: 0,
   };
 
   for (const job of jobs) {
     switch (job.stage) {
-      case 'interested':
-        data.interested += 1;
-        break;
       case 'to_apply':
         data.toApply += 1;
         break;
       case 'applied':
         data.applied += 1;
         break;
+      case 'assessment':
+        data.assessment += 1;
+        break;
       case 'written_test':
         data.writtenTest += 1;
         break;
-      case 'interviewing':
-        data.interviewing += 1;
+      case 'first_interview':
+        data.firstInterview += 1;
+        break;
+      case 'second_interview':
+        data.secondInterview += 1;
+        break;
+      case 'third_interview':
+        data.thirdInterview += 1;
+        break;
+      case 'hr_interview':
+        data.hrInterview += 1;
         break;
       case 'offer':
         data.offer += 1;

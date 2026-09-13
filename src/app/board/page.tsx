@@ -16,7 +16,7 @@ export default function BoardPage() {
     <div className="space-y-6">
       <PageHeader
         title="申请看板"
-        description="按阶段查看岗位，跟着申请进度把待投递、已投递、笔试和面试安排理顺。"
+        description="按校招流程查看岗位，跟着待投递、测评、笔试和多轮面试安排理顺进度。"
         action={
           <Button
             type="button"

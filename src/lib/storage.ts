@@ -1,10 +1,27 @@
 import type { Job, Material } from './types';
 import { isValidDateString } from './date';
+import { isJobStage } from './job-stages';
 
 const JOBS_KEY = 'jobfind.jobs';
 const MATERIALS_KEY = 'jobfind.materials';
 const COMPLETED_TASK_IDS_KEY = 'jobfind.completedTasks';
 const DEMO_DATA_VERSION_KEY = 'jobfind.demoDataVersion';
+const JOBS_BACKUP_V3_KEY = 'jobfind.jobs.backup.v3';
+
+const LEGACY_STAGE_MAP: Record<string, Job['stage']> = {
+  interested: 'to_apply',
+  to_apply: 'to_apply',
+  applied: 'applied',
+  written_test: 'written_test',
+  interviewing: 'first_interview',
+  offer: 'offer',
+  rejected: 'rejected',
+  assessment: 'assessment',
+  first_interview: 'first_interview',
+  second_interview: 'second_interview',
+  third_interview: 'third_interview',
+  hr_interview: 'hr_interview',
+};
 
 function hasWindow(): boolean {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
@@ -23,7 +40,6 @@ function loadJsonValue<T>(key: string): T | null {
   try {
     return JSON.parse(raw) as T;
   } catch {
-    window.localStorage.removeItem(key);
     return null;
   }
 }
@@ -67,18 +83,6 @@ function isTimelineEvent(value: unknown): boolean {
     isValidDateString(value.date) &&
     typeof value.stage === 'string' &&
     typeof value.description === 'string'
-  );
-}
-
-function isJobStage(value: unknown): value is Job['stage'] {
-  return (
-    value === 'interested' ||
-    value === 'to_apply' ||
-    value === 'applied' ||
-    value === 'written_test' ||
-    value === 'interviewing' ||
-    value === 'offer' ||
-    value === 'rejected'
   );
 }
 
@@ -141,6 +145,7 @@ function isJob(value: unknown): value is Job {
     isStringArray(value.boundMaterialIds) &&
     (typeof value.contactName === 'string' || value.contactName === null) &&
     (typeof value.contactInfo === 'string' || value.contactInfo === null) &&
+    typeof value.note === 'string' &&
     Array.isArray(value.riskTags) &&
     value.riskTags.every(isRiskTag) &&
     Array.isArray(value.aiSuggestions) &&
@@ -170,18 +175,10 @@ function isMaterial(value: unknown): value is Material {
 function loadValidatedArray<T>(key: string, predicate: (value: unknown) => value is T): T[] | null {
   const value = loadJsonValue<unknown>(key);
   if (!Array.isArray(value)) {
-    if (value !== null && hasWindow()) {
-      window.localStorage.removeItem(key);
-    }
-
     return null;
   }
 
   if (!value.every(predicate)) {
-    if (hasWindow()) {
-      window.localStorage.removeItem(key);
-    }
-
     return null;
   }
 
@@ -189,7 +186,56 @@ function loadValidatedArray<T>(key: string, predicate: (value: unknown) => value
 }
 
 export function loadJobs(): Job[] | null {
-  return loadValidatedArray(JOBS_KEY, isJob);
+  const value = loadJsonValue<unknown>(JOBS_KEY);
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const migrated = value.map((item) => migrateJob(item));
+  if (migrated.some((item) => item === null)) {
+    return null;
+  }
+
+  const jobs = migrated as Job[];
+  const didChange = JSON.stringify(jobs) !== JSON.stringify(value);
+  if (didChange && hasWindow()) {
+    if (window.localStorage.getItem(JOBS_BACKUP_V3_KEY) === null) {
+      window.localStorage.setItem(JOBS_BACKUP_V3_KEY, JSON.stringify(value));
+    }
+    saveJobs(jobs);
+  }
+
+  return jobs;
+}
+
+function migrateStage(value: unknown): Job['stage'] | null {
+  return typeof value === 'string' ? LEGACY_STAGE_MAP[value] ?? null : null;
+}
+
+function migrateJob(value: unknown): Job | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const stage = migrateStage(value.stage);
+  if (!stage || !Array.isArray(value.timeline)) {
+    return null;
+  }
+
+  const timeline = value.timeline.map((event) => {
+    if (!isRecord(event)) {
+      return null;
+    }
+    const eventStage = migrateStage(event.stage);
+    return eventStage ? { ...event, stage: eventStage } : null;
+  });
+
+  if (timeline.some((event) => event === null)) {
+    return null;
+  }
+
+  const candidate = { ...value, stage, timeline, note: typeof value.note === 'string' ? value.note : '' };
+  return isJob(candidate) ? candidate : null;
 }
 
 export function saveJobs(jobs: Job[]): void {

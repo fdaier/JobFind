@@ -1,5 +1,6 @@
 import { generateRiskTags } from "@/lib/rules-engine";
 import type { Job, JobStage, JobType, Material, MaterialType, RecruitBatch } from "@/lib/types";
+import { JOB_STAGE_LABELS } from "@/lib/job-stages";
 
 export interface JDIntakeDraft {
   company: string;
@@ -12,15 +13,7 @@ export interface JDIntakeDraft {
   requiredMaterials: MaterialType[];
 }
 
-export const JOB_STAGE_LABELS: Record<JobStage, string> = {
-  interested: "关注中",
-  to_apply: "待投递",
-  applied: "已投递",
-  written_test: "笔试",
-  interviewing: "面试",
-  offer: "录用",
-  rejected: "已淘汰",
-};
+export { JOB_STAGE_LABELS };
 
 const KEYWORD_RULES = [
   "LLM",
@@ -35,9 +28,11 @@ const KEYWORD_RULES = [
   "产品策略",
   "数据分析",
   "用户增长",
-  "增长",
-  "原型",
-  "AI",
+  "智能体",
+  "对话式界面",
+  "生成式 UI",
+  "用户行为分析",
+  "数据实验",
 ];
 
 const MATERIAL_RULES: Array<{ type: MaterialType; pattern: RegExp }> = [
@@ -192,7 +187,7 @@ export function createJobFromJDIntake(draft: JDIntakeDraft, materials: Material[
     applicationDeadline: deadlineToIso(draft.applicationDeadline),
     writtenTestDate: null,
     interviewDate: null,
-    appliedDate: draft.stage === "interested" || draft.stage === "to_apply" ? null : createdAt,
+    appliedDate: draft.stage === "to_apply" ? null : createdAt,
     jdText: draft.jdText,
     keywords: draft.keywords,
     requirements: draft.requirements,
@@ -200,6 +195,7 @@ export function createJobFromJDIntake(draft: JDIntakeDraft, materials: Material[
     boundMaterialIds: [],
     contactName: null,
     contactInfo: null,
+    note: "",
     riskTags: [],
     aiSuggestions: [],
     timeline: [

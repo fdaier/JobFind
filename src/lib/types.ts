@@ -1,9 +1,12 @@
 export type JobStage =
-  | 'interested'
   | 'to_apply'
   | 'applied'
+  | 'assessment'
   | 'written_test'
-  | 'interviewing'
+  | 'first_interview'
+  | 'second_interview'
+  | 'third_interview'
+  | 'hr_interview'
   | 'offer'
   | 'rejected';
 
@@ -83,6 +86,8 @@ export interface Job {
   boundMaterialIds: string[];
   contactName: string | null;
   contactInfo: string | null;
+  /** Added in V3; storage hydration backfills old jobs with an empty value. */
+  note?: string;
   riskTags: RiskTag[];
   aiSuggestions: AISuggestion[];
   timeline: TimelineEvent[];
@@ -115,11 +120,14 @@ export interface TodayTask {
 }
 
 export interface FunnelData {
-  interested: number;
   toApply: number;
   applied: number;
+  assessment: number;
   writtenTest: number;
-  interviewing: number;
+  firstInterview: number;
+  secondInterview: number;
+  thirdInterview: number;
+  hrInterview: number;
   offer: number;
   rejected: number;
 }

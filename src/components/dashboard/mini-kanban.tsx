@@ -2,17 +2,10 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
+import { JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "@/lib/job-stages";
 import { cn } from "@/lib/utils";
 
-const stages = [
-  { key: "interested", label: "关注中" },
-  { key: "to_apply", label: "待投递" },
-  { key: "applied", label: "已投递" },
-  { key: "written_test", label: "笔试" },
-  { key: "interviewing", label: "面试" },
-  { key: "offer", label: "录用" },
-  { key: "rejected", label: "已淘汰" },
-] as const;
+const stages = JOB_STAGE_ORDER.map((key) => ({ key, label: JOB_STAGE_LABELS[key] }));
 
 export function MiniKanban() {
   const { jobs } = useJobfindStore();
@@ -24,10 +17,10 @@ export function MiniKanban() {
       <CardContent className="space-y-4 p-5">
         <div>
           <h2 className="text-base font-semibold text-slate-950">阶段看板</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">七个阶段的轻量统计，方便快速扫一眼推进情况。</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">十个校招阶段的轻量统计，方便快速扫一眼推进情况。</p>
         </div>
 
-        <div className="grid gap-3 xl:grid-cols-7">
+        <div className="grid gap-3 xl:grid-cols-5">
           {stages.map((stage, index) => {
             const count = counts[index];
             const width = count === 0 ? 0 : Math.max(12, (count / maxCount) * 100);

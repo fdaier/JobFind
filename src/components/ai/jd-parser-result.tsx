@@ -95,7 +95,7 @@ export function JDParserResult({
       <Separator />
 
       <section className="space-y-2">
-        <h3 className="text-sm font-semibold text-slate-950">关键词</h3>
+            <h3 className="text-sm font-semibold text-slate-950">JD 命中的术语（可编辑）</h3>
         <div className="flex flex-wrap gap-2">
           {draft.keywords.map((keyword) => (
             <Badge key={keyword} variant="outline" className="gap-1 rounded-md pr-1">

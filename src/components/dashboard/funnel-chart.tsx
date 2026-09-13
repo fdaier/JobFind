@@ -7,11 +7,14 @@ import { useJobfindStore } from "@/hooks/use-jobfind-store";
 import { calculateFunnelData } from "@/lib/rules-engine";
 
 const steps = [
-  { key: "interested", label: "关注" },
   { key: "toApply", label: "待投递" },
   { key: "applied", label: "已投递" },
+  { key: "assessment", label: "测评" },
   { key: "writtenTest", label: "笔试" },
-  { key: "interviewing", label: "面试" },
+  { key: "firstInterview", label: "一面" },
+  { key: "secondInterview", label: "二面" },
+  { key: "thirdInterview", label: "三面" },
+  { key: "hrInterview", label: "HR面" },
   { key: "offer", label: "录用" },
   { key: "rejected", label: "已淘汰" },
 ] as const;

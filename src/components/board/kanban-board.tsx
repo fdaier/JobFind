@@ -4,18 +4,11 @@ import React from "react";
 import { useMemo } from "react";
 
 import { useJobfindStore } from "../../hooks/use-jobfind-store";
+import { JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "../../lib/job-stages";
 import type { JobStage } from "../../lib/types";
 import { KanbanColumn } from "./kanban-column";
 
-const STAGES: Array<{ stage: JobStage; title: string }> = [
-  { stage: "interested", title: "关注中" },
-  { stage: "to_apply", title: "待投递" },
-  { stage: "applied", title: "已投递" },
-  { stage: "written_test", title: "笔试" },
-  { stage: "interviewing", title: "面试" },
-  { stage: "offer", title: "录用" },
-  { stage: "rejected", title: "已淘汰" },
-];
+const STAGES: Array<{ stage: JobStage; title: string }> = JOB_STAGE_ORDER.map((stage) => ({ stage, title: JOB_STAGE_LABELS[stage] }));
 
 export function KanbanBoard() {
   const { jobs, materials } = useJobfindStore();

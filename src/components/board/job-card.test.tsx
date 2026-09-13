@@ -16,7 +16,7 @@ describe("JobCard", () => {
     localStorage.clear();
   });
 
-  it("shows material completeness and risk info and updates the selected job", () => {
+  it("shows time, risk and note while keeping material completion out of the card", () => {
     const jobs = createMockJobs();
     const materials = createMockMaterials();
     const tencent = jobs.find((job) => job.id === "tencent");
@@ -31,9 +31,9 @@ describe("JobCard", () => {
     );
 
     expect(screen.getByTestId("job-card")).toBeInTheDocument();
-    expect(screen.getByText("材料完成度")).toBeInTheDocument();
-    expect(screen.getByText(/%/)).toBeInTheDocument();
+    expect(screen.queryByText("材料完成度")).not.toBeInTheDocument();
     expect(screen.getByText("Agent 风险")).toBeInTheDocument();
+    expect(screen.getByText("备注")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("job-card"));
 

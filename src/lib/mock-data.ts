@@ -153,7 +153,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('tencent-submit', '今天补齐作品集并提交腾讯投递', 'DDL 在今天结束前到期', 'urgent', 'submit_application'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -7 * DAY), 'interested', '收藏腾讯 AI 产品实习岗位'),
+        createTimelineEvent(shiftDate(now, -7 * DAY), 'to_apply', '加入腾讯 AI 产品实习岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -4 * DAY), 'applied', '完成腾讯岗位投递'),
       ],
       interviewNotes: [],
@@ -167,7 +167,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
       jobType: 'intern',
       batch: 'summer_intern',
       channel: 'school_career',
-      stage: 'interviewing',
+      stage: 'first_interview',
       applicationDeadline: null,
       writtenTestDate: shiftDate(now, -6 * DAY),
       interviewDate: tomorrowAt(now, 10).toISOString(),
@@ -184,9 +184,9 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('bytedance-prepare', '明天面试前复盘 AI 产品项目', '面试安排在明天', 'urgent', 'prepare_interview'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -11 * DAY), 'interested', '关注字节 AI 产品实习岗位'),
+        createTimelineEvent(shiftDate(now, -11 * DAY), 'to_apply', '加入字节 AI 产品实习岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -9 * DAY), 'applied', '完成字节投递'),
-        createTimelineEvent(shiftDate(now, -1 * DAY), 'interviewing', '收到明天面试通知'),
+        createTimelineEvent(shiftDate(now, -1 * DAY), 'first_interview', '收到明天一面通知'),
       ],
       interviewNotes: [
         createInterviewNote(
@@ -224,7 +224,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('xiaohongshu-followup', '跟进小红书投递反馈', '已投递 12 天但还没有回复', 'high', 'follow_up'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -14 * DAY), 'interested', '关注小红书 AI 产品经理实习'),
+        createTimelineEvent(shiftDate(now, -14 * DAY), 'to_apply', '加入小红书 AI 产品经理实习待投递清单'),
         createTimelineEvent(shiftDate(now, -12 * DAY), 'applied', '完成小红书投递'),
       ],
       interviewNotes: [],
@@ -255,7 +255,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('meituan-wait', '等待美团面试通知并整理复盘笔记', '笔试已完成，当前在等待下一步安排', 'medium', 'review_interview'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -10 * DAY), 'interested', '收到美团校招信息'),
+        createTimelineEvent(shiftDate(now, -10 * DAY), 'to_apply', '收到美团校招信息'),
         createTimelineEvent(shiftDate(now, -8 * DAY), 'applied', '完成美团校招投递'),
         createTimelineEvent(shiftDate(now, -2 * DAY), 'written_test', '完成美团笔试'),
       ],
@@ -270,7 +270,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
       jobType: 'intern',
       batch: 'summer_intern',
       channel: 'official_site',
-      stage: 'interested',
+      stage: 'to_apply',
       applicationDeadline: shiftDate(today, 5 * DAY),
       writtenTestDate: null,
       interviewDate: null,
@@ -287,7 +287,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('alibaba-plan', '先准备阿里投递材料，五天内完成申请', '职位还在关注阶段，但 DDL 已经明确', 'medium', 'submit_application'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -1 * DAY), 'interested', '加入阿里岗位观察列表'),
+        createTimelineEvent(shiftDate(now, -1 * DAY), 'to_apply', '加入阿里岗位待投递清单'),
       ],
       interviewNotes: [],
       createdAt: shiftDate(now, -1 * DAY),
@@ -317,9 +317,9 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('netease-decide', '整理网易 Offer 的决策信息', '已经拿到 Offer，进入决策阶段', 'high', 'follow_up'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -20 * DAY), 'interested', '关注网易 AI 游戏产品经理实习岗位'),
+        createTimelineEvent(shiftDate(now, -20 * DAY), 'to_apply', '加入网易 AI 游戏产品经理实习岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -18 * DAY), 'applied', '完成网易投递'),
-        createTimelineEvent(shiftDate(now, -12 * DAY), 'interviewing', '完成网易面试'),
+        createTimelineEvent(shiftDate(now, -12 * DAY), 'first_interview', '完成网易一面'),
         createTimelineEvent(shiftDate(now, -2 * DAY), 'offer', '收到网易 Offer'),
       ],
       interviewNotes: [
@@ -358,10 +358,10 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('jd-review', '把京东拒绝原因归档到复盘里', '可以作为后续投递策略参考', 'low', 'update_material'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -24 * DAY), 'interested', '关注京东 AI 产品经理岗位'),
+        createTimelineEvent(shiftDate(now, -24 * DAY), 'to_apply', '加入京东 AI 产品经理岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -22 * DAY), 'applied', '完成京东投递'),
         createTimelineEvent(shiftDate(now, -18 * DAY), 'written_test', '完成京东笔试'),
-        createTimelineEvent(shiftDate(now, -15 * DAY), 'interviewing', '完成京东面试'),
+        createTimelineEvent(shiftDate(now, -15 * DAY), 'first_interview', '完成京东一面'),
         createTimelineEvent(shiftDate(now, -1 * DAY), 'rejected', '收到京东拒绝通知'),
       ],
       interviewNotes: [
@@ -400,7 +400,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('kuaishou-submit', '在七天内完成快手投递', '职位已经明确，但还没有提交申请', 'medium', 'submit_application'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -1 * DAY), 'interested', '加入快手岗位待投递清单'),
+        createTimelineEvent(shiftDate(now, -1 * DAY), 'to_apply', '加入快手岗位待投递清单'),
       ],
       interviewNotes: [],
       createdAt: shiftDate(now, -1 * DAY),
@@ -413,7 +413,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
       jobType: 'intern',
       batch: 'daily_intern',
       channel: 'official_site',
-      stage: 'interviewing',
+      stage: 'first_interview',
       applicationDeadline: null,
       writtenTestDate: shiftDate(now, -9 * DAY),
       interviewDate: shiftDate(now, 50 * HOUR),
@@ -430,10 +430,10 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('baidu-second-round', '准备百度二面：重点复盘搜索 AI 助手案例', '二面窗口在 72 小时内，需要提前沉淀回答结构', 'urgent', 'prepare_interview'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -18 * DAY), 'interested', '关注百度智能搜索 AI 产品岗位'),
+        createTimelineEvent(shiftDate(now, -18 * DAY), 'to_apply', '加入百度智能搜索 AI 产品岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -15 * DAY), 'applied', '完成百度投递'),
         createTimelineEvent(shiftDate(now, -9 * DAY), 'written_test', '完成百度产品分析题'),
-        createTimelineEvent(shiftDate(now, -3 * DAY), 'interviewing', '通过一面并进入二面准备'),
+        createTimelineEvent(shiftDate(now, -3 * DAY), 'second_interview', '通过一面并进入二面准备'),
       ],
       interviewNotes: [
         createInterviewNote(
@@ -471,7 +471,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('ant-cover-letter', '为蚂蚁补齐 AI 产品经理求职信', '岗位要求说明业务理解，当前求职信还没有绑定', 'high', 'bind_material'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -9 * DAY), 'interested', '参加蚂蚁 AI 产品宣讲会'),
+        createTimelineEvent(shiftDate(now, -9 * DAY), 'to_apply', '参加蚂蚁 AI 产品宣讲会'),
         createTimelineEvent(shiftDate(now, -6 * DAY), 'applied', '完成蚂蚁投递'),
       ],
       interviewNotes: [],
@@ -502,7 +502,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('bilibili-apply', '三天内提交 B站 AI 产品经理申请', '岗位与作品集匹配度高，适合尽快进入投递池', 'medium', 'submit_application'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -2 * DAY), 'interested', '从实习僧发现 B站 AI 产品岗位'),
+        createTimelineEvent(shiftDate(now, -2 * DAY), 'to_apply', '从实习僧发现 B站 AI 产品岗位'),
         createTimelineEvent(shiftDate(now, -1 * DAY), 'to_apply', '已整理 JD，等待最终提交'),
       ],
       interviewNotes: [],
@@ -533,9 +533,9 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('tme-offer-compare', '对比腾讯音乐 Offer 与网易 Offer 的成长空间', '当前已有多个正向结果，需要进入选择和谈判阶段', 'high', 'follow_up'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -18 * DAY), 'interested', '通过内推关注腾讯音乐 AI 音乐产品岗位'),
+        createTimelineEvent(shiftDate(now, -18 * DAY), 'to_apply', '通过内推加入腾讯音乐 AI 音乐产品岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -16 * DAY), 'applied', '完成腾讯音乐投递'),
-        createTimelineEvent(shiftDate(now, -5 * DAY), 'interviewing', '完成腾讯音乐终面'),
+        createTimelineEvent(shiftDate(now, -5 * DAY), 'hr_interview', '完成腾讯音乐 HR 面'),
         createTimelineEvent(shiftDate(now, -1 * DAY), 'offer', '收到腾讯音乐 Offer'),
       ],
       interviewNotes: [
@@ -575,7 +575,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
         createSuggestion('mihoyo-certificate', '补充英语证书或实习证明到米哈游材料', '当前证书类材料还没有绑定到该岗位', 'medium', 'bind_material'),
       ],
       timeline: [
-        createTimelineEvent(shiftDate(now, -8 * DAY), 'interested', '关注米哈游 AI 互动产品岗位'),
+        createTimelineEvent(shiftDate(now, -8 * DAY), 'to_apply', '加入米哈游 AI 互动产品岗位待投递清单'),
         createTimelineEvent(shiftDate(now, -5 * DAY), 'applied', '完成米哈游投递'),
         createTimelineEvent(shiftDate(now, -1 * DAY), 'written_test', '收到明晚笔试通知'),
       ],
@@ -587,6 +587,7 @@ export function createMockJobs(now: Date = new Date()): Job[] {
 
   return baseJobs.map((job) => ({
     ...job,
+    note: "",
     riskTags: generateRiskTags(job, materials, now),
   }));
 }

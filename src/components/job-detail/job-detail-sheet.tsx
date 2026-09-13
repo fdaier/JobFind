@@ -29,25 +29,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
+import { getNextStage, JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "@/lib/job-stages";
 import type { JobStage } from "@/lib/types";
-
-const STAGE_LABELS: Record<JobStage, string> = {
-  interested: "关注中",
-  to_apply: "待投递",
-  applied: "已投递",
-  written_test: "笔试",
-  interviewing: "面试",
-  offer: "录用",
-  rejected: "已淘汰",
-};
-
-const STAGE_FLOW: JobStage[] = ["to_apply", "applied", "written_test", "interviewing", "offer"];
-const STAGE_ORDER: JobStage[] = ["interested", "to_apply", "applied", "written_test", "interviewing", "offer", "rejected"];
 
 export function JobDetailSheet() {
   const { selectedJob, selectedJobId, setSelectedJobId, materials, advanceJobStage, deleteJob } = useJobfindStore();
   const [tabValue, setTabValue] = useState("ai");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [adjustStage, setAdjustStage] = useState<JobStage>("to_apply");
   const cancelDeleteButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -56,20 +45,10 @@ export function JobDetailSheet() {
     }
 
     setIsDeleteDialogOpen(false);
-  }, [selectedJobId]);
+    setAdjustStage(selectedJob?.stage ?? "to_apply");
+  }, [selectedJob?.stage, selectedJobId]);
 
-  const canAdvanceStages = useMemo(() => {
-    if (!selectedJob) {
-      return [];
-    }
-
-    const currentStageIndex = STAGE_ORDER.indexOf(selectedJob.stage);
-    if (currentStageIndex < 0 || selectedJob.stage === "offer" || selectedJob.stage === "rejected") {
-      return [];
-    }
-
-    return STAGE_FLOW.filter((stage) => STAGE_ORDER.indexOf(stage) > currentStageIndex);
-  }, [selectedJob]);
+  const nextStage = useMemo(() => selectedJob ? getNextStage(selectedJob.stage) : null, [selectedJob]);
 
   const canMarkRejected = selectedJob ? selectedJob.stage !== "offer" && selectedJob.stage !== "rejected" : false;
 
@@ -87,7 +66,7 @@ export function JobDetailSheet() {
                   </SheetTitle>
                 </div>
                 <Badge variant="outline" className="rounded-md px-3 py-1 text-sm">
-                  {STAGE_LABELS[selectedJob.stage]}
+                  {JOB_STAGE_LABELS[selectedJob.stage]}
                 </Badge>
               </div>
               <SheetDescription className="text-sm leading-6 text-slate-600">
@@ -131,17 +110,24 @@ export function JobDetailSheet() {
               <div className="space-y-3">
                 <p className="text-sm font-medium text-slate-950">推进阶段</p>
                 <div className="flex flex-wrap gap-2">
-                  {canAdvanceStages.map((stage) => (
+                  {nextStage ? (
                     <Button
-                      key={stage}
                       type="button"
-                      variant="outline"
+                      variant="default"
                       size="sm"
-                      onClick={() => advanceJobStage(selectedJob.id, stage, `推进到 ${STAGE_LABELS[stage]}`)}
+                      onClick={() => advanceJobStage(selectedJob.id, nextStage, `推进到 ${JOB_STAGE_LABELS[nextStage]}`)}
                     >
-                      {`推进到 ${STAGE_LABELS[stage]}`}
+                      {`推进到 ${JOB_STAGE_LABELS[nextStage]}`}
                     </Button>
-                  ))}
+                  ) : null}
+                  {canMarkRejected ? (
+                    <>
+                      <select aria-label="调整阶段" value={adjustStage} onChange={(event) => setAdjustStage(event.target.value as JobStage)} className="h-8 rounded-md border border-slate-200 bg-white px-2 text-sm">
+                        {JOB_STAGE_ORDER.filter((stage) => stage !== "rejected").map((stage) => <option key={stage} value={stage}>{JOB_STAGE_LABELS[stage]}</option>)}
+                      </select>
+                      <Button type="button" variant="outline" size="sm" disabled={adjustStage === selectedJob.stage} onClick={() => advanceJobStage(selectedJob.id, adjustStage, `调整到 ${JOB_STAGE_LABELS[adjustStage]}`)}>调整阶段</Button>
+                    </>
+                  ) : null}
                   {canMarkRejected ? (
                     <Button
                       type="button"

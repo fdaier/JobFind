@@ -12,6 +12,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { useJobfindStore } from "@/hooks/use-jobfind-store";
 import { calculateFunnelData, generateRiskTags } from "@/lib/rules-engine";
+import { isInterviewStage } from "@/lib/job-stages";
 
 type MetricTone = "default" | "warning" | "danger" | "success";
 
@@ -79,7 +80,7 @@ export function StatsSummary() {
     );
     const funnel = calculateFunnelData(jobs);
     const upcomingInterviewCount = jobs.filter((job) => {
-      if (job.stage !== "interviewing" || !job.interviewDate) {
+      if (!isInterviewStage(job.stage) || !job.interviewDate) {
         return false;
       }
 
@@ -98,7 +99,7 @@ export function StatsSummary() {
           const appliedAt = new Date(job.appliedDate);
           return appliedAt >= weekStart && appliedAt <= now;
         }).length,
-        hint: `覆盖 ${funnel.applied + funnel.writtenTest + funnel.interviewing + funnel.offer} 个已推进岗位`,
+        hint: `覆盖 ${funnel.applied + funnel.assessment + funnel.writtenTest + funnel.firstInterview + funnel.secondInterview + funnel.thirdInterview + funnel.hrInterview + funnel.offer} 个已推进岗位`,
         icon: CalendarDays,
         tone: "default",
       },

@@ -14,6 +14,27 @@ import {
   saveMaterials,
 } from '../lib/storage';
 import type { InterviewNote, Job, JobStage, Material, TimelineEvent } from '../lib/types';
+import { JOB_STAGE_LABELS } from '../lib/job-stages';
+
+type EditableJobFields = Pick<
+  Job,
+  | 'company'
+  | 'position'
+  | 'jobType'
+  | 'batch'
+  | 'channel'
+  | 'stage'
+  | 'applicationDeadline'
+  | 'writtenTestDate'
+  | 'interviewDate'
+  | 'appliedDate'
+  | 'jdText'
+  | 'keywords'
+  | 'requirements'
+  | 'contactName'
+  | 'contactInfo'
+  | 'note'
+>;
 
 const SEEDED_MOCK_DATE = new Date('2026-04-19T08:00:00.000Z');
 const DEMO_DATA_VERSION = '2026-04-20-rich-ai-pm-pool';
@@ -30,9 +51,16 @@ interface JobFindStoreValue {
   setSelectedJobId: (jobId: string | null) => void;
   setJDParserOpen: (isOpen: boolean) => void;
   addJob: (job: Job) => void;
+  updateJob: (jobId: string, fields: Partial<EditableJobFields>) => void;
+  updateJobMaterials: (jobId: string, requiredMaterials: Job['requiredMaterials'], boundMaterialIds: string[]) => void;
   deleteJob: (jobId: string) => void;
   advanceJobStage: (jobId: string, stage: JobStage, description?: string) => void;
   addInterviewNote: (jobId: string, note: InterviewNote) => void;
+  updateInterviewNote: (jobId: string, noteIndex: number, note: InterviewNote) => void;
+  deleteInterviewNote: (jobId: string, noteIndex: number) => void;
+  addTimelineEvent: (jobId: string, event: TimelineEvent) => void;
+  updateTimelineEvent: (jobId: string, eventIndex: number, event: TimelineEvent) => void;
+  deleteTimelineEvent: (jobId: string, eventIndex: number) => void;
   markTaskComplete: (taskId: string) => void;
 }
 
@@ -118,6 +146,40 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
           selectedJobId: job.id,
         }));
       },
+      updateJob: (jobId, fields) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => {
+            if (job.id !== jobId) return job;
+            const stageChanged = fields.stage && fields.stage !== job.stage;
+            const updatedAt = new Date().toISOString();
+            return {
+              ...job,
+              ...fields,
+              updatedAt,
+              timeline: stageChanged
+                ? [createTimelineEvent(fields.stage!, `手动调整阶段：${JOB_STAGE_LABELS[fields.stage!]}`), ...job.timeline]
+                : job.timeline,
+            };
+          }),
+        }));
+      },
+      updateJobMaterials: (jobId, requiredMaterials, boundMaterialIds) => {
+        setState((current) => {
+          const knownMaterialIds = new Set(current.materials.map((material) => material.id));
+          const nextBoundIds = boundMaterialIds.filter((id) => knownMaterialIds.has(id));
+          return {
+            ...current,
+            jobs: current.jobs.map((job) => job.id === jobId ? { ...job, requiredMaterials, boundMaterialIds: nextBoundIds, updatedAt: new Date().toISOString() } : job),
+            materials: current.materials.map((material) => ({
+              ...material,
+              boundJobIds: nextBoundIds.includes(material.id)
+                ? [...new Set([...material.boundJobIds, jobId])]
+                : material.boundJobIds.filter((id) => id !== jobId),
+            })),
+          };
+        });
+      },
       deleteJob: (jobId) => {
         setState((current) => {
           if (!current.jobs.some((job) => job.id === jobId)) {
@@ -169,6 +231,52 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
               timeline: [createTimelineEvent(job.stage, `补充面试复盘：${note.round}`), ...job.timeline],
             };
           }),
+        }));
+      },
+      updateInterviewNote: (jobId, noteIndex, note) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => job.id === jobId ? {
+            ...job,
+            updatedAt: new Date().toISOString(),
+            interviewNotes: job.interviewNotes.map((item, index) => index === noteIndex ? note : item),
+          } : job),
+        }));
+      },
+      deleteInterviewNote: (jobId, noteIndex) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => job.id === jobId ? {
+            ...job,
+            updatedAt: new Date().toISOString(),
+            interviewNotes: job.interviewNotes.filter((_, index) => index !== noteIndex),
+          } : job),
+        }));
+      },
+      addTimelineEvent: (jobId, event) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => job.id === jobId ? { ...job, updatedAt: new Date().toISOString(), timeline: [event, ...job.timeline] } : job),
+        }));
+      },
+      updateTimelineEvent: (jobId, eventIndex, event) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => job.id === jobId ? {
+            ...job,
+            updatedAt: new Date().toISOString(),
+            timeline: job.timeline.map((item, index) => index === eventIndex ? event : item),
+          } : job),
+        }));
+      },
+      deleteTimelineEvent: (jobId, eventIndex) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => job.id === jobId ? {
+            ...job,
+            updatedAt: new Date().toISOString(),
+            timeline: job.timeline.filter((_, index) => index !== eventIndex),
+          } : job),
         }));
       },
       markTaskComplete: (taskId) => {

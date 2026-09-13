@@ -6,23 +6,14 @@ import {
   getTopJobTasks,
 } from "../rules-engine";
 import type { Job, RiskTag, TodayTask } from "../types";
+import { isInterviewStage, JOB_STAGE_LABELS } from "../job-stages";
 
 import type { AgentRuntime, AgentRuntimeContext } from "./runtime";
 import { buildFollowUpDraft, buildInterviewPrepChecklist, buildMaterialGuidance } from "./templates";
 import type { AgentArtifactSection, AgentDiagnosis, AgentRecommendation, AgentResult } from "./types";
 
 function getStageLabel(job: Job): string {
-  const labels: Record<Job["stage"], string> = {
-    interested: "关注中",
-    to_apply: "待投递",
-    applied: "已投递",
-    written_test: "笔试",
-    interviewing: "面试中",
-    offer: "录用",
-    rejected: "已淘汰",
-  };
-
-  return labels[job.stage];
+  return JOB_STAGE_LABELS[job.stage];
 }
 
 function getPrimaryRisk(risks: RiskTag[]): RiskTag | null {
@@ -181,7 +172,7 @@ export function buildDeterministicAgentResult(context: AgentRuntimeContext): Age
       rankingExplanation: buildRankingExplanation(context.job, rank, context.jobs.length, risks),
       followUpDraft: risks.some((risk) => risk.type === "silence") ? buildFollowUpDraft(context.job) : null,
       interviewPrepChecklist:
-        risks.some((risk) => risk.type === "interview_prep") || context.job.stage === "interviewing"
+        risks.some((risk) => risk.type === "interview_prep") || isInterviewStage(context.job.stage)
           ? buildInterviewPrepChecklist(context.job)
           : null,
       materialGuidance: materialState.missing.length > 0 ? buildMaterialGuidance(context.job, materialState.missing) : null,

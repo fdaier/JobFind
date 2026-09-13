@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { deterministicAgentRuntime } from "@/lib/agent/deterministic-runtime";
 import type { AgentArtifactSection, AgentRecommendation } from "@/lib/agent/types";
 import type { Job, Material } from "@/lib/types";
+import { JOB_STAGE_LABELS } from "@/lib/job-stages";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,16 +19,6 @@ const HELPER_LABELS: Record<HelperKey, string> = {
   followUpDraft: "生成跟进话术",
   interviewPrepChecklist: "生成面试准备清单",
   materialGuidance: "查看材料补齐建议",
-};
-
-const STAGE_LABELS: Record<Job["stage"], string> = {
-  interested: "关注中",
-  to_apply: "待投递",
-  applied: "已投递",
-  written_test: "笔试",
-  interviewing: "面试",
-  offer: "录用",
-  rejected: "已淘汰",
 };
 
 const HELPER_PRIORITY: HelperKey[] = [
@@ -160,7 +151,7 @@ export function JobAIPanel({ job, materials }: { job: Job; materials: Material[]
       <section className="rounded-md border border-slate-200 bg-slate-50 p-4">
         <p className="text-xs font-medium text-slate-500">Agent 岗位快照</p>
         <h3 className="mt-2 text-base font-semibold text-slate-950">
-          {job.company} · {job.position} · {STAGE_LABELS[job.stage]}
+          {job.company} · {job.position} · {JOB_STAGE_LABELS[job.stage]}
         </h3>
         <p className="mt-2 text-sm leading-6 text-slate-700">{result.summary}</p>
         <p className="mt-2 text-sm leading-6 text-slate-600">{result.dashboardBrief}</p>

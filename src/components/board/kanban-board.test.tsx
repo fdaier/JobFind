@@ -11,25 +11,28 @@ describe("KanbanBoard", () => {
     localStorage.clear();
   });
 
-  it("renders the seven stages in order with the seeded job counts", () => {
+  it("renders the ten campus-recruiting stages in order with seeded job counts", () => {
     render(
       <JobFindProvider>
         <KanbanBoard />
       </JobFindProvider>,
     );
 
-    expect(screen.getByRole("heading", { name: "关注中" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "待投递" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "已投递" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "测评" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "笔试" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "面试" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "一面" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "二面" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "三面" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "HR面" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "录用" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "已淘汰" })).toBeInTheDocument();
 
     const jobs = createMockJobs();
     expect(screen.getAllByTestId("job-card")).toHaveLength(jobs.length);
 
-    for (const stage of ["interested", "to_apply", "applied", "written_test", "interviewing", "offer", "rejected"] as const) {
+    for (const stage of ["to_apply", "applied", "assessment", "written_test", "first_interview", "second_interview", "third_interview", "hr_interview", "offer", "rejected"] as const) {
       expect(within(screen.getByTestId(`kanban-column-${stage}`)).getByTestId(`kanban-count-${stage}`)).toHaveTextContent(
         String(jobs.filter((job) => job.stage === stage).length),
       );
