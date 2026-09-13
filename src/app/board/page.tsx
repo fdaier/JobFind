@@ -23,7 +23,7 @@ export default function BoardPage() {
             className="rounded-lg bg-slate-950 px-4 shadow-[0_12px_28px_rgba(22,28,40,0.16)] hover:bg-slate-800"
             onClick={() => setJDParserOpen(true)}
           >
-            粘贴 JD 添加岗位
+            导入 JD 添加岗位
           </Button>
         }
       />

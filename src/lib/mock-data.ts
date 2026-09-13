@@ -1,22 +1,6 @@
 import { generateRiskTags } from './rules-engine';
 import type { AISuggestion, InterviewNote, Job, Material, TimelineEvent } from './types';
 
-export const sampleJD = `B站 AI 产品实习生
-
-岗位职责
-1. 参与 AI 产品需求梳理、原型讨论和方案输出。
-2. 协助分析用户内容消费、创作和互动链路中的机会点。
-3. 跟进功能落地，与设计、研发和算法同学协作推进。
-
-岗位要求
-1. 对 AI 产品、内容平台和用户体验有兴趣。
-2. 具备良好的结构化表达和学习能力。
-3. 有 AI 产品、产品经理或相关项目经历优先。
-
-加分项
-1. 有作品集、项目复盘或数据分析经验。
-2. 熟悉 B站社区生态。`;
-
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
@@ -60,19 +44,6 @@ function createTimelineEvent(date: string, stage: Job['stage'], description: str
 
 function createInterviewNote(round: string, date: string, questions: string[], reflection: string, result: InterviewNote['result']): InterviewNote {
   return { round, date, questions, reflection, result };
-}
-
-const PARSED_JD_ID_PREFIX = 'bilibili-jd';
-let parsedJDIdFallbackCounter = 0;
-
-function createParsedJDJobId(now: Date): string {
-  const cryptoId = globalThis.crypto?.randomUUID?.();
-  if (cryptoId) {
-    return `${PARSED_JD_ID_PREFIX}-${now.getTime()}-${cryptoId}`;
-  }
-
-  parsedJDIdFallbackCounter += 1;
-  return `${PARSED_JD_ID_PREFIX}-${now.getTime()}-${parsedJDIdFallbackCounter}`;
 }
 
 export function createMockMaterials(now: Date = new Date()): Material[] {
@@ -618,51 +589,4 @@ export function createMockJobs(now: Date = new Date()): Job[] {
     ...job,
     riskTags: generateRiskTags(job, materials, now),
   }));
-}
-
-export function createParsedJDJob(now: Date = new Date(), id?: string): Job {
-  const materials = createMockMaterials(now);
-  const createdAt = now.toISOString();
-  const updatedAt = createdAt;
-  const applicationDeadline = new Date(now.getTime() + 3 * DAY).toISOString();
-
-  const job: Job = {
-    id: id ?? createParsedJDJobId(now),
-    company: 'B站',
-    position: 'AI 产品实习生',
-    jobType: 'intern',
-    batch: 'summer_intern',
-    channel: 'official_site',
-    stage: 'to_apply',
-    applicationDeadline,
-    writtenTestDate: null,
-    interviewDate: null,
-    appliedDate: null,
-    jdText: sampleJD,
-    keywords: ['推荐系统', '内容社区', '用户增长'],
-    requirements: ['熟悉内容产品流程', '能整理需求和方案', '有 AI 产品作品更好'],
-    requiredMaterials: ['resume', 'portfolio'],
-    boundMaterialIds: ['resume-pm'],
-    contactName: null,
-    contactInfo: null,
-    riskTags: [],
-    aiSuggestions: [
-      createSuggestion(
-        'bilibili-jd-next-step',
-        '保存到看板后补齐 AI 产品作品集',
-        '当前是待投递状态，先把作品集和岗位材料对齐，再推进申请更稳。',
-        'high',
-        'bind_material',
-      ),
-    ],
-    timeline: [createTimelineEvent(createdAt, 'to_apply', 'JD 解析生成待投递岗位')],
-    interviewNotes: [],
-    createdAt,
-    updatedAt,
-  };
-
-  return {
-    ...job,
-    riskTags: generateRiskTags(job, materials, now),
-  };
 }

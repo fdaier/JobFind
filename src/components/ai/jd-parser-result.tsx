@@ -1,120 +1,164 @@
 "use client";
 
-import React from "react";
-import type { ReactNode } from "react";
-
-import type { Job, JobStage, MaterialType } from "@/lib/types";
+import React, { useState } from "react";
+import { X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-
-const DATE_FORMAT = new Intl.DateTimeFormat("zh-CN", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-});
-
-const stageLabels: Record<JobStage, string> = {
-  interested: "关注中",
-  to_apply: "待投递",
-  applied: "已投递",
-  written_test: "笔试",
-  interviewing: "面试",
-  offer: "录用",
-  rejected: "已淘汰",
-};
+import { JOB_STAGE_LABELS, type JDIntakeDraft } from "@/lib/jd-intake";
+import type { MaterialType } from "@/lib/types";
 
 const materialLabels: Record<MaterialType, string> = {
   resume: "简历",
-  portfolio: "作品集",
+  portfolio: "作品集 / 项目材料",
   transcript: "成绩单",
   certificate: "证书",
   cover_letter: "求职信",
   other: "其他材料",
 };
 
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="space-y-1">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-sm font-medium text-slate-950">{value}</p>
-    </div>
-  );
-}
+const materialTypes = Object.keys(materialLabels) as MaterialType[];
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
-      {children}
-    </section>
-  );
+function formatDeadline(value: string): string {
+  if (!value) {
+    return "未设置";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "未设置";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
 }
 
 export function JDParserResult({
-  job,
+  draft,
+  onDraftChange,
+  onBack,
   onSave,
   isSaving = false,
 }: {
-  job: Job;
+  draft: JDIntakeDraft;
+  onDraftChange: (draft: JDIntakeDraft) => void;
+  onBack: () => void;
   onSave: () => void;
   isSaving?: boolean;
 }) {
-  const deadline = job.applicationDeadline ? DATE_FORMAT.format(new Date(job.applicationDeadline)) : "暂无";
+  const [keywordInput, setKeywordInput] = useState("");
+
+  const updateDraft = <Key extends keyof JDIntakeDraft>(field: Key, value: JDIntakeDraft[Key]) => {
+    onDraftChange({ ...draft, [field]: value });
+  };
+
+  const addKeyword = () => {
+    const keyword = keywordInput.trim();
+    if (!keyword || draft.keywords.includes(keyword)) {
+      return;
+    }
+
+    updateDraft("keywords", [...draft.keywords, keyword]);
+    setKeywordInput("");
+  };
+
+  const toggleMaterial = (material: MaterialType) => {
+    updateDraft(
+      "requiredMaterials",
+      draft.requiredMaterials.includes(material)
+        ? draft.requiredMaterials.filter((item) => item !== material)
+        : [...draft.requiredMaterials, material],
+    );
+  };
 
   return (
     <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-slate-950">根据 JD 整理的建议</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">你可以直接修改。公司、岗位名称和原始 JD 会按你的输入保存。</p>
+        </div>
+        <p className="shrink-0 text-xs text-slate-500">DDL：{formatDeadline(draft.applicationDeadline)}</p>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="公司" value={job.company} />
-        <Field label="岗位" value={job.position} />
-        <Field label="阶段" value={stageLabels[job.stage]} />
-        <Field label="DDL" value={`${deadline}（3 天内）`} />
+        <div className="space-y-2">
+          <label htmlFor="jd-preview-company" className="text-xs text-slate-500">公司</label>
+          <Input id="jd-preview-company" value={draft.company} onChange={(event) => updateDraft("company", event.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="jd-preview-position" className="text-xs text-slate-500">岗位名称</label>
+          <Input id="jd-preview-position" value={draft.position} onChange={(event) => updateDraft("position", event.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="jd-preview-stage" className="text-xs text-slate-500">阶段</label>
+          <select id="jd-preview-stage" value={draft.stage} onChange={(event) => updateDraft("stage", event.target.value as JDIntakeDraft["stage"])} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
+            {Object.entries(JOB_STAGE_LABELS).map(([stage, label]) => <option key={stage} value={stage}>{label}</option>)}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="jd-preview-deadline" className="text-xs text-slate-500">申请截止时间（选填）</label>
+          <Input id="jd-preview-deadline" type="datetime-local" value={draft.applicationDeadline} onChange={(event) => updateDraft("applicationDeadline", event.target.value)} />
+        </div>
       </div>
 
       <Separator />
 
-      <Section title="关键词">
+      <section className="space-y-2">
+        <h3 className="text-sm font-semibold text-slate-950">关键词</h3>
         <div className="flex flex-wrap gap-2">
-          {job.keywords.map((keyword) => (
-            <Badge key={keyword} variant="outline" className="rounded-md">
+          {draft.keywords.map((keyword) => (
+            <Badge key={keyword} variant="outline" className="gap-1 rounded-md pr-1">
               {keyword}
+              <button type="button" aria-label={`移除关键词 ${keyword}`} onClick={() => updateDraft("keywords", draft.keywords.filter((item) => item !== keyword))} className="rounded-sm p-0.5 text-slate-500 hover:bg-slate-200 hover:text-slate-950">
+                <X className="size-3" />
+              </button>
             </Badge>
           ))}
+          {draft.keywords.length === 0 ? <p className="text-sm text-slate-500">未从 JD 中匹配到关键词，可手动补充。</p> : null}
         </div>
-      </Section>
+        <div className="flex max-w-sm gap-2">
+          <Input aria-label="添加关键词" value={keywordInput} onChange={(event) => setKeywordInput(event.target.value)} onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              addKeyword();
+            }
+          }} placeholder="添加关键词" />
+          <Button type="button" variant="outline" size="sm" onClick={addKeyword}>添加</Button>
+        </div>
+      </section>
 
       <Separator />
 
-      <Section title="所需材料">
-        <div className="flex flex-wrap gap-2">
-          {job.requiredMaterials.map((material) => (
-            <Badge key={material} variant="outline" className="rounded-md">
-              {materialLabels[material]}（{material}）
-            </Badge>
+      <section className="space-y-2">
+        <h3 className="text-sm font-semibold text-slate-950">材料建议</h3>
+        <p className="text-sm text-slate-600">仅把 JD 中明确提到的材料预先勾选；你可以调整。</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {materialTypes.map((material) => (
+            <label key={material} className="flex items-center gap-2 text-sm text-slate-800">
+              <input type="checkbox" checked={draft.requiredMaterials.includes(material)} onChange={() => toggleMaterial(material)} className="size-4 rounded border-slate-300 text-slate-950 focus:ring-slate-400" />
+              {materialLabels[material]}
+            </label>
           ))}
         </div>
-      </Section>
+      </section>
 
-      <Separator />
+      <details className="border-t border-slate-200 pt-3">
+        <summary className="cursor-pointer text-sm font-medium text-slate-700">查看原始 JD</summary>
+        <pre className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-slate-50 p-3 text-xs leading-5 text-slate-700">{draft.jdText}</pre>
+      </details>
 
-      <Section title="下一步">
-        <p className="text-sm leading-6 text-slate-700">保存到看板后补齐 AI 产品作品集。</p>
-      </Section>
-
-      <div className="flex justify-end">
-        <Button type="button" onClick={onSave} disabled={isSaving}>
-          {isSaving ? "保存中..." : "保存到看板"}
-        </Button>
+      <div className="flex justify-between gap-3">
+        <Button type="button" variant="outline" onClick={onBack} disabled={isSaving}>返回修改</Button>
+        <Button type="button" onClick={onSave} disabled={isSaving}>{isSaving ? "保存中..." : "保存到看板"}</Button>
       </div>
     </div>
   );

@@ -1,10 +1,9 @@
 import React from "react";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import BoardPage from "./page";
 import { JobFindProvider, useJobfindStore } from "../../hooks/use-jobfind-store";
-import { sampleJD } from "../../lib/mock-data";
 
 function SelectedJobProbe() {
   const { selectedJobId } = useJobfindStore();
@@ -202,50 +201,49 @@ describe("BoardPage job detail sheet", () => {
     expect(notesPanel).toHaveTextContent("待定");
   });
 
-  it("opens the JD parser, previews the parsed job, and saves it to the board", async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-04-19T08:00:00.000Z"));
+  it("validates, previews, and saves the user-provided Tencent JD instead of a mock job", async () => {
+    renderBoardPage();
+    const toApplyColumn = screen.getByTestId("kanban-column-to_apply");
+    const initialToApplyCardCount = within(toApplyColumn).getAllByTestId("job-card").length;
 
-    try {
-      renderBoardPage();
-      const toApplyColumn = screen.getByTestId("kanban-column-to_apply");
-      const initialToApplyCardCount = within(toApplyColumn).getAllByTestId("job-card").length;
+    fireEvent.click(screen.getByRole("button", { name: "导入 JD 添加岗位" }));
 
-      fireEvent.click(screen.getByRole("button", { name: "粘贴 JD 添加岗位" }));
+    expect(screen.getByLabelText("公司")).toHaveValue("");
+    expect(screen.getByLabelText("岗位名称")).toHaveValue("");
+    expect(screen.getByLabelText("JD 正文")).toHaveValue("");
 
-      const dialog = screen.getByRole("dialog");
-      expect(dialog).toBeInTheDocument();
-      expect(screen.getByLabelText("JD")).toHaveValue(sampleJD);
-      expect(screen.getByText("系统会先整理岗位关键信息，再把它纳入你的申请池和 Agent 判断。")).toBeInTheDocument();
-      expect(screen.queryByText("这是本地解析预览，不连接真实后端或 AI 接口。")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "整理并预览" }));
+    expect(screen.getByText("请填写公司名称。")).toBeInTheDocument();
+    expect(screen.getByText("请填写岗位名称。")).toBeInTheDocument();
+    expect(screen.getByText("请粘贴岗位描述。")).toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
-      expect(screen.getByText("正在解析 JD")).toBeInTheDocument();
-      expect(screen.getByText("正在解析 JD")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("公司"), { target: { value: "腾讯" } });
+    fireEvent.change(screen.getByLabelText("岗位名称"), { target: { value: "AI 产品经理" } });
+    fireEvent.change(screen.getByLabelText("JD 正文"), {
+      target: { value: "岗位要求：熟悉大模型、LLM、Agent、RAG、多模态和 A/B测试；有产品项目或 AI 应用原型经验。" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "整理并预览" }));
 
-      await act(async () => {
-        vi.advanceTimersByTime(800);
-      });
+    expect(screen.getByText("根据 JD 整理的建议")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("腾讯")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("AI 产品经理")).toBeInTheDocument();
+    expect(screen.getByText("LLM")).toBeInTheDocument();
+    expect(screen.getByText("Agent")).toBeInTheDocument();
+    expect(screen.getByLabelText("作品集 / 项目材料")).toBeChecked();
+    expect(within(screen.getByRole("dialog")).queryByText("B站")).not.toBeInTheDocument();
 
-      const preview = within(dialog);
-      expect(preview.getByText("B站")).toBeInTheDocument();
-      expect(preview.getAllByText("AI 产品实习生").length).toBeGreaterThan(0);
-      expect(preview.getByText("简历（resume）")).toBeInTheDocument();
-      expect(preview.getByText("作品集（portfolio）")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "保存到看板" }));
 
-      const saveButton = screen.getByRole("button", { name: "保存到看板" });
-      await act(async () => {
-        fireEvent.click(saveButton);
-        fireEvent.click(saveButton);
-      });
-
-      expect(screen.queryByLabelText("JD")).not.toBeInTheDocument();
-
+    await waitFor(() => {
       expect(within(toApplyColumn).getAllByTestId("job-card")).toHaveLength(initialToApplyCardCount + 1);
-      expect(within(toApplyColumn).getAllByText("B站")).toHaveLength(2);
-      expect(screen.getByTestId("selected-job-id")).not.toHaveTextContent("none");
-    } finally {
-      vi.useRealTimers();
-    }
+    });
+    expect(within(toApplyColumn).getByText("腾讯")).toBeInTheDocument();
+    expect(within(toApplyColumn).getByText("AI 产品经理")).toBeInTheDocument();
+    expect(screen.getByTestId("selected-job-id")).not.toHaveTextContent("none");
+
+    await waitFor(() => {
+      const jobs = JSON.parse(localStorage.getItem("jobfind.jobs") ?? "[]") as Array<{ company: string; position: string; applicationDeadline: string | null }>;
+      expect(jobs).toEqual(expect.arrayContaining([expect.objectContaining({ company: "腾讯", position: "AI 产品经理", applicationDeadline: null })]));
+    });
   });
 });
