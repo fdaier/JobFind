@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `a3f3289 feat: refine application board workflow and editing`
+- 稳定分支与当前产品提交：`main` / `103c804 feat: add note during JD intake`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_HZayunEQ2vKtnKR239QVMXQAvke7`（2026-09-14，Ready）
+- 当前生产部署：`dpl_9KJeQA2DjwS31F1D8183ByXgnkpB`（2026-09-14，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -42,6 +42,8 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - `docs/superpowers/plans/2026-09-14-jobfind-board-workflow-and-editing.md`
 
 本地已完成 18 个测试文件、55 个测试，`tsc --noEmit`、`npm run lint` 与静态生产构建；本地浏览器已验证十列、卡片备注和基本信息编辑保存。生产部署 `dpl_HZayunEQ2vKtnKR239QVMXQAvke7` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200，线上已确认十阶段与备注卡片。
+
+后续小版本 `103c804` 已在生产部署 `dpl_9KJeQA2DjwS31F1D8183ByXgnkpB` Ready：导入 JD 的首屏和预览页均可填写 20 字备注；公司名和岗位名在卡片中使用同级标题样式。该版本同样通过完整测试、类型检查、lint、静态构建与本地/生产浏览器检查，且不改写既有岗位。
 
 ## 历史完成：岗位删除
 
