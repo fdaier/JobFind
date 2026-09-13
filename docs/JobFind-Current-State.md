@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前提交：`main` / `44f31e5 feat: add job deletion to application board`
+- 稳定分支与当前产品提交：`main` / `68259b7 feat: support real JD intake on application board`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_3Sqw1ZMn4Pmv9RHAL6rtsVLPQ97h`（2026-09-13，Ready）
+- 当前生产部署：`dpl_Fx5QpB5bPbdtY4e2L7nVL3PueU2E`（2026-09-14，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -37,13 +37,13 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 ## 已验证状态
 
-- 2026-09-14 本地真实 JD 导入：18 个测试文件、53 个测试通过，`tsc --noEmit`、`eslint src`、静态生产构建通过；已用“腾讯 · AI 产品经理”完成浏览器录入、预览和保存验证。
-- 本次发布尚未执行。上一生产版本的 Vercel 别名和 `jobfind.fdaier.xyz` 均返回 HTTP 200，且线上 `/board` 包含“删除该岗位”功能。
+- 2026-09-14 真实 JD 导入：18 个测试文件、53 个测试通过，`tsc --noEmit`、`eslint src`、静态生产构建通过；已用“腾讯 · AI 产品经理”完成本地与生产浏览器的录入、预览和保存验证。
+- Vercel 生产别名和 `jobfind.fdaier.xyz` 均指向本次部署并返回 HTTP 200；线上 `/board` 已包含真实 JD 导入与岗位删除功能。
 - 本地真实 JD 导入要求公司、岗位名称和 JD 正文，DDL 可选；预览和保存共享同一份用户草稿，关键词/材料建议为可编辑的本地规则输出。
 
 ## 后续优先级与边界
 
-1. 真实 JD 导入的正式依据：`superpowers/specs/2026-09-14-jobfind-real-jd-intake-design.md` 与对应计划。当前代码待提交和部署；它是单浏览器、本地存储的申请管理能力，不是自动投递或真实 LLM。
+1. 真实 JD 导入的正式依据：`superpowers/specs/2026-09-14-jobfind-real-jd-intake-design.md` 与对应计划。它是单浏览器、本地存储的申请管理能力，不是自动投递或真实 LLM。
 2. 若推进 V2，下一优先级为 `DRAFT-PRD-JobFind-V2-Review-Center.md` 的结构化复盘输入；它目前尚未实施。
 3. 删除功能暂不做回收站或 Undo；本期选择低频、慎重删除，未来再统一设计恢复语义。
 4. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
