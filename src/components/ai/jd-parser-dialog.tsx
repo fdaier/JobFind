@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { JDParserResult } from "@/components/ai/jd-parser-result";
+import { ApplicationDeadlineInput } from "@/components/ai/application-deadline-input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -106,10 +107,12 @@ export function JDParserDialog() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="jd-intake-deadline" className="text-sm font-medium text-slate-950">申请截止时间 <span className="font-normal text-slate-500">（选填）</span></label>
-                <Input id="jd-intake-deadline" type="datetime-local" value={draft.applicationDeadline} onChange={(event) => updateField("applicationDeadline", event.target.value)} />
-              </div>
+              <ApplicationDeadlineInput
+                id="jd-intake-deadline"
+                label={<>申请截止时间 <span className="font-normal text-slate-500">（选填）</span></>}
+                value={draft.applicationDeadline}
+                onChange={(value) => updateField("applicationDeadline", value)}
+              />
               <div className="space-y-2">
                 <label htmlFor="jd-intake-stage" className="text-sm font-medium text-slate-950">当前阶段</label>
                 <select id="jd-intake-stage" value={draft.stage} onChange={(event) => updateField("stage", event.target.value as JDIntakeDraft["stage"])} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">

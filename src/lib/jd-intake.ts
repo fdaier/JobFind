@@ -128,12 +128,22 @@ function classifyRecruitBatch(text: string, jobType: JobType): RecruitBatch {
 }
 
 function deadlineToIso(value: string): string | null {
-  if (!value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return null;
   }
 
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  const parsed = new Date(`${value}T23:59:59`);
+  const [year, month, day] = value.split("-").map(Number);
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getFullYear() !== year ||
+    parsed.getMonth() !== month - 1 ||
+    parsed.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return parsed.toISOString();
 }
 
 function matchesKeyword(jdText: string, keyword: string): boolean {

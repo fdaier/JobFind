@@ -219,6 +219,11 @@ describe("BoardPage job detail sheet", () => {
 
     fireEvent.change(screen.getByLabelText("公司"), { target: { value: "腾讯" } });
     fireEvent.change(screen.getByLabelText("岗位名称"), { target: { value: "AI 产品经理" } });
+    expect(screen.queryByPlaceholderText("yyyy/mm/dd")).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("截止年份"), { target: { value: "2027" } });
+    fireEvent.change(screen.getByLabelText("截止月份"), { target: { value: "10" } });
+    fireEvent.change(screen.getByLabelText("截止日期"), { target: { value: "1" } });
+    expect(screen.getByRole("button", { name: "选择申请截止日期" })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("JD 正文"), {
       target: { value: "岗位要求：熟悉大模型、LLM、Agent、RAG、多模态和 A/B测试；有产品项目或 AI 应用原型经验。" },
     });
@@ -231,6 +236,7 @@ describe("BoardPage job detail sheet", () => {
     expect(screen.getByText("Agent")).toBeInTheDocument();
     expect(screen.getByLabelText("作品集 / 项目材料")).toBeChecked();
     expect(within(screen.getByRole("dialog")).queryByText("B站")).not.toBeInTheDocument();
+    expect(screen.queryByText(/DDL：/)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "保存到看板" }));
 
@@ -243,7 +249,12 @@ describe("BoardPage job detail sheet", () => {
 
     await waitFor(() => {
       const jobs = JSON.parse(localStorage.getItem("jobfind.jobs") ?? "[]") as Array<{ company: string; position: string; applicationDeadline: string | null }>;
-      expect(jobs).toEqual(expect.arrayContaining([expect.objectContaining({ company: "腾讯", position: "AI 产品经理", applicationDeadline: null })]));
+      const createdJob = jobs.find((job) => job.company === "腾讯" && job.position === "AI 产品经理");
+      expect(createdJob).toBeDefined();
+      expect(createdJob?.applicationDeadline).not.toBeNull();
+      expect(new Date(createdJob!.applicationDeadline!).getFullYear()).toBe(2027);
+      expect(new Date(createdJob!.applicationDeadline!).getMonth()).toBe(9);
+      expect(new Date(createdJob!.applicationDeadline!).getDate()).toBe(1);
     });
   });
 });

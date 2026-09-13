@@ -49,4 +49,25 @@ describe("JD intake", () => {
     expect(job.requiredMaterials).toEqual(["portfolio"]);
     expect(job.company).not.toBe("B站");
   });
+
+  it("stores a valid date-only deadline at the end of the selected day", () => {
+    const job = createJobFromJDIntake(
+      {
+        ...createEmptyJDIntakeDraft(),
+        company: "京东",
+        position: "技术产品经理",
+        jdText: "岗位要求：具备产品能力。",
+        applicationDeadline: "2027-10-01",
+      },
+      [],
+      new Date("2026-09-14T08:00:00.000Z"),
+    );
+
+    const deadline = new Date(job.applicationDeadline!);
+    expect(deadline.getFullYear()).toBe(2027);
+    expect(deadline.getMonth()).toBe(9);
+    expect(deadline.getDate()).toBe(1);
+    expect(deadline.getHours()).toBe(23);
+    expect(deadline.getMinutes()).toBe(59);
+  });
 });

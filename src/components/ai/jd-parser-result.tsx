@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { ApplicationDeadlineInput } from "@/components/ai/application-deadline-input";
 import { JOB_STAGE_LABELS, type JDIntakeDraft } from "@/lib/jd-intake";
 import type { MaterialType } from "@/lib/types";
 
@@ -20,26 +21,6 @@ const materialLabels: Record<MaterialType, string> = {
 };
 
 const materialTypes = Object.keys(materialLabels) as MaterialType[];
-
-function formatDeadline(value: string): string {
-  if (!value) {
-    return "未设置";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "未设置";
-  }
-
-  return new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(date);
-}
 
 export function JDParserResult({
   draft,
@@ -81,12 +62,11 @@ export function JDParserResult({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
+      <div>
         <div>
           <p className="text-sm font-semibold text-slate-950">根据 JD 整理的建议</p>
           <p className="mt-1 text-sm leading-6 text-slate-600">你可以直接修改。公司、岗位名称和原始 JD 会按你的输入保存。</p>
         </div>
-        <p className="shrink-0 text-xs text-slate-500">DDL：{formatDeadline(draft.applicationDeadline)}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -104,10 +84,12 @@ export function JDParserResult({
             {Object.entries(JOB_STAGE_LABELS).map(([stage, label]) => <option key={stage} value={stage}>{label}</option>)}
           </select>
         </div>
-        <div className="space-y-2">
-          <label htmlFor="jd-preview-deadline" className="text-xs text-slate-500">申请截止时间（选填）</label>
-          <Input id="jd-preview-deadline" type="datetime-local" value={draft.applicationDeadline} onChange={(event) => updateDraft("applicationDeadline", event.target.value)} />
-        </div>
+        <ApplicationDeadlineInput
+          id="jd-preview-deadline"
+          label={<>申请截止时间 <span className="font-normal text-slate-500">（选填）</span></>}
+          value={draft.applicationDeadline}
+          onChange={(value) => updateDraft("applicationDeadline", value)}
+        />
       </div>
 
       <Separator />
