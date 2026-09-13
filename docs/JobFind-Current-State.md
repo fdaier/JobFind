@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `待提交：申请看板十阶段、备注与详情编辑`
+- 稳定分支与当前产品提交：`main` / `a3f3289 feat: refine application board workflow and editing`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_8k9G4Qeox1mCDLxuM397tQnzfHkh`（2026-09-14，Ready）
+- 当前生产部署：`dpl_HZayunEQ2vKtnKR239QVMXQAvke7`（2026-09-14，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -41,7 +41,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - `docs/superpowers/specs/2026-09-14-jobfind-board-workflow-and-editing-design.md`
 - `docs/superpowers/plans/2026-09-14-jobfind-board-workflow-and-editing.md`
 
-本地已完成 18 个测试文件、55 个测试，`tsc --noEmit`、`npm run lint` 与静态生产构建；浏览器已验证十列、卡片备注和基本信息编辑保存。下一步是提交、Vercel 发布并验证生产域名。
+本地已完成 18 个测试文件、55 个测试，`tsc --noEmit`、`npm run lint` 与静态生产构建；本地浏览器已验证十列、卡片备注和基本信息编辑保存。生产部署 `dpl_HZayunEQ2vKtnKR239QVMXQAvke7` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200，线上已确认十阶段与备注卡片。
 
 ## 历史完成：岗位删除
 
@@ -60,7 +60,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 ## 后续优先级与边界
 
-1. V3 已在本地实现并通过验证，待提交和生产发布。用户已有数据的安全迁移是发布阻断项，禁止跳过 `jobfind.jobs.backup.v3` 备份。
+1. V3 已发布。用户已有数据的安全迁移是长期不变的发布约束，禁止移除或跳过 `jobfind.jobs.backup.v3` 备份。
 2. 真实 JD 导入的正式依据：`superpowers/specs/2026-09-14-jobfind-real-jd-intake-design.md` 与对应计划。它是单浏览器、本地存储的申请管理能力，不是自动投递或真实 LLM。
 3. 生产浏览器校验时发现一条 React hydration 警告（minified #418）；真实 JD 表单及保存流程未受影响，原因尚未归因。下次前端迭代前应复现并消除该警告。
 4. 若推进 V2，下一优先级为 `DRAFT-PRD-JobFind-V2-Review-Center.md` 的结构化复盘输入；它目前尚未实施。
