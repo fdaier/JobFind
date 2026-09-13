@@ -123,6 +123,13 @@ export function JDParserDialog() {
             </div>
 
             <div className="space-y-2">
+              <label htmlFor="jd-intake-note" className="text-sm font-medium text-slate-950">
+                备注 <span className="font-normal text-slate-500">（选填，{draft.note.length}/20）</span>
+              </label>
+              <Input id="jd-intake-note" maxLength={20} value={draft.note} onChange={(event) => updateField("note", event.target.value)} placeholder="例如：等内推回复" />
+            </div>
+
+            <div className="space-y-2">
               <label htmlFor="jd-parser-input" className="text-sm font-medium text-slate-950">JD 正文</label>
               <Textarea id="jd-parser-input" value={draft.jdText} onChange={(event) => updateField("jdText", event.target.value)} aria-invalid={Boolean(errors.jdText)} aria-describedby={errors.jdText ? "jd-parser-input-error" : undefined} placeholder="粘贴完整的岗位职责、岗位要求和加分项。原文会保存到此岗位。" rows={12} className="min-h-[18rem] rounded-md" />
               {errors.jdText ? <p id="jd-parser-input-error" className="text-xs text-rose-700">{errors.jdText}</p> : null}

@@ -90,6 +90,10 @@ export function JDParserResult({
           value={draft.applicationDeadline}
           onChange={(value) => updateDraft("applicationDeadline", value)}
         />
+        <div className="space-y-2 sm:col-span-2">
+          <label htmlFor="jd-preview-note" className="text-xs text-slate-500">备注（选填，{draft.note.length}/20）</label>
+          <Input id="jd-preview-note" maxLength={20} value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} placeholder="例如：等内推回复" />
+        </div>
       </div>
 
       <Separator />

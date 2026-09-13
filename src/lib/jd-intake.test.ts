@@ -37,6 +37,7 @@ describe("JD intake", () => {
       company: "腾讯",
       position: "AI 产品经理",
       jdText: tencentAiProductManagerJD,
+      note: "等内推回复",
     });
     const job = createJobFromJDIntake(draft, [], new Date("2026-09-14T08:00:00.000Z"));
 
@@ -47,6 +48,7 @@ describe("JD intake", () => {
     expect(job.applicationDeadline).toBeNull();
     expect(job.timeline[0]?.description).toBe("添加岗位：腾讯 · AI 产品经理");
     expect(job.requiredMaterials).toEqual(["portfolio"]);
+    expect(job.note).toBe("等内推回复");
     expect(job.company).not.toBe("B站");
   });
 

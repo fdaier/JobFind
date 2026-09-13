@@ -73,8 +73,8 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{job.company}</p>
-          <h3 className="mt-1 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
+          <p className="break-words text-sm font-semibold text-slate-950">{job.company}</p>
+          <h3 className="mt-0.5 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
         </div>
         <span className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/30 px-2 py-0.5 text-[11px] font-medium text-slate-600">
           {JOB_STAGE_LABELS[job.stage]}

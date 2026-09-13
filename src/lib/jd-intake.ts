@@ -8,6 +8,7 @@ export interface JDIntakeDraft {
   jdText: string;
   applicationDeadline: string;
   stage: JobStage;
+  note: string;
   keywords: string[];
   requirements: string[];
   requiredMaterials: MaterialType[];
@@ -156,6 +157,7 @@ export function createEmptyJDIntakeDraft(): JDIntakeDraft {
     jdText: "",
     applicationDeadline: "",
     stage: "to_apply",
+    note: "",
     keywords: [],
     requirements: [],
     requiredMaterials: [],
@@ -195,7 +197,7 @@ export function createJobFromJDIntake(draft: JDIntakeDraft, materials: Material[
     boundMaterialIds: [],
     contactName: null,
     contactInfo: null,
-    note: "",
+    note: draft.note.trim().slice(0, 20),
     riskTags: [],
     aiSuggestions: [],
     timeline: [
