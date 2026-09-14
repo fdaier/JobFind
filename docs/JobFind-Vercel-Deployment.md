@@ -5,7 +5,7 @@
 - 自定义域名：<https://jobfind.fdaier.xyz>
 - Vercel 生产别名：<https://jobfind-core-loop.vercel.app>
 - Vercel 团队 / 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_8k9G4Qeox1mCDLxuM397tQnzfHkh`（2026-09-14）
+- 当前生产部署：`dpl_7b4cmZWWemxeM2VqX1D5PaU99mMd`（2026-09-14）
 
 根目录 `D:\projects\JobFind` 的 `main` 是当前发布来源。不要再从历史 `.worktrees/jobfind-core-loop` 发布。
 

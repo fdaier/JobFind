@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `103c804 feat: add note during JD intake`
+- 稳定分支与当前产品提交：`main` / `7eb1ada feat: track assessment deadlines`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_9KJeQA2DjwS31F1D8183ByXgnkpB`（2026-09-14，Ready）
+- 当前生产部署：`dpl_7b4cmZWWemxeM2VqX1D5PaU99mMd`（2026-09-14，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -45,6 +45,20 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 后续小版本 `103c804` 已在生产部署 `dpl_9KJeQA2DjwS31F1D8183ByXgnkpB` Ready：导入 JD 的首屏和预览页均可填写 20 字备注；公司名和岗位名在卡片中使用同级标题样式。该版本同样通过完整测试、类型检查、lint、静态构建与本地/生产浏览器检查，且不改写既有岗位。
 
+## 最近完成：测评截止时间与站内提醒
+
+正式依据：
+
+- `docs/superpowers/specs/2026-09-14-jobfind-assessment-deadline-design.md`
+- `docs/superpowers/plans/2026-09-14-jobfind-assessment-deadline.md`
+
+- 既有岗位可在“基本信息 → 编辑 → 关键时间”保存精确到时分的测评截止时间、可选测评链接，以及已有的笔试/面试时间；新建 JD 的填写页和预览页也支持同一组测评字段。
+- 看板继续只显示一个最近的未来关键时间；测评节点显示为“测评截止”。
+- 测评阶段且截止时间在 72 小时内时，确定性 Agent 会在看板、作战台和今日任务中提示；24 小时内或已过期为紧急，已过期任务改为确认测评状态。
+- 旧 localStorage 岗位只安全补齐 `assessmentDeadline` 和 `assessmentLink` 的空值，不改写其他数据，也不会覆写既有 V3 备份。
+
+本次通过 18 个测试文件、58 个用例、`tsc --noEmit`、`npm run lint`、生产构建和本地浏览器完整闭环验证。生产部署 `dpl_7b4cmZWWemxeM2VqX1D5PaU99mMd` Ready；`jobfind.fdaier.xyz/board` 返回 HTTP 200，线上只读确认导入弹窗含两个新增字段。
+
 ## 历史完成：岗位删除
 
 岗位进入“录用”或“已淘汰”后不再卡死在终态列：所有七个阶段均可从详情抽屉底部删除岗位。入口低强调度、删除前二次确认；删除会移除岗位自身的时间线和面试复盘、清理材料的 `boundJobIds`，并通过既有 localStorage 流程持久化。
@@ -62,14 +76,13 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 ## 后续优先级与边界
 
-1. **待确认草案**：`DRAFT-PRD-JobFind-Assessment-Deadline.md`。现有系统没有测评截止时间入口或 Agent 规则；草案新增测评截止时间/可选链接、卡片关键时间与站内 Agent 提醒，不影响既有岗位数据。
-2. V3 已发布。用户已有数据的安全迁移是长期不变的发布约束，禁止移除或跳过 `jobfind.jobs.backup.v3` 备份。
-3. 真实 JD 导入的正式依据：`superpowers/specs/2026-09-14-jobfind-real-jd-intake-design.md` 与对应计划。它是单浏览器、本地存储的申请管理能力，不是自动投递或真实 LLM。
-4. 生产浏览器校验时发现一条 React hydration 警告（minified #418）；真实 JD 表单及保存流程未受影响，原因尚未归因。下次前端迭代前应复现并消除该警告。
-5. 若推进 V2，下一优先级为 `DRAFT-PRD-JobFind-V2-Review-Center.md` 的结构化复盘输入；它目前尚未实施。
-6. 删除功能暂不做回收站或 Undo；本期选择低频、慎重删除，未来再统一设计恢复语义。
-7. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
-8. 只有验证自然语言体验收益后才接入 LLM；不把开发时使用 A1/Codex 与产品线上模型能力混为一谈。
+1. V3 已发布。用户已有数据的安全迁移是长期不变的发布约束，禁止移除或跳过 `jobfind.jobs.backup.v3` 备份。
+2. 真实 JD 导入的正式依据：`superpowers/specs/2026-09-14-jobfind-real-jd-intake-design.md` 与对应计划。它是单浏览器、本地存储的申请管理能力，不是自动投递或真实 LLM。
+3. 生产浏览器校验时发现一条 React hydration 警告（minified #418）；真实 JD 表单及保存流程未受影响，原因尚未归因。下次前端迭代前应复现并消除该警告。
+4. 若推进 V2，下一优先级为 `DRAFT-PRD-JobFind-V2-Review-Center.md` 的结构化复盘输入；它目前尚未实施。
+5. 删除功能暂不做回收站或 Undo；本期选择低频、慎重删除，未来再统一设计恢复语义。
+6. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
+7. 只有验证自然语言体验收益后才接入 LLM；不把开发时使用 A1/Codex 与产品线上模型能力混为一谈。
 
 ## 新对话执行规则
 
