@@ -133,7 +133,7 @@ describe('storage helpers', () => {
     const migrated = loadJobs();
 
     expect(migrated).toHaveLength(1);
-    expect(migrated![0]).toMatchObject({ id: job.id, stage: 'first_interview', note: '', jdText: job.jdText, boundMaterialIds: job.boundMaterialIds, interviewNotes: job.interviewNotes });
+    expect(migrated![0]).toMatchObject({ id: job.id, stage: 'first_interview', note: '', assessmentDeadline: null, assessmentLink: null, jdText: job.jdText, boundMaterialIds: job.boundMaterialIds, interviewNotes: job.interviewNotes });
     expect(migrated![0].timeline[0].stage).toBe('to_apply');
     expect(localStorage.getItem('jobfind.jobs.backup.v3')).toBe(JSON.stringify([legacy]));
   });

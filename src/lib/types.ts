@@ -39,7 +39,7 @@ export type TaskActionType =
   | 'review_interview';
 
 export interface RiskTag {
-  type: 'deadline' | 'material_gap' | 'silence' | 'interview_prep';
+  type: 'deadline' | 'assessment_deadline' | 'material_gap' | 'silence' | 'interview_prep';
   level: RiskLevel;
   message: string;
 }
@@ -76,6 +76,10 @@ export interface Job {
   channel: SourceChannel;
   stage: JobStage;
   applicationDeadline: string | null;
+  /** Added in the assessment-deadline release; storage hydration backfills old jobs with null. */
+  assessmentDeadline?: string | null;
+  /** User-provided link only; JobFind never automatically opens or accesses it. */
+  assessmentLink?: string | null;
   writtenTestDate: string | null;
   interviewDate: string | null;
   appliedDate: string | null;

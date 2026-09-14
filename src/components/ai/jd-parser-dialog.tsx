@@ -122,6 +122,17 @@ export function JDParserDialog() {
               </div>
             </div>
 
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label htmlFor="jd-intake-assessment-deadline" className="text-sm font-medium text-slate-950">测评截止时间 <span className="font-normal text-slate-500">（选填）</span></label>
+                <Input id="jd-intake-assessment-deadline" type="datetime-local" value={draft.assessmentDeadline} onChange={(event) => updateField("assessmentDeadline", event.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="jd-intake-assessment-link" className="text-sm font-medium text-slate-950">测评链接 <span className="font-normal text-slate-500">（选填）</span></label>
+                <Input id="jd-intake-assessment-link" type="url" value={draft.assessmentLink} onChange={(event) => updateField("assessmentLink", event.target.value)} placeholder="https://..." />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label htmlFor="jd-intake-note" className="text-sm font-medium text-slate-950">
                 备注 <span className="font-normal text-slate-500">（选填，{draft.note.length}/20）</span>

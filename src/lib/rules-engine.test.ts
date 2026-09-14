@@ -148,6 +148,25 @@ describe('rules engine', () => {
     );
   });
 
+  it('creates an urgent assessment task only while the job is in the assessment stage', () => {
+    const assessmentJob: Job = {
+      ...baseJob,
+      id: 'assessment-job',
+      stage: 'assessment',
+      applicationDeadline: null,
+      assessmentDeadline: '2026-04-19T18:00:00.000Z',
+      requiredMaterials: [],
+      boundMaterialIds: [],
+    };
+
+    const risks = generateRiskTags(assessmentJob, materials, now);
+    const [task] = generateTodayTasks([assessmentJob], materials, now);
+
+    expect(risks).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'assessment_deadline', level: 'critical', message: '测评剩余 6 小时' })]));
+    expect(task).toMatchObject({ actionType: 'take_test', priority: 'urgent', action: '完成 Tencent Product Intern 测评' });
+    expect(generateRiskTags({ ...assessmentJob, stage: 'written_test' }, materials, now)).not.toEqual(expect.arrayContaining([expect.objectContaining({ type: 'assessment_deadline' })]));
+  });
+
   it('generates today tasks sorted by priority, including submit_application and bind_material', () => {
     const jobs: Job[] = [
       {

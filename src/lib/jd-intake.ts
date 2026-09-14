@@ -7,6 +7,8 @@ export interface JDIntakeDraft {
   position: string;
   jdText: string;
   applicationDeadline: string;
+  assessmentDeadline: string;
+  assessmentLink: string;
   stage: JobStage;
   note: string;
   keywords: string[];
@@ -142,6 +144,15 @@ function deadlineToIso(value: string): string | null {
   return parsed.toISOString();
 }
 
+function dateTimeToIso(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
 function matchesKeyword(jdText: string, keyword: string): boolean {
   if (keyword === "A/B 测试") {
     return /A\s*\/\s*B\s*测试/i.test(jdText);
@@ -156,6 +167,8 @@ export function createEmptyJDIntakeDraft(): JDIntakeDraft {
     position: "",
     jdText: "",
     applicationDeadline: "",
+    assessmentDeadline: "",
+    assessmentLink: "",
     stage: "to_apply",
     note: "",
     keywords: [],
@@ -187,6 +200,8 @@ export function createJobFromJDIntake(draft: JDIntakeDraft, materials: Material[
     channel: "official_site",
     stage: draft.stage,
     applicationDeadline: deadlineToIso(draft.applicationDeadline),
+    assessmentDeadline: dateTimeToIso(draft.assessmentDeadline),
+    assessmentLink: draft.assessmentLink.trim() || null,
     writtenTestDate: null,
     interviewDate: null,
     appliedDate: draft.stage === "to_apply" ? null : createdAt,

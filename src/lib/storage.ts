@@ -100,7 +100,7 @@ function isInterviewNote(value: unknown): boolean {
 function isRiskTag(value: unknown): boolean {
   return (
     isRecord(value) &&
-    (value.type === 'deadline' || value.type === 'material_gap' || value.type === 'silence' || value.type === 'interview_prep') &&
+    (value.type === 'deadline' || value.type === 'assessment_deadline' || value.type === 'material_gap' || value.type === 'silence' || value.type === 'interview_prep') &&
     (value.level === 'critical' || value.level === 'warning' || value.level === 'normal') &&
     typeof value.message === 'string'
   );
@@ -135,6 +135,8 @@ function isJob(value: unknown): value is Job {
     typeof value.channel === 'string' &&
     isJobStage(value.stage) &&
     (typeof value.applicationDeadline === 'string' || value.applicationDeadline === null) &&
+    (typeof value.assessmentDeadline === 'string' || value.assessmentDeadline === null) &&
+    (typeof value.assessmentLink === 'string' || value.assessmentLink === null) &&
     (typeof value.writtenTestDate === 'string' || value.writtenTestDate === null) &&
     (typeof value.interviewDate === 'string' || value.interviewDate === null) &&
     (typeof value.appliedDate === 'string' || value.appliedDate === null) &&
@@ -234,7 +236,14 @@ function migrateJob(value: unknown): Job | null {
     return null;
   }
 
-  const candidate = { ...value, stage, timeline, note: typeof value.note === 'string' ? value.note : '' };
+  const candidate = {
+    ...value,
+    stage,
+    timeline,
+    note: typeof value.note === 'string' ? value.note : '',
+    assessmentDeadline: typeof value.assessmentDeadline === 'string' ? value.assessmentDeadline : null,
+    assessmentLink: typeof value.assessmentLink === 'string' ? value.assessmentLink : null,
+  };
   return isJob(candidate) ? candidate : null;
 }
 

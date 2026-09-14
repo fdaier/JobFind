@@ -588,6 +588,8 @@ export function createMockJobs(now: Date = new Date()): Job[] {
   return baseJobs.map((job) => ({
     ...job,
     note: "",
+    assessmentDeadline: null,
+    assessmentLink: null,
     riskTags: generateRiskTags(job, materials, now),
   }));
 }

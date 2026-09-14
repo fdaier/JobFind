@@ -72,4 +72,19 @@ describe("JD intake", () => {
     expect(deadline.getHours()).toBe(23);
     expect(deadline.getMinutes()).toBe(59);
   });
+
+  it("stores an optional assessment deadline and link from the same intake draft", () => {
+    const job = createJobFromJDIntake({
+      ...createEmptyJDIntakeDraft(),
+      company: "腾讯",
+      position: "AI 产品经理",
+      jdText: tencentAiProductManagerJD,
+      stage: "assessment",
+      assessmentDeadline: "2026-09-16T20:30",
+      assessmentLink: "https://example.com/assessment",
+    }, [], new Date("2026-09-14T08:00:00.000Z"));
+
+    expect(job.assessmentDeadline).toBe("2026-09-16T12:30:00.000Z");
+    expect(job.assessmentLink).toBe("https://example.com/assessment");
+  });
 });

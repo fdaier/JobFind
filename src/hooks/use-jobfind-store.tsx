@@ -25,6 +25,8 @@ type EditableJobFields = Pick<
   | 'channel'
   | 'stage'
   | 'applicationDeadline'
+  | 'assessmentDeadline'
+  | 'assessmentLink'
   | 'writtenTestDate'
   | 'interviewDate'
   | 'appliedDate'

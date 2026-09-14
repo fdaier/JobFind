@@ -63,6 +63,21 @@ describe("JobCard", () => {
     expect(screen.queryByText("关键下一时间")).not.toBeInTheDocument();
   });
 
+  it("shows the assessment deadline when it is the nearest upcoming milestone", () => {
+    const materials = createMockMaterials();
+    const assessmentJob = {
+      ...createMockJobs()[0],
+      id: "assessment",
+      stage: "assessment" as const,
+      applicationDeadline: "2026-04-23T09:00:00.000Z",
+      assessmentDeadline: "2026-04-20T09:30:00.000Z",
+    };
+
+    render(<JobFindProvider><JobCard job={assessmentJob} materials={materials} now={new Date("2026-04-19T08:00:00.000Z")} /></JobFindProvider>);
+
+    expect(screen.getByText(/测评截止 4\/20/)).toBeInTheDocument();
+  });
+
   it("uses the current time when now is omitted", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-04-21T08:00:00.000Z"));

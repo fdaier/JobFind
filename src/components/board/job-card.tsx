@@ -28,6 +28,7 @@ function formatDate(dateValue: string) {
 function getMilestoneState(job: Job, now: Date) {
   const milestones = [
     job.applicationDeadline ? { label: "DDL", value: job.applicationDeadline } : null,
+    job.assessmentDeadline ? { label: "测评截止", value: job.assessmentDeadline } : null,
     job.writtenTestDate ? { label: "笔试", value: job.writtenTestDate } : null,
     job.interviewDate ? { label: "面试", value: job.interviewDate } : null,
   ].filter((item): item is { label: string; value: string } => Boolean(item));

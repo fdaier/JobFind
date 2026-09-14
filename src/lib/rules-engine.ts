@@ -32,6 +32,14 @@ function formatOverdueDeadline(hoursLate: number): string {
   return `网申已截止 ${Math.ceil(hoursLate)} 小时`;
 }
 
+function formatOverdueAssessmentDeadline(hoursLate: number): string {
+  if (hoursLate >= 24) {
+    return `测评已截止 ${Math.ceil(hoursLate / 24)} 天`;
+  }
+
+  return `测评已截止 ${Math.ceil(hoursLate)} 小时`;
+}
+
 function buildPriority(score: number): TaskPriority {
   if (score >= 130) {
     return 'urgent';
@@ -128,6 +136,29 @@ export function generateRiskTags(job: Job, materials: Material[], now: Date = ne
     }
   }
 
+  if (job.stage === 'assessment' && job.assessmentDeadline) {
+    const hoursUntilAssessment = getHoursUntil(job.assessmentDeadline, now);
+    if (hoursUntilAssessment < 0) {
+      risks.push({
+        type: 'assessment_deadline',
+        level: 'critical',
+        message: formatOverdueAssessmentDeadline(Math.abs(hoursUntilAssessment)),
+      });
+    } else if (hoursUntilAssessment <= 24) {
+      risks.push({
+        type: 'assessment_deadline',
+        level: 'critical',
+        message: `测评剩余 ${Math.ceil(hoursUntilAssessment)} 小时`,
+      });
+    } else if (hoursUntilAssessment <= 72) {
+      risks.push({
+        type: 'assessment_deadline',
+        level: 'warning',
+        message: `测评剩余 ${Math.ceil(hoursUntilAssessment / 24)} 天`,
+      });
+    }
+  }
+
   const missingMaterials = getMissingMaterials(job, materials);
   if (missingMaterials.length > 0) {
     risks.push({
@@ -174,6 +205,7 @@ function scoreJobUrgency(job: Job, materials: Material[], now: Date): number {
 
     switch (riskTag.type) {
       case 'deadline':
+      case 'assessment_deadline':
         next += 50;
         break;
       case 'interview_prep':
@@ -219,6 +251,14 @@ export function generateTodayTasks(jobs: Job[], materials: Material[], now: Date
           score += 50;
           actionType = 'submit_application';
           action = `提交 ${job.company} ${job.position} 申请`;
+          reason = riskTag.message;
+          break;
+        case 'assessment_deadline':
+          score += 50;
+          actionType = 'take_test';
+          action = riskTag.message.startsWith('测评已截止')
+            ? `确认 ${job.company} ${job.position} 测评状态`
+            : `完成 ${job.company} ${job.position} 测评`;
           reason = riskTag.message;
           break;
         case 'material_gap':

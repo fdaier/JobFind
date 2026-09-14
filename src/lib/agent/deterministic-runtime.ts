@@ -35,6 +35,10 @@ function buildSummary(job: Job, primaryRisk: RiskTag | null): string {
     return `当前最需要关注的是 ${job.company}${job.position}，它正处在网申时间窗口最紧的阶段。`;
   }
 
+  if (primaryRisk?.type === "assessment_deadline") {
+    return `当前最需要关注的是 ${job.company}${job.position}，测评时间窗口正在收紧。`;
+  }
+
   if (primaryRisk?.type === "interview_prep") {
     return `${job.company}${job.position} 已进入面试准备阶段，当前重点是把临近面试准备完整。`;
   }
@@ -53,6 +57,10 @@ function buildSummary(job: Job, primaryRisk: RiskTag | null): string {
 function buildDashboardBrief(job: Job, primaryRisk: RiskTag | null): string {
   if (primaryRisk?.type === "deadline") {
     return `为什么现在先做这件事：${job.company}${job.position} 的网申时间最紧，再拖就会直接影响结果。`;
+  }
+
+  if (primaryRisk?.type === "assessment_deadline") {
+    return `为什么现在先做这件事：${job.company}${job.position} 的测评截止时间临近，需尽快完成。`;
   }
 
   if (primaryRisk?.type === "interview_prep") {
@@ -75,6 +83,10 @@ function buildPerception(job: Job, risks: RiskTag[], rank: number, totalJobs: nu
 
   if (job.applicationDeadline) {
     bullets.push("已识别到明确的网申截止时间。");
+  }
+
+  if (job.assessmentDeadline) {
+    bullets.push("已识别到明确的测评截止时间。");
   }
 
   if (job.interviewDate) {
@@ -101,6 +113,8 @@ function buildDiagnosis(job: Job, primaryRisk: RiskTag | null, rank: number): Ag
     headline:
       primaryRisk.type === "deadline"
         ? `${job.company}${job.position} 当前最重要的是先处理网申时效`
+        : primaryRisk.type === "assessment_deadline"
+          ? `${job.company}${job.position} 当前最重要的是完成临近测评`
         : primaryRisk.type === "interview_prep"
           ? `${job.company}${job.position} 当前最重要的是准备临近面试`
           : primaryRisk.type === "silence"
@@ -114,6 +128,10 @@ function buildDiagnosis(job: Job, primaryRisk: RiskTag | null, rank: number): Ag
 function buildWhyNow(task: TodayTask, rank: number): string {
   if (task.actionType === "submit_application") {
     return `这件事现在重要，因为网申时间最紧，而且它在当前申请池里排第 ${rank}。`;
+  }
+
+  if (task.actionType === "take_test") {
+    return `这件事现在重要，因为测评截止时间临近，错过会直接失去本轮机会。`;
   }
 
   if (task.actionType === "prepare_interview") {
