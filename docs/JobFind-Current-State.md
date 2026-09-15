@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `62bad53 style: refine compact date time input`
+- 稳定分支与当前产品提交：`main` / `ba59a1f feat: improve high volume board navigation`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_JAuppbkCTQCKdYF7RK3ZFu2dCfYs`（2026-09-15，Ready）
+- 当前生产部署：`dpl_9aT7vscoUCffatpcVDiPbJ7A93qc`（2026-09-15，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -73,6 +73,20 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 本次通过 10 个相关 Vitest 用例、`tsc --noEmit`、`npm run lint` 与静态生产构建；在 1000×700 本地浏览器窗口完成导入、预览、滚动到底部的非写入验证。生产部署 `dpl_JAuppbkCTQCKdYF7RK3ZFu2dCfYs` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200。
 
+## 最近完成：高容量看板导航
+
+正式依据：
+
+- `docs/superpowers/specs/2026-09-15-jobfind-board-high-volume-management-design.md`
+- `docs/superpowers/plans/2026-09-15-jobfind-board-high-volume-management.md`
+
+- 看板顶部新增本地搜索（公司、岗位、备注）、“全部／需要处理／有关键时间”筛选与“优先处理／最近更新／公司名”排序；全部只生成即时视图，不改写 localStorage。
+- 筛选或搜索时保留全部十阶段列，并在列头显示“匹配数／总数”；空列明确显示“当前筛选下没有岗位”。支持 `/` 快速聚焦搜索和 `Esc` 清空。
+- 看板仍为自然页面滚动；按用户确认，明确不做列内独立滚动或固定列头。
+- 岗位卡片改为紧凑布局，保留关键时间、Agent 风险与已填写备注，移除与所在列重复的阶段徽标。
+
+本次通过 20 个测试文件、65 个测试、`tsc --noEmit`、`npm run lint`、静态生产构建和本地浏览器回归。生产部署 `dpl_9aT7vscoUCffatpcVDiPbJ7A93qc` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200。
+
 ## 历史完成：岗位删除
 
 岗位进入“录用”或“已淘汰”后不再卡死在终态列：所有七个阶段均可从详情抽屉底部删除岗位。入口低强调度、删除前二次确认；删除会移除岗位自身的时间线和面试复盘、清理材料的 `boundJobIds`，并通过既有 localStorage 流程持久化。
@@ -98,6 +112,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 6. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
 7. 只有验证自然语言体验收益后才接入 LLM；不把开发时使用 A1/Codex 与产品线上模型能力混为一谈。
 8. **Persistent UI convention:** Every user-entered date uses the established separate year/month/day fields plus a calendar picker, never a browser-default `yyyy/mm/dd` placeholder. Date-time fields add separate hour/minute inputs. Assessment-link inputs remain blank and have no example placeholder.
+9. **Persistent board convention:** Keep the application board as a naturally scrolling, continuous page. Do not introduce per-column vertical scrolling or fixed column headers; high-volume navigation is handled through local search, derived filters, sorting, and compact cards.
 
 ## 新对话执行规则
 
