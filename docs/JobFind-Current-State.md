@@ -1,6 +1,6 @@
 # JobFind 当前状态与新对话交接
 
-> 最后更新：2026-09-14。新对话在修改本项目之前必须先阅读本文。
+> 最后更新：2026-09-15。新对话在修改本项目之前必须先阅读本文。
 
 ## 当前事实源
 
@@ -83,6 +83,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 5. 删除功能暂不做回收站或 Undo；本期选择低频、慎重删除，未来再统一设计恢复语义。
 6. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
 7. 只有验证自然语言体验收益后才接入 LLM；不把开发时使用 A1/Codex 与产品线上模型能力混为一谈。
+8. **Persistent UI convention (implementation pending):** Every user-entered date must use the established separate year/month/day fields plus a calendar picker, never a browser-default `yyyy/mm/dd` placeholder. Date-time fields add a separate time input. Assessment-link inputs must remain blank and have no example placeholder.
 
 ## 新对话执行规则
 
