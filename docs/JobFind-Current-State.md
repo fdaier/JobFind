@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `44fbeb9 feat: unify job date time inputs`
+- 稳定分支与当前产品提交：`main` / `62bad53 style: refine compact date time input`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_Ho7uHs8gSzhFmJBjwYsyPXcY9Aq3`（2026-09-15，Ready）
+- 当前生产部署：`dpl_JAuppbkCTQCKdYF7RK3ZFu2dCfYs`（2026-09-15，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -69,8 +69,9 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - 所有可编辑的日期时间（新建 JD、整理预览、岗位基本信息中的测评截止、笔试与面试）统一为年／月／日／时／分的独立输入框，并保留日历选择入口；不再暴露浏览器默认的 `yyyy/mm/dd` 占位格式。
 - 测评链接输入框保持空白，不再显示示例 URL。已有岗位仍按既有 localStorage 安全补全和保存路径处理，不迁移、不覆写用户已有信息。
 - JD 整理预览弹窗改为受视口约束的独立滚动区域，小屏幕无需 F11 即可滚动至“保存到看板”。
+- 后续视觉优化将日期（年／月／日）、日历入口和时间（时／分）重构为三个紧凑连续的输入单元；常规双列表单宽度内保持一行，窄屏才按单元换行，避免小时／分钟孤立换行。
 
-本次通过 10 个相关 Vitest 用例、`tsc --noEmit`、`npm run lint` 与静态生产构建；在 1000×700 本地浏览器窗口完成导入、预览、滚动到底部的非写入验证。生产部署 `dpl_Ho7uHs8gSzhFmJBjwYsyPXcY9Aq3` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200。
+本次通过 10 个相关 Vitest 用例、`tsc --noEmit`、`npm run lint` 与静态生产构建；在 1000×700 本地浏览器窗口完成导入、预览、滚动到底部的非写入验证。生产部署 `dpl_JAuppbkCTQCKdYF7RK3ZFu2dCfYs` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200。
 
 ## 历史完成：岗位删除
 
