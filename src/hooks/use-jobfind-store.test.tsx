@@ -209,4 +209,26 @@ describe('JobFind store', () => {
       expect(persistedMaterials.every((material: { boundJobIds: string[] }) => !material.boundJobIds.includes(targetJobId))).toBe(true);
     });
   });
+
+  it('restores the selected company pool context after a company-opened job detail closes', () => {
+    const { result } = renderHook(() => useJobfindStore(), { wrapper: createWrapper() });
+
+    act(() => {
+      result.current.openCompanyPool();
+      result.current.setCompanyPoolSelectedCompanyId('company-123');
+      result.current.openCompanyPoolJob('tencent');
+    });
+
+    expect(result.current.isCompanyPoolOpen).toBe(false);
+    expect(result.current.companyPoolSelectedCompanyId).toBe('company-123');
+    expect(result.current.selectedJobId).toBe('tencent');
+
+    act(() => {
+      result.current.setSelectedJobId(null);
+      result.current.resumeCompanyPoolAfterJobDetail();
+    });
+
+    expect(result.current.isCompanyPoolOpen).toBe(true);
+    expect(result.current.companyPoolSelectedCompanyId).toBe('company-123');
+  });
 });

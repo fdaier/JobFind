@@ -54,10 +54,17 @@ interface JobFindStoreValue {
   materials: Material[];
   selectedJobId: string | null;
   isJDParserOpen: boolean;
+  isCompanyPoolOpen: boolean;
+  companyPoolSelectedCompanyId: string | null;
   completedTaskIds: string[];
   selectedJob: Job | null;
   setSelectedJobId: (jobId: string | null) => void;
   setJDParserOpen: (isOpen: boolean) => void;
+  openCompanyPool: () => void;
+  dismissCompanyPool: () => void;
+  setCompanyPoolSelectedCompanyId: (companyId: string | null) => void;
+  openCompanyPoolJob: (jobId: string) => void;
+  resumeCompanyPoolAfterJobDetail: () => void;
   addJob: (job: Job) => void;
   updateJob: (jobId: string, fields: Partial<EditableJobFields>) => void;
   updateJobCompanyBinding: (jobId: string, companyId: string | null) => void;
@@ -81,6 +88,9 @@ interface StoreState {
   materials: Material[];
   selectedJobId: string | null;
   isJDParserOpen: boolean;
+  isCompanyPoolOpen: boolean;
+  companyPoolSelectedCompanyId: string | null;
+  resumeCompanyPoolAfterDetail: boolean;
   completedTaskIds: string[];
 }
 
@@ -98,6 +108,9 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
     materials: SEEDED_MATERIALS,
     selectedJobId: null,
     isJDParserOpen: false,
+    isCompanyPoolOpen: false,
+    companyPoolSelectedCompanyId: null,
+    resumeCompanyPoolAfterDetail: false,
     completedTaskIds: [],
   });
   const [isHydrated, setIsHydrated] = useState(false);
@@ -154,6 +167,8 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
       materials: state.materials,
       selectedJobId: state.selectedJobId,
       isJDParserOpen: state.isJDParserOpen,
+      isCompanyPoolOpen: state.isCompanyPoolOpen,
+      companyPoolSelectedCompanyId: state.companyPoolSelectedCompanyId,
       completedTaskIds: state.completedTaskIds,
       selectedJob,
       setSelectedJobId: (jobId) => {
@@ -174,6 +189,35 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
           jobs: [{ ...job, companyId: job.companyId ?? resolveCompanyId(job.company, current.companies) }, ...current.jobs],
           selectedJobId: job.id,
         }));
+      },
+      openCompanyPool: () => {
+        setState((current) => ({ ...current, isCompanyPoolOpen: true }));
+      },
+      dismissCompanyPool: () => {
+        setState((current) => ({
+          ...current,
+          isCompanyPoolOpen: false,
+          companyPoolSelectedCompanyId: null,
+          resumeCompanyPoolAfterDetail: false,
+        }));
+      },
+      setCompanyPoolSelectedCompanyId: (companyId) => {
+        setState((current) => ({ ...current, companyPoolSelectedCompanyId: companyId }));
+      },
+      openCompanyPoolJob: (jobId) => {
+        setState((current) => ({
+          ...current,
+          isCompanyPoolOpen: false,
+          resumeCompanyPoolAfterDetail: true,
+          selectedJobId: jobId,
+        }));
+      },
+      resumeCompanyPoolAfterJobDetail: () => {
+        setState((current) => current.resumeCompanyPoolAfterDetail ? {
+          ...current,
+          isCompanyPoolOpen: true,
+          resumeCompanyPoolAfterDetail: false,
+        } : current);
       },
       updateJob: (jobId, fields) => {
         setState((current) => ({
@@ -340,7 +384,7 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
         });
       },
     }),
-    [selectedJob, state.completedTaskIds, state.isJDParserOpen, state.jobs, state.companies, state.materials, state.selectedJobId],
+    [selectedJob, state.completedTaskIds, state.isJDParserOpen, state.isCompanyPoolOpen, state.companyPoolSelectedCompanyId, state.jobs, state.companies, state.materials, state.selectedJobId],
   );
 
   return <JobFindStoreContext.Provider value={value}>{children}</JobFindStoreContext.Provider>;

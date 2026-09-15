@@ -55,18 +55,26 @@ function CompanyEditor({ company, onDone }: { company?: Company; onDone: () => v
   </div>;
 }
 
-export function CompanyPoolDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { companies, jobs, setSelectedJobId, updateCompany } = useJobfindStore();
+export function CompanyPoolDialog() {
+  const {
+    companies,
+    jobs,
+    updateCompany,
+    isCompanyPoolOpen,
+    companyPoolSelectedCompanyId,
+    dismissCompanyPool,
+    setCompanyPoolSelectedCompanyId,
+    openCompanyPoolJob,
+  } = useJobfindStore();
   const [view, setView] = useState<CompanyPoolView>("city");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [manageMode, setManageMode] = useState(false);
   const [editingCompanyId, setEditingCompanyId] = useState<string | "new" | null>(null);
 
   const activeCompanies = useMemo(() => companies.filter((company) => !company.archived), [companies]);
   const jobsByCompany = useMemo(() => new Map(activeCompanies.map((company) => [company.id, jobs.filter((job) => job.companyId === company.id)])), [activeCompanies, jobs]);
-  const selectedCompany = activeCompanies.find((company) => company.id === selectedCompanyId) ?? null;
+  const selectedCompany = activeCompanies.find((company) => company.id === companyPoolSelectedCompanyId) ?? null;
   const selectedAppliedJobs = selectedCompany ? (jobsByCompany.get(selectedCompany.id) ?? []).filter(isJobApplied) : [];
 
   const visibleCompanies = activeCompanies.filter((company) => {
@@ -79,14 +87,11 @@ export function CompanyPoolDialog({ open, onOpenChange }: { open: boolean; onOpe
     return cities.map((city) => ({ key: city, label: COMPANY_CITY_LABELS[city], companies: visibleCompanies.filter((company) => getCompanyCities(company).includes(city)) })).filter((group) => group.companies.length > 0);
   }, [view, visibleCompanies]);
 
-  const close = (nextOpen: boolean) => {
-    if (!nextOpen) { setSelectedCompanyId(null); setManageMode(false); setEditingCompanyId(null); }
-    onOpenChange(nextOpen);
-  };
+  const close = () => { setManageMode(false); setEditingCompanyId(null); dismissCompanyPool(); };
 
-  const openJob = (jobId: string) => { close(false); setSelectedJobId(jobId); };
+  const openJob = (jobId: string) => { openCompanyPoolJob(jobId); };
 
-  return <Dialog open={open} onOpenChange={close}>
+  return <Dialog open={isCompanyPoolOpen} onOpenChange={(nextOpen) => !nextOpen && close()}>
     <DialogContent className="!flex h-[min(46rem,calc(100dvh-2rem))] max-w-[calc(100%-2rem)] flex-col overflow-hidden p-0 sm:max-w-5xl">
       <DialogHeader className="shrink-0 border-b border-white/60 px-6 py-5 pr-14">
         <div className="flex items-center justify-between gap-3">
@@ -94,7 +99,7 @@ export function CompanyPoolDialog({ open, onOpenChange }: { open: boolean; onOpe
             <DialogTitle className="flex items-center gap-2"><Building2 className="size-5 text-slate-600" />公司池</DialogTitle>
             <DialogDescription className="mt-1">浏览目标公司；投递状态仅供识别，不代表需要全部投递。</DialogDescription>
           </div>
-          {!selectedCompany && !manageMode ? <Button type="button" variant="outline" size="sm" onClick={() => setManageMode(true)}><Settings2 className="size-3.5" />管理名单</Button> : <Button type="button" variant="ghost" size="sm" onClick={() => { setSelectedCompanyId(null); setManageMode(false); setEditingCompanyId(null); }}><ArrowLeft className="size-3.5" />返回名单</Button>}
+          {!selectedCompany && !manageMode ? <Button type="button" variant="outline" size="sm" onClick={() => setManageMode(true)}><Settings2 className="size-3.5" />管理名单</Button> : <Button type="button" variant="ghost" size="sm" onClick={() => { setCompanyPoolSelectedCompanyId(null); setManageMode(false); setEditingCompanyId(null); }}><ArrowLeft className="size-3.5" />返回名单</Button>}
         </div>
       </DialogHeader>
 
@@ -117,7 +122,7 @@ export function CompanyPoolDialog({ open, onOpenChange }: { open: boolean; onOpe
             const applied = linkedJobs.some(isJobApplied);
             const secondaryTags = view === "city" ? [COMPANY_TIER_LABELS[getCompanyTier(company)]] : getCompanyCities(company).map((city) => COMPANY_CITY_LABELS[city]);
             const content = <><span>{company.name}</span><span className={cn("text-[10px]", applied ? "text-white/70" : "text-slate-500")}>{secondaryTags.join(" · ")}</span></>;
-            return <Tooltip key={company.id}><TooltipTrigger asChild>{applied ? <button type="button" onClick={() => setSelectedCompanyId(company.id)} className="company-pool-chip company-pool-chip-applied">{content}</button> : <span className="company-pool-chip company-pool-chip-unapplied">{content}</span>}</TooltipTrigger><TooltipContent sideOffset={8}><p>{company.name} · {applied ? "已投递" : "未投递"}</p><p className="mt-1 text-white/70">{linkedJobs.length ? `${linkedJobs.length} 个已记录岗位` : "暂未记录岗位"}</p></TooltipContent></Tooltip>;
+            return <Tooltip key={company.id}><TooltipTrigger asChild>{applied ? <button type="button" onClick={() => setCompanyPoolSelectedCompanyId(company.id)} className="company-pool-chip company-pool-chip-applied">{content}</button> : <span className="company-pool-chip company-pool-chip-unapplied">{content}</span>}</TooltipTrigger><TooltipContent sideOffset={8}><p>{company.name} · {applied ? "已投递" : "未投递"}</p><p className="mt-1 text-white/70">{linkedJobs.length ? `${linkedJobs.length} 个已记录岗位` : "暂未记录岗位"}</p></TooltipContent></Tooltip>;
           })}</div></section>)}{groups.length === 0 ? <p className="py-12 text-center text-sm text-slate-500">没有匹配的公司。</p> : null}</div></TooltipProvider>
         </>}
       </div>

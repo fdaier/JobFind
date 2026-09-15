@@ -211,7 +211,30 @@ body::before {
 }
 
 .company-pool-chip-applied {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  border-color: #6254bd;
+  background: #6b5dca;
+  color: #fff;
   cursor: pointer;
+}
+
+.company-pool-chip-applied:hover,
+.company-pool-chip-applied:focus-visible {
+  background: #5f51bc;
+}
+
+.company-pool-entry {
+  border-color: #c9c0ed;
+  background: rgba(239, 235, 253, 0.86);
+  color: #594ca8;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), 0 5px 14px rgba(103, 84, 180, 0.1);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.company-pool-entry:hover,
+.company-pool-entry:focus-visible {
+  transform: translateY(-1px);
+  border-color: #a99bdd;
+  background: #f7f4ff;
+  color: #4d4198;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 9px 18px rgba(103, 84, 180, 0.16);
 }

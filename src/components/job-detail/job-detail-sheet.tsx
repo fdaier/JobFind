@@ -33,7 +33,7 @@ import { getNextStage, JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "@/lib/job-stage
 import type { JobStage } from "@/lib/types";
 
 export function JobDetailSheet() {
-  const { selectedJob, selectedJobId, setSelectedJobId, materials, advanceJobStage, deleteJob } = useJobfindStore();
+  const { selectedJob, selectedJobId, setSelectedJobId, resumeCompanyPoolAfterJobDetail, materials, advanceJobStage, deleteJob } = useJobfindStore();
   const [tabValue, setTabValue] = useState("ai");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [adjustStage, setAdjustStage] = useState<JobStage>("to_apply");
@@ -52,8 +52,17 @@ export function JobDetailSheet() {
 
   const canMarkRejected = selectedJob ? selectedJob.stage !== "offer" && selectedJob.stage !== "rejected" : false;
 
+  const closeDetail = () => {
+    setSelectedJobId(null);
+    resumeCompanyPoolAfterJobDetail();
+  };
+
   return (
-    <Sheet open={selectedJob !== null} onOpenChange={(open) => !open && setSelectedJobId(null)}>
+    <Sheet open={selectedJob !== null} onOpenChange={(open) => {
+      if (!open) {
+        closeDetail();
+      }
+    }}>
       <SheetContent side="right" className="w-full p-0 sm:max-w-[72rem]">
         {selectedJob ? (
           <div className="flex h-full flex-col">
@@ -142,7 +151,7 @@ export function JobDetailSheet() {
               </div>
               <Separator />
               <div className="flex items-center justify-between gap-3">
-                <Button type="button" variant="secondary" onClick={() => setSelectedJobId(null)}>
+                <Button type="button" variant="secondary" onClick={closeDetail}>
                   关闭详情
                 </Button>
                 <Button

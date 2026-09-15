@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Search, X } from "lucide-react";
+import { Building2, Search, X } from "lucide-react";
 
 import { useJobfindStore } from "../../hooks/use-jobfind-store";
 import { JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "../../lib/job-stages";
@@ -15,11 +15,10 @@ import { KanbanColumn } from "./kanban-column";
 const STAGES: Array<{ stage: JobStage; title: string }> = JOB_STAGE_ORDER.map((stage) => ({ stage, title: JOB_STAGE_LABELS[stage] }));
 
 export function KanbanBoard() {
-  const { jobs, materials } = useJobfindStore();
+  const { jobs, materials, openCompanyPool } = useJobfindStore();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<BoardFilter>("all");
   const [sort, setSort] = useState<BoardSort>("priority");
-  const [isCompanyPoolOpen, setIsCompanyPoolOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const now = useMemo(() => new Date(), []);
 
@@ -127,7 +126,7 @@ export function KanbanBoard() {
               <option value="updated">最近更新</option>
               <option value="company">公司名</option>
             </select>
-            <Button type="button" variant="outline" className="h-10 border-white/60 bg-white/38" onClick={() => setIsCompanyPoolOpen(true)}>公司池</Button>
+            <Button type="button" variant="outline" className="company-pool-entry h-10" onClick={openCompanyPool}><Building2 className="size-4" />公司池</Button>
           </div>
         </div>
         <p aria-live="polite" className="text-xs text-slate-500">
@@ -151,7 +150,7 @@ export function KanbanBoard() {
         ))}
       </div>
       </div>
-      <CompanyPoolDialog open={isCompanyPoolOpen} onOpenChange={setIsCompanyPoolOpen} />
+      <CompanyPoolDialog />
     </section>
   );
 }
