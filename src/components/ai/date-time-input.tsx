@@ -107,18 +107,21 @@ export function DateTimeInput({
 
   return (
     <div className="space-y-2">
-      <label id={`${id}-label`} className="text-sm font-medium text-slate-950">{label}</label>
+      <label id={`${id}-label`} className="text-sm font-medium text-slate-800">{label}</label>
       <div role="group" aria-labelledby={`${id}-label`} className="flex flex-wrap items-center gap-2">
-        <Input id={`${id}-year`} aria-label={`${ariaLabel}年份`} inputMode="numeric" autoComplete="off" maxLength={4} value={parts.year} onChange={(event) => updatePart("year", event.target.value)} placeholder="年" className="w-20 text-center tabular-nums" />
-        <span aria-hidden="true" className="text-sm text-slate-400">—</span>
-        <Input id={`${id}-month`} aria-label={`${ariaLabel}月份`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.month} onChange={(event) => updatePart("month", event.target.value)} placeholder="月" className="w-14 text-center tabular-nums" />
-        <span aria-hidden="true" className="text-sm text-slate-400">—</span>
-        <Input id={`${id}-day`} aria-label={`${ariaLabel}日期`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.day} onChange={(event) => updatePart("day", event.target.value)} placeholder="日" className="w-14 text-center tabular-nums" />
-        <Button type="button" variant="ghost" size="icon-sm" aria-label={`选择${ariaLabel}日期`} onClick={openPicker}><CalendarDays className="size-4" /></Button>
-        <span aria-hidden="true" className="text-sm text-slate-400">·</span>
-        <Input id={`${id}-hour`} aria-label={`${ariaLabel}小时`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.hour} onChange={(event) => updatePart("hour", event.target.value)} placeholder="时" className="w-14 text-center tabular-nums" />
-        <span aria-hidden="true" className="text-sm text-slate-400">:</span>
-        <Input id={`${id}-minute`} aria-label={`${ariaLabel}分钟`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.minute} onChange={(event) => updatePart("minute", event.target.value)} placeholder="分" className="w-14 text-center tabular-nums" />
+        <div className="flex h-10 items-center rounded-lg border border-slate-200 bg-white/70 px-1 shadow-sm transition-[border-color,box-shadow] focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-900/10">
+          <Input id={`${id}-year`} aria-label={`${ariaLabel}年份`} inputMode="numeric" autoComplete="off" maxLength={4} value={parts.year} onChange={(event) => updatePart("year", event.target.value)} placeholder="年" className="h-8 w-16 !border-0 bg-transparent px-1 text-center tabular-nums shadow-none focus-visible:ring-0" />
+          <span aria-hidden="true" className="select-none text-sm text-slate-300">—</span>
+          <Input id={`${id}-month`} aria-label={`${ariaLabel}月份`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.month} onChange={(event) => updatePart("month", event.target.value)} placeholder="月" className="h-8 w-10 !border-0 bg-transparent px-1 text-center tabular-nums shadow-none focus-visible:ring-0" />
+          <span aria-hidden="true" className="select-none text-sm text-slate-300">—</span>
+          <Input id={`${id}-day`} aria-label={`${ariaLabel}日期`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.day} onChange={(event) => updatePart("day", event.target.value)} placeholder="日" className="h-8 w-10 !border-0 bg-transparent px-1 text-center tabular-nums shadow-none focus-visible:ring-0" />
+        </div>
+        <Button type="button" variant="outline" size="icon-sm" aria-label={`选择${ariaLabel}日期`} onClick={openPicker} className="size-10 rounded-lg border-slate-200 bg-white/70 text-slate-600 shadow-sm hover:bg-white hover:text-slate-950"><CalendarDays className="size-4" /></Button>
+        <div className="flex h-10 items-center rounded-lg border border-slate-200 bg-white/70 px-1 shadow-sm transition-[border-color,box-shadow] focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-900/10">
+          <Input id={`${id}-hour`} aria-label={`${ariaLabel}小时`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.hour} onChange={(event) => updatePart("hour", event.target.value)} placeholder="时" className="h-8 w-10 !border-0 bg-transparent px-1 text-center tabular-nums shadow-none focus-visible:ring-0" />
+          <span aria-hidden="true" className="select-none text-sm text-slate-300">:</span>
+          <Input id={`${id}-minute`} aria-label={`${ariaLabel}分钟`} inputMode="numeric" autoComplete="off" maxLength={2} value={parts.minute} onChange={(event) => updatePart("minute", event.target.value)} placeholder="分" className="h-8 w-10 !border-0 bg-transparent px-1 text-center tabular-nums shadow-none focus-visible:ring-0" />
+        </div>
         <input ref={pickerRef} type="date" tabIndex={-1} aria-hidden="true" value={dateValue} onChange={(event) => updateDateFromPicker(event.target.value)} className="sr-only" />
       </div>
     </div>
