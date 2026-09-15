@@ -33,7 +33,7 @@ describe("JobCard", () => {
     expect(screen.getByTestId("job-card")).toBeInTheDocument();
     expect(screen.queryByText("材料完成度")).not.toBeInTheDocument();
     expect(screen.getByText("Agent 风险")).toBeInTheDocument();
-    expect(screen.getByText("备注")).toBeInTheDocument();
+    expect(screen.queryByText("备注")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("job-card"));
 
@@ -61,6 +61,19 @@ describe("JobCard", () => {
 
     expect(screen.getByText("已过期")).toBeInTheDocument();
     expect(screen.queryByText("关键下一时间")).not.toBeInTheDocument();
+  });
+
+  it("shows a filled note without repeating the stage label inside the card", () => {
+    const job = { ...createMockJobs()[0], note: "下周跟进招聘进度" };
+
+    render(
+      <JobFindProvider>
+        <JobCard job={job} materials={createMockMaterials()} />
+      </JobFindProvider>,
+    );
+
+    expect(screen.getByText("下周跟进招聘进度")).toBeInTheDocument();
+    expect(screen.queryByText("已投递")).not.toBeInTheDocument();
   });
 
   it("shows the assessment deadline when it is the nearest upcoming milestone", () => {

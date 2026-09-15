@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { JobFindProvider } from "../../hooks/use-jobfind-store";
@@ -37,5 +37,20 @@ describe("KanbanBoard", () => {
         String(jobs.filter((job) => job.stage === stage).length),
       );
     }
+  });
+
+  it("filters by company and keeps the matched-to-total stage count visible", () => {
+    render(
+      <JobFindProvider>
+        <KanbanBoard />
+      </JobFindProvider>,
+    );
+
+    fireEvent.change(screen.getByRole("textbox", { name: "搜索公司、岗位或备注" }), { target: { value: "腾讯" } });
+
+    expect(screen.getAllByTestId("job-card")).toHaveLength(2);
+    expect(within(screen.getByTestId("kanban-column-applied")).getByTestId("kanban-count-applied")).toHaveTextContent("1 / 3");
+    expect(within(screen.getByTestId("kanban-column-offer")).getByTestId("kanban-count-offer")).toHaveTextContent("1 / 2");
+    expect(screen.getByText("当前显示 2 / 13 个岗位")).toBeInTheDocument();
   });
 });

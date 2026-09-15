@@ -236,7 +236,7 @@ describe("BoardPage job detail sheet", () => {
     fireEvent.change(screen.getByLabelText("JD 正文"), {
       target: { value: "岗位要求：熟悉大模型、LLM、Agent、RAG、多模态和 A/B测试；有产品项目或 AI 应用原型经验。" },
     });
-    fireEvent.change(screen.getByLabelText(/备注/), { target: { value: "等内推回复" } });
+    fireEvent.change(screen.getByLabelText(/^备注/), { target: { value: "等内推回复" } });
     fireEvent.click(screen.getByRole("button", { name: "整理并预览" }));
 
     expect(screen.getByText("根据 JD 整理的建议")).toBeInTheDocument();

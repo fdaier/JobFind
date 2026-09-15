@@ -4,7 +4,6 @@ import React, { useMemo } from "react";
 
 import { useJobfindStore } from "../../hooks/use-jobfind-store";
 import { generateRiskTags } from "../../lib/rules-engine";
-import { JOB_STAGE_LABELS } from "../../lib/job-stages";
 import type { Job, Material } from "../../lib/types";
 import { cn } from "../../lib/utils";
 
@@ -68,30 +67,23 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
       data-testid="job-card"
       onClick={() => setSelectedJobId(job.id)}
       className={cn(
-        "flex w-full flex-col gap-3 rounded-lg border border-white/52 bg-white/36 p-4 text-left",
+        "flex w-full flex-col gap-2 rounded-lg border border-white/52 bg-white/36 p-3 text-left",
         "transition hover:-translate-y-0.5 hover:border-white/70 hover:bg-white/48 hover:shadow-[0_16px_32px_rgba(43,51,69,0.045)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="break-words text-sm font-semibold text-slate-950">{job.company}</p>
-          <h3 className="mt-0.5 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
-        </div>
-        <span className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/30 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-          {JOB_STAGE_LABELS[job.stage]}
-        </span>
+      <div className="min-w-0">
+        <p className="break-words text-sm font-semibold text-slate-950">{job.company}</p>
+        <h3 className="mt-0.5 break-words text-sm font-semibold text-slate-950">{job.position}</h3>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3 text-xs text-slate-600">
-          <span className="font-medium text-slate-700">{milestoneState.label}</span>
-          <span>{milestoneState.milestone ? `${milestoneState.milestone.label} ${formatDate(milestoneState.milestone.value)}` : "—"}</span>
-        </div>
+      <div className="flex items-center justify-between gap-3 text-xs text-slate-600">
+        <span className="font-medium text-slate-700">{milestoneState.label}</span>
+        <span className="shrink-0 tabular-nums">{milestoneState.milestone ? `${milestoneState.milestone.label} ${formatDate(milestoneState.milestone.value)}` : "—"}</span>
       </div>
 
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-slate-700">Agent 风险</p>
-        <div className="flex flex-wrap gap-2">
+      <div className="flex items-start gap-2">
+        <p className="shrink-0 pt-0.5 text-xs font-medium text-slate-700">Agent 风险</p>
+        <div className="flex flex-wrap gap-1.5">
           {riskTags.length === 0 ? (
               <span className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600">
                 暂无风险
@@ -116,10 +108,7 @@ export function JobCard({ job, materials, now = new Date() }: JobCardProps) {
         </div>
       </div>
 
-      <div className="space-y-1">
-        <p className="text-xs font-medium text-slate-700">备注</p>
-        <p className="min-h-5 text-xs leading-5 text-slate-600">{job.note?.trim() || "未添加备注"}</p>
-      </div>
+      {job.note?.trim() ? <p className="truncate text-xs leading-5 text-slate-600"><span className="mr-1 font-medium text-slate-700">备注</span>{job.note.trim()}</p> : null}
     </button>
   );
 }
