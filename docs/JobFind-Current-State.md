@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `ba59a1f feat: improve high volume board navigation`
+- 稳定分支与当前产品提交：`main` / `34b4631 feat: add maintainable company pool`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_9aT7vscoUCffatpcVDiPbJ7A93qc`（2026-09-15，Ready）
+- 当前生产部署：`dpl_HDnNekCTPVSRLpSa1gpioM1gjfXP`（2026-09-16，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -26,7 +26,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 技术栈为 Next.js App Router、React、TypeScript、Tailwind CSS、Radix UI、Vitest。应用使用静态导出和浏览器 localStorage；没有账号、后端、跨设备同步或真实 LLM API。当前 Agent 是可解释的确定性规则运行时。
 
-## 最新本地完成：公司池（待发布）
+## 最近完成：公司池（已发布）
 
 正式依据：
 
@@ -38,7 +38,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - 已投递状态由已绑定岗位派生：任一岗位已填写投递日期或离开“待投递”阶段即显示为已投递。已投递公司可打开岗位列表并进入详情。
 - 公司通过正式名、受控别名和可选 `companyId` 绑定岗位；“阿里 → 阿里巴巴”“B站 → 哔哩哔哩”等明确别名可安全匹配，未使用包含或模糊匹配。首次为旧岗位补绑定前保留独立原始备份。
 - 公司池内可新增、编辑正式名／别名／主梯队／覆盖城市，或归档公司；岗位详情的基本信息页可手动修改名单公司，所有岗位驱动界面随 store 即时同步。
-- 本地已通过 21 个 Vitest 文件、68 个用例、`tsc --noEmit`、`npm run lint`、静态生产构建与浏览器交互验证；尚未部署生产。
+- 本地已通过 21 个 Vitest 文件、68 个用例、`tsc --noEmit`、`npm run lint`、静态生产构建与浏览器交互验证。生产部署 `dpl_HDnNekCTPVSRLpSa1gpioM1gjfXP` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200，线上已确认“公司池”入口。
 
 ## 最近完成：申请看板 V3（已发布）
 
