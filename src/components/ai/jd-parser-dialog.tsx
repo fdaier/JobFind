@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { JDParserResult } from "@/components/ai/jd-parser-result";
 import { ApplicationDeadlineInput } from "@/components/ai/application-deadline-input";
+import { DateTimeInput } from "@/components/ai/date-time-input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -86,14 +87,15 @@ export function JDParserDialog() {
 
   return (
     <Dialog open={isJDParserOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-3xl">
-        <DialogHeader>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-hidden sm:max-w-3xl">
+        <DialogHeader className="shrink-0 pr-8">
           <DialogTitle>导入 JD 添加岗位</DialogTitle>
           <DialogDescription>填写公司、岗位名称和 JD；系统会提取可编辑的 JD 术语和材料建议，保存前请确认。</DialogDescription>
         </DialogHeader>
 
-        {mode === "input" ? (
-          <div className="space-y-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+          {mode === "input" ? (
+          <div className="space-y-4 pb-1">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <label htmlFor="jd-intake-company" className="text-sm font-medium text-slate-950">公司</label>
@@ -123,13 +125,10 @@ export function JDParserDialog() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label htmlFor="jd-intake-assessment-deadline" className="text-sm font-medium text-slate-950">测评截止时间 <span className="font-normal text-slate-500">（选填）</span></label>
-                <Input id="jd-intake-assessment-deadline" type="datetime-local" value={draft.assessmentDeadline} onChange={(event) => updateField("assessmentDeadline", event.target.value)} />
-              </div>
+              <DateTimeInput id="jd-intake-assessment-deadline" label={<>测评截止时间 <span className="font-normal text-slate-500">（选填）</span></>} ariaLabel="测评截止时间" value={draft.assessmentDeadline} onChange={(value) => updateField("assessmentDeadline", value)} />
               <div className="space-y-2">
                 <label htmlFor="jd-intake-assessment-link" className="text-sm font-medium text-slate-950">测评链接 <span className="font-normal text-slate-500">（选填）</span></label>
-                <Input id="jd-intake-assessment-link" type="url" value={draft.assessmentLink} onChange={(event) => updateField("assessmentLink", event.target.value)} placeholder="https://..." />
+                <Input id="jd-intake-assessment-link" type="url" value={draft.assessmentLink} onChange={(event) => updateField("assessmentLink", event.target.value)} />
               </div>
             </div>
 
@@ -152,9 +151,10 @@ export function JDParserDialog() {
               <Button type="button" onClick={handlePreview}>整理并预览</Button>
             </DialogFooter>
           </div>
-        ) : (
-          <JDParserResult draft={draft} onDraftChange={setDraft} onBack={() => setMode("input")} onSave={handleSave} isSaving={isSaving} />
-        )}
+          ) : (
+            <JDParserResult draft={draft} onDraftChange={setDraft} onBack={() => setMode("input")} onSave={handleSave} isSaving={isSaving} />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

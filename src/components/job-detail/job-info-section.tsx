@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 import { ApplicationDeadlineInput } from "@/components/ai/application-deadline-input";
+import { DateTimeInput } from "@/components/ai/date-time-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,10 +72,10 @@ export function JobInfoSection({ job }: { job: Job }) {
       <div><h4 className="text-sm font-semibold text-slate-950">关键时间</h4><p className="mt-1 text-xs text-slate-500">测评截止支持精确到时分；填写链接仅用于你快速返回入口。</p></div>
       <div className="grid gap-4 sm:grid-cols-2">
         <ApplicationDeadlineInput id="detail-deadline" label="申请截止时间" value={draft.deadline} onChange={(deadline) => setDraft({ ...draft, deadline })} />
-        <label className="space-y-2 text-sm font-medium">测评截止时间<Input type="datetime-local" value={draft.assessmentDeadline} onChange={(event) => setDraft({ ...draft, assessmentDeadline: event.target.value })} /></label>
-        <label className="space-y-2 text-sm font-medium">笔试时间<Input type="datetime-local" value={draft.writtenTestDate} onChange={(event) => setDraft({ ...draft, writtenTestDate: event.target.value })} /></label>
-        <label className="space-y-2 text-sm font-medium">面试时间<Input type="datetime-local" value={draft.interviewDate} onChange={(event) => setDraft({ ...draft, interviewDate: event.target.value })} /></label>
-        <label className="space-y-2 text-sm font-medium sm:col-span-2">测评链接 <span className="font-normal text-slate-500">（选填）</span><Input type="url" value={draft.assessmentLink} onChange={(event) => setDraft({ ...draft, assessmentLink: event.target.value })} placeholder="https://..." /></label>
+        <DateTimeInput id="detail-assessment-deadline" label="测评截止时间" ariaLabel="测评截止时间" value={draft.assessmentDeadline} onChange={(value) => setDraft({ ...draft, assessmentDeadline: value })} />
+        <DateTimeInput id="detail-written-test-date" label="笔试时间" ariaLabel="笔试时间" value={draft.writtenTestDate} onChange={(value) => setDraft({ ...draft, writtenTestDate: value })} />
+        <DateTimeInput id="detail-interview-date" label="面试时间" ariaLabel="面试时间" value={draft.interviewDate} onChange={(value) => setDraft({ ...draft, interviewDate: value })} />
+        <label className="space-y-2 text-sm font-medium sm:col-span-2">测评链接 <span className="font-normal text-slate-500">（选填）</span><Input type="url" value={draft.assessmentLink} onChange={(event) => setDraft({ ...draft, assessmentLink: event.target.value })} /></label>
       </div>
     </section>
     <label className="block space-y-2 text-sm font-medium">JD 正文<Textarea rows={10} value={draft.jdText} onChange={(event) => setDraft({ ...draft, jdText: event.target.value })} /></label>

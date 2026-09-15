@@ -223,6 +223,16 @@ describe("BoardPage job detail sheet", () => {
     fireEvent.change(screen.getByLabelText("截止月份"), { target: { value: "10" } });
     fireEvent.change(screen.getByLabelText("截止日期"), { target: { value: "1" } });
     expect(screen.getByRole("button", { name: "选择申请截止日期" })).toBeInTheDocument();
+    expect(screen.getByLabelText("测评截止时间年份")).toBeInTheDocument();
+    expect(screen.getByLabelText("测评截止时间小时")).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("https://...")).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toHaveClass("max-h-[calc(100dvh-2rem)]");
+    expect(screen.getByRole("dialog").querySelector(".overflow-y-auto")).not.toBeNull();
+    fireEvent.change(screen.getByLabelText("测评截止时间年份"), { target: { value: "2027" } });
+    fireEvent.change(screen.getByLabelText("测评截止时间月份"), { target: { value: "10" } });
+    fireEvent.change(screen.getByLabelText("测评截止时间日期"), { target: { value: "2" } });
+    fireEvent.change(screen.getByLabelText("测评截止时间小时"), { target: { value: "20" } });
+    fireEvent.change(screen.getByLabelText("测评截止时间分钟"), { target: { value: "30" } });
     fireEvent.change(screen.getByLabelText("JD 正文"), {
       target: { value: "岗位要求：熟悉大模型、LLM、Agent、RAG、多模态和 A/B测试；有产品项目或 AI 应用原型经验。" },
     });
@@ -249,13 +259,17 @@ describe("BoardPage job detail sheet", () => {
     expect(screen.getByTestId("selected-job-id")).not.toHaveTextContent("none");
 
     await waitFor(() => {
-      const jobs = JSON.parse(localStorage.getItem("jobfind.jobs") ?? "[]") as Array<{ company: string; position: string; applicationDeadline: string | null }>;
+      const jobs = JSON.parse(localStorage.getItem("jobfind.jobs") ?? "[]") as Array<{ company: string; position: string; applicationDeadline: string | null; assessmentDeadline: string | null }>;
       const createdJob = jobs.find((job) => job.company === "腾讯" && job.position === "AI 产品经理");
       expect(createdJob).toBeDefined();
       expect(createdJob?.applicationDeadline).not.toBeNull();
       expect(new Date(createdJob!.applicationDeadline!).getFullYear()).toBe(2027);
       expect(new Date(createdJob!.applicationDeadline!).getMonth()).toBe(9);
       expect(new Date(createdJob!.applicationDeadline!).getDate()).toBe(1);
+      expect(createdJob?.assessmentDeadline).not.toBeNull();
+      expect(new Date(createdJob!.assessmentDeadline!).getDate()).toBe(2);
+      expect(new Date(createdJob!.assessmentDeadline!).getHours()).toBe(20);
+      expect(new Date(createdJob!.assessmentDeadline!).getMinutes()).toBe(30);
     });
   });
 });

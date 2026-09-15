@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ApplicationDeadlineInput } from "@/components/ai/application-deadline-input";
+import { DateTimeInput } from "@/components/ai/date-time-input";
 import { JOB_STAGE_LABELS, type JDIntakeDraft } from "@/lib/jd-intake";
 import type { MaterialType } from "@/lib/types";
 
@@ -90,13 +91,10 @@ export function JDParserResult({
           value={draft.applicationDeadline}
           onChange={(value) => updateDraft("applicationDeadline", value)}
         />
-        <div className="space-y-2">
-          <label htmlFor="jd-preview-assessment-deadline" className="text-xs text-slate-500">测评截止时间（选填）</label>
-          <Input id="jd-preview-assessment-deadline" type="datetime-local" value={draft.assessmentDeadline} onChange={(event) => updateDraft("assessmentDeadline", event.target.value)} />
-        </div>
+        <DateTimeInput id="jd-preview-assessment-deadline" label={<>测评截止时间 <span className="font-normal text-slate-500">（选填）</span></>} ariaLabel="测评截止时间" value={draft.assessmentDeadline} onChange={(value) => updateDraft("assessmentDeadline", value)} />
         <div className="space-y-2">
           <label htmlFor="jd-preview-assessment-link" className="text-xs text-slate-500">测评链接（选填）</label>
-          <Input id="jd-preview-assessment-link" type="url" value={draft.assessmentLink} onChange={(event) => updateDraft("assessmentLink", event.target.value)} placeholder="https://..." />
+          <Input id="jd-preview-assessment-link" type="url" value={draft.assessmentLink} onChange={(event) => updateDraft("assessmentLink", event.target.value)} />
         </div>
         <div className="space-y-2 sm:col-span-2">
           <label htmlFor="jd-preview-note" className="text-xs text-slate-500">备注（选填，{draft.note.length}/20）</label>
