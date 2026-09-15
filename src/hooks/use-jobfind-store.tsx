@@ -5,16 +5,20 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import { createMockJobs, createMockMaterials } from '../lib/mock-data';
 import {
   loadCompletedTaskIds,
+  loadCompanyPool,
   loadDemoDataVersion,
   loadJobs,
   loadMaterials,
   saveCompletedTaskIds,
+  saveCompanyPool,
   saveDemoDataVersion,
   saveJobs,
   saveMaterials,
+  backupJobsBeforeCompanyBinding,
 } from '../lib/storage';
 import type { InterviewNote, Job, JobStage, Material, TimelineEvent } from '../lib/types';
 import { JOB_STAGE_LABELS } from '../lib/job-stages';
+import { createSeedCompanies, resolveCompanyId, type Company } from '../lib/company-pool';
 
 type EditableJobFields = Pick<
   Job,
@@ -42,9 +46,11 @@ const SEEDED_MOCK_DATE = new Date('2026-04-19T08:00:00.000Z');
 const DEMO_DATA_VERSION = '2026-04-20-rich-ai-pm-pool';
 const SEEDED_JOBS = createMockJobs(SEEDED_MOCK_DATE);
 const SEEDED_MATERIALS = createMockMaterials(SEEDED_MOCK_DATE);
+const SEEDED_COMPANIES = createSeedCompanies();
 
 interface JobFindStoreValue {
   jobs: Job[];
+  companies: Company[];
   materials: Material[];
   selectedJobId: string | null;
   isJDParserOpen: boolean;
@@ -54,6 +60,9 @@ interface JobFindStoreValue {
   setJDParserOpen: (isOpen: boolean) => void;
   addJob: (job: Job) => void;
   updateJob: (jobId: string, fields: Partial<EditableJobFields>) => void;
+  updateJobCompanyBinding: (jobId: string, companyId: string | null) => void;
+  addCompany: (company: Omit<Company, 'id'>) => void;
+  updateCompany: (companyId: string, fields: Partial<Omit<Company, 'id'>>) => void;
   updateJobMaterials: (jobId: string, requiredMaterials: Job['requiredMaterials'], boundMaterialIds: string[]) => void;
   deleteJob: (jobId: string) => void;
   advanceJobStage: (jobId: string, stage: JobStage, description?: string) => void;
@@ -68,6 +77,7 @@ interface JobFindStoreValue {
 
 interface StoreState {
   jobs: Job[];
+  companies: Company[];
   materials: Material[];
   selectedJobId: string | null;
   isJDParserOpen: boolean;
@@ -84,6 +94,7 @@ function createTimelineEvent(stage: JobStage, description: string): TimelineEven
 export function JobFindProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<StoreState>({
     jobs: SEEDED_JOBS,
+    companies: SEEDED_COMPANIES,
     materials: SEEDED_MATERIALS,
     selectedJobId: null,
     isJDParserOpen: false,
@@ -94,15 +105,29 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const isCurrentDemoData = loadDemoDataVersion() === DEMO_DATA_VERSION;
     const loadedJobs = loadJobs();
+    const loadedCompanies = loadCompanyPool();
     const loadedMaterials = loadMaterials();
     const loadedCompletedTaskIds = loadCompletedTaskIds();
 
-    setState((current) => ({
+    setState((current) => {
+      const companies = loadedCompanies ?? current.companies;
+      const jobs = isCurrentDemoData ? (loadedJobs ?? current.jobs) : current.jobs;
+      const boundJobs = jobs.map((job) => {
+        if (job.companyId) return job;
+        const companyId = resolveCompanyId(job.company, companies);
+        return companyId ? { ...job, companyId } : job;
+      });
+      if (isCurrentDemoData && loadedJobs && JSON.stringify(jobs) !== JSON.stringify(boundJobs)) {
+        backupJobsBeforeCompanyBinding();
+      }
+      return {
       ...current,
-      jobs: isCurrentDemoData ? (loadedJobs ?? current.jobs) : current.jobs,
+      jobs: boundJobs,
+      companies,
       materials: isCurrentDemoData ? (loadedMaterials ?? current.materials) : current.materials,
       completedTaskIds: isCurrentDemoData ? (loadedCompletedTaskIds ?? current.completedTaskIds) : current.completedTaskIds,
-    }));
+      };
+    });
     setIsHydrated(true);
   }, []);
 
@@ -112,10 +137,11 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
     }
 
     saveJobs(state.jobs);
+    saveCompanyPool(state.companies);
     saveMaterials(state.materials);
     saveCompletedTaskIds(state.completedTaskIds);
     saveDemoDataVersion(DEMO_DATA_VERSION);
-  }, [isHydrated, state.jobs, state.materials, state.completedTaskIds]);
+  }, [isHydrated, state.jobs, state.companies, state.materials, state.completedTaskIds]);
 
   const selectedJob = useMemo(() => {
     return state.selectedJobId ? state.jobs.find((job) => job.id === state.selectedJobId) ?? null : null;
@@ -124,6 +150,7 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<JobFindStoreValue>(
     () => ({
       jobs: state.jobs,
+      companies: state.companies,
       materials: state.materials,
       selectedJobId: state.selectedJobId,
       isJDParserOpen: state.isJDParserOpen,
@@ -144,7 +171,7 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
       addJob: (job) => {
         setState((current) => ({
           ...current,
-          jobs: [job, ...current.jobs],
+          jobs: [{ ...job, companyId: job.companyId ?? resolveCompanyId(job.company, current.companies) }, ...current.jobs],
           selectedJobId: job.id,
         }));
       },
@@ -158,12 +185,31 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
             return {
               ...job,
               ...fields,
+              companyId: fields.company === undefined ? job.companyId : resolveCompanyId(fields.company, current.companies),
               updatedAt,
               timeline: stageChanged
                 ? [createTimelineEvent(fields.stage!, `手动调整阶段：${JOB_STAGE_LABELS[fields.stage!]}`), ...job.timeline]
                 : job.timeline,
             };
           }),
+        }));
+      },
+      updateJobCompanyBinding: (jobId, companyId) => {
+        setState((current) => ({
+          ...current,
+          jobs: current.jobs.map((job) => job.id === jobId ? { ...job, companyId, updatedAt: new Date().toISOString() } : job),
+        }));
+      },
+      addCompany: (company) => {
+        setState((current) => ({
+          ...current,
+          companies: [...current.companies, { ...company, id: `company-user-${Date.now()}` }].sort((left, right) => left.name.localeCompare(right.name, "zh-CN")),
+        }));
+      },
+      updateCompany: (companyId, fields) => {
+        setState((current) => ({
+          ...current,
+          companies: current.companies.map((company) => company.id === companyId ? { ...company, ...fields } : company),
         }));
       },
       updateJobMaterials: (jobId, requiredMaterials, boundMaterialIds) => {
@@ -294,7 +340,7 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
         });
       },
     }),
-    [selectedJob, state.completedTaskIds, state.isJDParserOpen, state.jobs, state.materials, state.selectedJobId],
+    [selectedJob, state.completedTaskIds, state.isJDParserOpen, state.jobs, state.companies, state.materials, state.selectedJobId],
   );
 
   return <JobFindStoreContext.Provider value={value}>{children}</JobFindStoreContext.Provider>;

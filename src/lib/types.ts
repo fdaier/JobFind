@@ -70,6 +70,8 @@ export interface InterviewNote {
 export interface Job {
   id: string;
   company: string;
+  /** Optional canonical company-pool binding. The free-text company name stays untouched. */
+  companyId?: string | null;
   position: string;
   jobType: JobType;
   batch: RecruitBatch;

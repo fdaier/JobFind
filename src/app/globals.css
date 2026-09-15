@@ -181,3 +181,37 @@ body::before {
     inset -1px -1px 0 rgba(198, 190, 215, 0.12);
   backdrop-filter: blur(18px);
 }
+
+.company-pool-chip {
+  display: inline-flex;
+  max-width: 100%;
+  flex-direction: column;
+  gap: 0.125rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  padding: 0.5rem 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.15;
+  text-align: left;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.company-pool-chip:hover,
+.company-pool-chip:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 22px rgba(74, 66, 94, 0.12);
+  outline: none;
+}
+
+.company-pool-chip-unapplied {
+  background: rgba(232, 226, 242, 0.78);
+  color: #334155;
+}
+
+.company-pool-chip-applied {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  cursor: pointer;
+}

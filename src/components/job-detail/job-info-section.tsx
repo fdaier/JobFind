@@ -45,11 +45,12 @@ function makeDraft(job: Job) {
 }
 
 export function JobInfoSection({ job }: { job: Job }) {
-  const { updateJob } = useJobfindStore();
+  const { updateJob, updateJobCompanyBinding, companies } = useJobfindStore();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(() => makeDraft(job));
-  useEffect(() => { setEditing(false); setDraft(makeDraft(job)); }, [job]);
-  const cancel = () => { setEditing(false); setDraft(makeDraft(job)); };
+  const [companyId, setCompanyId] = useState(job.companyId ?? "");
+  useEffect(() => { setEditing(false); setDraft(makeDraft(job)); setCompanyId(job.companyId ?? ""); }, [job]);
+  const cancel = () => { setEditing(false); setDraft(makeDraft(job)); setCompanyId(job.companyId ?? ""); };
   const save = () => {
     updateJob(job.id, {
       company: draft.company.trim(), position: draft.position.trim(), stage: draft.stage,
@@ -58,6 +59,7 @@ export function JobInfoSection({ job }: { job: Job }) {
       jdText: draft.jdText, keywords: list(draft.keywords), requirements: list(draft.requirements),
       contactName: draft.contactName.trim() || null, contactInfo: draft.contactInfo.trim() || null, note: draft.note.trim(),
     });
+    updateJobCompanyBinding(job.id, companyId || null);
     setEditing(false);
   };
 
@@ -65,6 +67,7 @@ export function JobInfoSection({ job }: { job: Job }) {
     <div className="flex items-center justify-between"><h3 className="text-sm font-semibold text-slate-950">编辑基本信息</h3><span className="text-xs text-slate-500">保存后 Agent 会重新判断</span></div>
     <div className="grid gap-4 sm:grid-cols-2">
       <label className="space-y-2 text-sm font-medium">公司<Input value={draft.company} onChange={(event) => setDraft({ ...draft, company: event.target.value })} /></label>
+      <label className="space-y-2 text-sm font-medium">名单公司<select aria-label="名单公司" value={companyId} onChange={(event) => setCompanyId(event.target.value)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"><option value="">不绑定公司池</option>{companies.filter((company) => !company.archived).map((company) => <option key={company.id} value={company.id}>{company.name}</option>)}</select><span className="block text-xs font-normal text-slate-500">用于同步公司池状态，不会改写录入名称。</span></label>
       <label className="space-y-2 text-sm font-medium">岗位名称<Input value={draft.position} onChange={(event) => setDraft({ ...draft, position: event.target.value })} /></label>
       <label className="space-y-2 text-sm font-medium">当前阶段<select value={draft.stage} onChange={(event) => setDraft({ ...draft, stage: event.target.value as Job["stage"] })} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm">{JOB_STAGE_ORDER.map((stage) => <option key={stage} value={stage}>{JOB_STAGE_LABELS[stage]}</option>)}</select></label>
     </div>
@@ -92,6 +95,7 @@ export function JobInfoSection({ job }: { job: Job }) {
     <section className="space-y-2"><h3 className="text-sm font-semibold text-slate-950">JD 命中的术语</h3><div className="flex flex-wrap gap-2">{job.keywords.length ? job.keywords.map((item) => <Badge key={item} variant="outline" className="rounded-md">{item}</Badge>) : <p className="text-sm text-slate-500">暂无术语。</p>}</div></section><Separator />
     <section className="space-y-2"><h3 className="text-sm font-semibold text-slate-950">岗位要求</h3>{job.requirements.length ? <ul className="space-y-2">{job.requirements.map((item) => <li key={item} className="text-sm leading-6 text-slate-700">• {item}</li>)}</ul> : <p className="text-sm text-slate-500">暂无要求信息。</p>}</section><Separator />
     <section className="grid gap-3 text-sm sm:grid-cols-2">
+      <div><p className="text-slate-500">名单公司</p><p>{companies.find((company) => company.id === job.companyId)?.name ?? "未绑定"}</p></div>
       <div><p className="text-slate-500">联系人</p><p>{job.contactName ?? "暂无"}</p></div><div><p className="text-slate-500">联系方式</p><p>{job.contactInfo ?? "暂无"}</p></div>
       <div><p className="text-slate-500">申请截止时间</p><p>{job.applicationDeadline ? toDateInput(job.applicationDeadline) : "暂无"}</p></div><div><p className="text-slate-500">测评截止时间</p><p>{formatDateTime(job.assessmentDeadline)}</p></div>
       <div><p className="text-slate-500">笔试时间</p><p>{formatDateTime(job.writtenTestDate)}</p></div><div><p className="text-slate-500">面试时间</p><p>{formatDateTime(job.interviewDate)}</p></div>

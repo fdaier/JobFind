@@ -8,6 +8,7 @@ import { JOB_STAGE_LABELS, JOB_STAGE_ORDER } from "../../lib/job-stages";
 import type { JobStage } from "../../lib/types";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { CompanyPoolDialog } from "../company-pool/company-pool-dialog";
 import { type BoardFilter, type BoardSort, matchesBoardFilter, matchesBoardQuery, sortBoardJobs } from "./board-view";
 import { KanbanColumn } from "./kanban-column";
 
@@ -18,6 +19,7 @@ export function KanbanBoard() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<BoardFilter>("all");
   const [sort, setSort] = useState<BoardSort>("priority");
+  const [isCompanyPoolOpen, setIsCompanyPoolOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const now = useMemo(() => new Date(), []);
 
@@ -114,16 +116,19 @@ export function KanbanBoard() {
             ))}
           </div>
 
-          <select
-            aria-label="排序方式"
-            value={sort}
-            onChange={(event) => setSort(event.target.value as BoardSort)}
-            className="h-10 rounded-lg border border-white/60 bg-white/45 px-3 text-sm text-slate-700 shadow-none outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-900/10"
-          >
-            <option value="priority">优先处理</option>
-            <option value="updated">最近更新</option>
-            <option value="company">公司名</option>
-          </select>
+          <div className="flex gap-2">
+            <select
+              aria-label="排序方式"
+              value={sort}
+              onChange={(event) => setSort(event.target.value as BoardSort)}
+              className="h-10 min-w-0 rounded-lg border border-white/60 bg-white/45 px-3 text-sm text-slate-700 shadow-none outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-900/10"
+            >
+              <option value="priority">优先处理</option>
+              <option value="updated">最近更新</option>
+              <option value="company">公司名</option>
+            </select>
+            <Button type="button" variant="outline" className="h-10 border-white/60 bg-white/38" onClick={() => setIsCompanyPoolOpen(true)}>公司池</Button>
+          </div>
         </div>
         <p aria-live="polite" className="text-xs text-slate-500">
           {hasActiveView ? `当前显示 ${visibleCount} / ${jobs.length} 个岗位` : `共 ${jobs.length} 个岗位`}
@@ -146,6 +151,7 @@ export function KanbanBoard() {
         ))}
       </div>
       </div>
+      <CompanyPoolDialog open={isCompanyPoolOpen} onOpenChange={setIsCompanyPoolOpen} />
     </section>
   );
 }

@@ -1,12 +1,15 @@
 import type { Job, Material } from './types';
 import { isValidDateString } from './date';
 import { isJobStage } from './job-stages';
+import type { Company } from './company-pool';
 
 const JOBS_KEY = 'jobfind.jobs';
 const MATERIALS_KEY = 'jobfind.materials';
 const COMPLETED_TASK_IDS_KEY = 'jobfind.completedTasks';
 const DEMO_DATA_VERSION_KEY = 'jobfind.demoDataVersion';
 const JOBS_BACKUP_V3_KEY = 'jobfind.jobs.backup.v3';
+const JOBS_COMPANY_BINDING_BACKUP_KEY = 'jobfind.jobs.backup.company-pool.v1';
+const COMPANY_POOL_KEY = 'jobfind.companyPool.v1';
 
 const LEGACY_STAGE_MAP: Record<string, Job['stage']> = {
   interested: 'to_apply',
@@ -129,6 +132,7 @@ function isJob(value: unknown): value is Job {
     isRecord(value) &&
     typeof value.id === 'string' &&
     typeof value.company === 'string' &&
+    (typeof value.companyId === 'undefined' || typeof value.companyId === 'string' || value.companyId === null) &&
     typeof value.position === 'string' &&
     typeof value.jobType === 'string' &&
     typeof value.batch === 'string' &&
@@ -241,6 +245,7 @@ function migrateJob(value: unknown): Job | null {
     stage,
     timeline,
     note: typeof value.note === 'string' ? value.note : '',
+    ...(typeof value.companyId === 'string' || value.companyId === null ? { companyId: value.companyId } : {}),
     assessmentDeadline: typeof value.assessmentDeadline === 'string' ? value.assessmentDeadline : null,
     assessmentLink: typeof value.assessmentLink === 'string' ? value.assessmentLink : null,
   };
@@ -249,6 +254,30 @@ function migrateJob(value: unknown): Job | null {
 
 export function saveJobs(jobs: Job[]): void {
   saveJsonValue(JOBS_KEY, jobs);
+}
+
+/** Preserve raw existing jobs before the one-time canonical-company enrichment. */
+export function backupJobsBeforeCompanyBinding(): void {
+  if (!hasWindow() || window.localStorage.getItem(JOBS_COMPANY_BINDING_BACKUP_KEY) !== null) return;
+  const raw = window.localStorage.getItem(JOBS_KEY);
+  if (raw !== null) window.localStorage.setItem(JOBS_COMPANY_BINDING_BACKUP_KEY, raw);
+}
+
+export function loadCompanyPool(): Company[] | null {
+  const value = loadJsonValue<unknown>(COMPANY_POOL_KEY);
+  if (!Array.isArray(value)) return null;
+  const isCompany = (item: unknown): item is Company => isRecord(item)
+    && typeof item.id === 'string'
+    && typeof item.name === 'string'
+    && isStringArray(item.aliases)
+    && isRecord(item.tags)
+    && Object.values(item.tags).every(isStringArray)
+    && (typeof item.archived === 'boolean' || typeof item.archived === 'undefined');
+  return value.every(isCompany) ? value : null;
+}
+
+export function saveCompanyPool(companies: Company[]): void {
+  saveJsonValue(COMPANY_POOL_KEY, companies);
 }
 
 export function loadMaterials(): Material[] | null {
