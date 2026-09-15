@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `7eb1ada feat: track assessment deadlines`
+- 稳定分支与当前产品提交：`main` / `44fbeb9 feat: unify job date time inputs`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_7b4cmZWWemxeM2VqX1D5PaU99mMd`（2026-09-14，Ready）
+- 当前生产部署：`dpl_Ho7uHs8gSzhFmJBjwYsyPXcY9Aq3`（2026-09-15，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -26,7 +26,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 技术栈为 Next.js App Router、React、TypeScript、Tailwind CSS、Radix UI、Vitest。应用使用静态导出和浏览器 localStorage；没有账号、后端、跨设备同步或真实 LLM API。当前 Agent 是可解释的确定性规则运行时。
 
-## 最近完成：申请看板 V3（待生产发布）
+## 最近完成：申请看板 V3（已发布）
 
 已按确认的 V3 草案完成本地实现：
 
@@ -59,6 +59,19 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 
 本次通过 18 个测试文件、58 个用例、`tsc --noEmit`、`npm run lint`、生产构建和本地浏览器完整闭环验证。生产部署 `dpl_7b4cmZWWemxeM2VqX1D5PaU99mMd` Ready；`jobfind.fdaier.xyz/board` 返回 HTTP 200，线上只读确认导入弹窗含两个新增字段。
 
+## 最近完成：日期时间一致性与 JD 预览滚动
+
+正式依据：
+
+- `docs/superpowers/specs/2026-09-15-jobfind-date-time-input-consistency-design.md`
+- `docs/superpowers/plans/2026-09-15-jobfind-date-time-input-consistency.md`
+
+- 所有可编辑的日期时间（新建 JD、整理预览、岗位基本信息中的测评截止、笔试与面试）统一为年／月／日／时／分的独立输入框，并保留日历选择入口；不再暴露浏览器默认的 `yyyy/mm/dd` 占位格式。
+- 测评链接输入框保持空白，不再显示示例 URL。已有岗位仍按既有 localStorage 安全补全和保存路径处理，不迁移、不覆写用户已有信息。
+- JD 整理预览弹窗改为受视口约束的独立滚动区域，小屏幕无需 F11 即可滚动至“保存到看板”。
+
+本次通过 10 个相关 Vitest 用例、`tsc --noEmit`、`npm run lint` 与静态生产构建；在 1000×700 本地浏览器窗口完成导入、预览、滚动到底部的非写入验证。生产部署 `dpl_Ho7uHs8gSzhFmJBjwYsyPXcY9Aq3` Ready，`jobfind.fdaier.xyz/board` 返回 HTTP 200。
+
 ## 历史完成：岗位删除
 
 岗位进入“录用”或“已淘汰”后不再卡死在终态列：所有七个阶段均可从详情抽屉底部删除岗位。入口低强调度、删除前二次确认；删除会移除岗位自身的时间线和面试复盘、清理材料的 `boundJobIds`，并通过既有 localStorage 流程持久化。
@@ -83,7 +96,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 5. 删除功能暂不做回收站或 Undo；本期选择低频、慎重删除，未来再统一设计恢复语义。
 6. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
 7. 只有验证自然语言体验收益后才接入 LLM；不把开发时使用 A1/Codex 与产品线上模型能力混为一谈。
-8. **Persistent UI convention (implementation pending):** Every user-entered date must use the established separate year/month/day fields plus a calendar picker, never a browser-default `yyyy/mm/dd` placeholder. Date-time fields add a separate time input. Assessment-link inputs must remain blank and have no example placeholder.
+8. **Persistent UI convention:** Every user-entered date uses the established separate year/month/day fields plus a calendar picker, never a browser-default `yyyy/mm/dd` placeholder. Date-time fields add separate hour/minute inputs. Assessment-link inputs remain blank and have no example placeholder.
 
 ## 新对话执行规则
 
