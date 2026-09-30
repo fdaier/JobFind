@@ -1,6 +1,6 @@
 # JobFind 当前状态与新对话交接
 
-> 最后更新：2026-09-16。新对话在修改本项目之前必须先阅读本文。
+> 最后更新：2026-09-30。新对话在修改本项目之前必须先阅读本文。
 
 ## 当前事实源
 
@@ -24,7 +24,16 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 | `/materials` | 材料版本、覆盖关系与缺口提示 |
 | `/review` | 渠道、材料、面试与 Agent 策略复盘 |
 
-技术栈为 Next.js App Router、React、TypeScript、Tailwind CSS、Radix UI、Vitest。应用使用静态导出和浏览器 localStorage；没有账号、后端、跨设备同步或真实 LLM API。当前 Agent 是可解释的确定性规则运行时。
+技术栈为 Next.js App Router、React、TypeScript、Tailwind CSS、Radix UI、Vitest。岗位、公司池和材料仍使用浏览器 localStorage；邮箱连接功能引入 Supabase Auth／Postgres 与 Vercel Node API。尚无跨设备岗位同步或真实 LLM API。当前 Agent 是可解释的确定性规则运行时。
+
+## 当前实施：163 邮箱连接与邮件样式扫描
+
+- 正式依据：`docs/superpowers/specs/2026-09-30-jobfind-163-mail-status-inbox-design.md`，实施计划：`docs/superpowers/plans/2026-09-30-jobfind-163-mail-status-inbox.md`。
+- 用户已明确授权接入 Supabase 后端并使用其平台令牌。已创建独立 `JobFind` Supabase 项目（`pkrkvnmkqginfkgcneqg`，`ap-southeast-1`）；两张邮件表启用 RLS，浏览器无直连读表权限。Vercel 生产环境变量已配置，敏感值仅保存在服务端 Secret 中。
+- `/mail` 提供 Supabase 邮件链接登录、163 IMAP 客户端授权密码连接、全部收件箱的分批扫描、邮件类型统计、候选招聘邮件主题／发件域／短摘要。每批扫描报告保存在 `mail_scan_batches`，原始邮件正文不入库；断开连接会删除加密凭据与扫描报告。
+- 目前是第一阶段：待用户在页面完成 163 邮箱连接和真实全量扫描后，分析邮件样本，再编写岗位匹配与状态识别规则。**不要把此版本描述成已经自动更新看板或自动监控官网。**
+- 岗位仍在原 localStorage 中，邮箱功能没有迁移或覆盖用户已录入的岗位。Next.js 已从静态导出切换到混合静态页＋Node Route Handler，`npm start` 使用 `next start`。
+- 本地已通过 23 个测试文件、72 个用例、类型检查、lint、生产构建；本地 `/api/mail` 未登录时返回 401，浏览器已检查 `/mail` 登录页。
 
 ## 最近完成：公司池交互优化（已发布）
 
@@ -130,7 +139,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 3. 生产浏览器校验时发现一条 React hydration 警告（minified #418）；真实 JD 表单及保存流程未受影响，原因尚未归因。下次前端迭代前应复现并消除该警告。
 4. 若推进 V2，下一优先级为 `DRAFT-PRD-JobFind-V2-Review-Center.md` 的结构化复盘输入；它目前尚未实施。
 5. 删除功能暂不做回收站或 Undo；本期选择低频、慎重删除，未来再统一设计恢复语义。
-6. 只有出现真实、多设备用户数据需求时才引入账号、后端和数据库。
+6. 账号、后端和数据库现仅用于邮箱连接。未来若迁移岗位、公司池和材料数据，必须单独设计数据备份与跨设备同步，不得借邮箱功能悄然改写 localStorage。
 7. 只有验证自然语言体验收益后才接入 LLM；不把开发时使用 A1/Codex 与产品线上模型能力混为一谈。
 8. **Persistent UI convention:** Every user-entered date uses the established separate year/month/day fields plus a calendar picker, never a browser-default `yyyy/mm/dd` placeholder. Date-time fields add separate hour/minute inputs. Assessment-link inputs remain blank and have no example placeholder.
 9. **Persistent board convention:** Keep the application board as a naturally scrolling, continuous page. Do not introduce per-column vertical scrolling or fixed column headers; high-volume navigation is handled through local search, derived filters, sorting, and compact cards.

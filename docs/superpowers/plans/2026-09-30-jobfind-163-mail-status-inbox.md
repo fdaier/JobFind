@@ -1,5 +1,7 @@
 # JobFind 163 邮箱状态收件箱实施计划
 
+> 第一阶段先落地连接、分批历史扫描与样式报告；识别规则和看板状态更新等真实样本分析后实施。
+
 1. 创建 Supabase 项目并配置 Email OTP、Postgres 与 RLS；建立连接、岗位索引、状态建议和审计来源表，以及只含服务端环境变量的 Vercel/Supabase 密钥配置。
 2. 将 Next.js 从静态导出改为可同时提供静态页面和 Node Route Handlers 的 Vercel 部署，接入 Supabase 登录态；不修改现有 localStorage 岗位读取和备份路径。
 3. 接入受维护的 Node IMAP 客户端，实现 163 连接测试、加密凭据保存、手动同步、游标去重和断开删除；禁止日志打印授权码或邮件全文。

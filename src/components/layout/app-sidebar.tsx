@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { BarChart3, BriefcaseBusiness, FileStack, LayoutDashboard } from "lucide-react";
+import { BarChart3, BriefcaseBusiness, FileStack, Inbox, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -19,6 +19,11 @@ const navItems = [
     href: "/board",
     label: "申请看板",
     icon: BriefcaseBusiness,
+  },
+  {
+    href: "/mail",
+    label: "状态收件箱",
+    icon: Inbox,
   },
   {
     href: "/materials",
