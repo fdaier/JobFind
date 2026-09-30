@@ -100,7 +100,7 @@ export default function MailPage() {
     if (!auth || !email.trim()) return;
     setWorking(true); setNotice("");
     const { error } = await auth.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: `${window.location.origin}/mail` } });
-    setNotice(error ? "登录邮件发送失败，请检查邮箱地址后重试" : "登录链接已发到你的邮箱，请在当前浏览器打开。 ");
+    setNotice(error ? "登录邮件发送失败。当前请使用你的 Supabase 团队账号邮箱。" : "登录链接已发到你的邮箱，请在当前浏览器打开。 ");
     setWorking(false);
   }
 
@@ -168,7 +168,7 @@ export default function MailPage() {
     {!auth ? <section className="border-b border-slate-200/70 pb-6 text-sm text-slate-600">邮箱服务尚未配置，现有看板仍可照常使用。</section> : checkingAuth ? <p className="text-sm text-slate-600">正在检查登录状态…</p> : !session ?
       <section className="max-w-xl space-y-4 border-b border-slate-200/70 pb-8">
         <div className="flex items-center gap-2 text-lg font-semibold"><ShieldCheck className="size-5 text-indigo-600" />先登录 JobFind</div>
-        <p className="text-sm text-slate-600">输入接收登录链接的邮箱。登录邮箱与要扫描的 163 邮箱可以是同一个。</p>
+        <p className="text-sm text-slate-600">当前试用版请使用你加入 Supabase 团队的账号邮箱接收登录链接。登录后再连接要扫描的 163 邮箱。</p>
         <div className="flex flex-col gap-2 sm:flex-row"><Input aria-label="登录邮箱" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="你的邮箱地址" /><Button disabled={working || !email.trim()} onClick={sendLoginLink}>发送登录链接</Button></div>
       </section> : <>
       <section className="border-b border-slate-200/70 pb-8">

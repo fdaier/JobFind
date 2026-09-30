@@ -31,6 +31,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - 正式依据：`docs/superpowers/specs/2026-09-30-jobfind-163-mail-status-inbox-design.md`，实施计划：`docs/superpowers/plans/2026-09-30-jobfind-163-mail-status-inbox.md`。
 - 用户已明确授权接入 Supabase 后端并使用其平台令牌。已创建独立 `JobFind` Supabase 项目（`pkrkvnmkqginfkgcneqg`，`ap-southeast-1`）；两张邮件表启用 RLS，浏览器无直连读表权限。Vercel 生产环境变量已配置，敏感值仅保存在服务端 Secret 中。
 - `/mail` 提供 Supabase 邮件链接登录、163 IMAP 客户端授权密码连接、全部收件箱的分批扫描、邮件类型统计、候选招聘邮件主题／发件域／短摘要。每批扫描报告保存在 `mail_scan_batches`，原始邮件正文不入库；断开连接会删除加密凭据与扫描报告。
+- Supabase 默认 SMTP 当前仅给项目组织成员发送认证邮件，因此第一位试用者需先以其 Supabase 团队账号邮箱登录 JobFind，再连接独立的 163 邮箱。若开放给非团队真实用户，须先配置自有 SMTP。
 - 目前是第一阶段：待用户在页面完成 163 邮箱连接和真实全量扫描后，分析邮件样本，再编写岗位匹配与状态识别规则。**不要把此版本描述成已经自动更新看板或自动监控官网。**
 - 岗位仍在原 localStorage 中，邮箱功能没有迁移或覆盖用户已录入的岗位。Next.js 已从静态导出切换到混合静态页＋Node Route Handler，`npm start` 使用 `next start`。
 - 本地已通过 23 个测试文件、72 个用例、类型检查、lint、生产构建；本地 `/api/mail` 未登录时返回 401，浏览器已检查 `/mail` 登录页。
