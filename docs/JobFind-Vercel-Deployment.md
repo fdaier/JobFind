@@ -5,7 +5,7 @@
 - 自定义域名：<https://jobfind.fdaier.xyz>
 - Vercel 生产别名：<https://jobfind-core-loop.vercel.app>
 - Vercel 团队 / 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_DF3X2H4qERmcGTmtgYeEnraviDHg`（2026-09-30，Ready）
+- 当前生产部署：`dpl_FKCMn3fYuT41pjG4RuU8AWYC7fJP`（2026-09-30，Ready）
 
 邮箱连接版本起，Next.js 不再使用纯静态导出。`/api/mail` 为 Vercel Node Function。部署前需要确认生产环境变量 `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`、`SUPABASE_SECRET_KEY`、`MAIL_CREDENTIAL_KEY` 已配置。后两者为服务端 Secret，不得进入 `NEXT_PUBLIC_`、客户端代码或仓库。Supabase 项目为独立的 `JobFind`（`pkrkvnmkqginfkgcneqg`，新加坡区域），迁移文件位于 `supabase/migrations/`。本地环境变量示例见根目录 `.env.example`。
 
