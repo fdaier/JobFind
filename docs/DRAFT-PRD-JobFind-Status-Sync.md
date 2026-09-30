@@ -1,6 +1,6 @@
 # DRAFT — JobFind 职位状态同步与状态收件箱
 
-> 状态：待确认；本文件不授权实施。
+> 状态：已由 `docs/superpowers/specs/2026-09-30-jobfind-163-mail-status-inbox-design.md` 取代；保留为早期讨论记录。
 > 日期：2026-09-30
 
 ## 用户问题
