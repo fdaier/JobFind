@@ -12,6 +12,7 @@ import type { MailCategory, MailObservation } from "@/lib/mail/analysis";
 type ScanBatch = {
   nextUid: number;
   uidNext: number;
+  totalMessages: number;
   processed: number;
   oversized: number;
   categories: Record<MailCategory, number>;
@@ -46,6 +47,7 @@ export default function MailPage() {
   const [notice, setNotice] = useState("");
   const [cursor, setCursor] = useState(1);
   const [uidNext, setUidNext] = useState(0);
+  const [totalMessages, setTotalMessages] = useState(0);
   const [processed, setProcessed] = useState(0);
   const [oversized, setOversized] = useState(0);
   const [counts, setCounts] = useState(emptyCounts);
@@ -121,7 +123,7 @@ export default function MailPage() {
     setWorking(true); setNotice("");
     try {
       await request("POST", { action: "disconnect" });
-      setConnectedAddress(null); setObservations([]); setCounts(emptyCounts()); setCursor(1); setUidNext(0); setProcessed(0);
+      setConnectedAddress(null); setObservations([]); setCounts(emptyCounts()); setCursor(1); setUidNext(0); setTotalMessages(0); setProcessed(0);
       setNotice("邮箱已断开，服务端授权密码已删除。 ");
     } catch (error) { setNotice(error instanceof Error ? error.message : "断开失败"); }
     setWorking(false);
@@ -131,11 +133,12 @@ export default function MailPage() {
     stopped.current = false;
     setScanRunning(true); setNotice("");
     let next = reset ? 1 : cursor;
-    if (reset) { setCounts(emptyCounts()); setObservations([]); setProcessed(0); setOversized(0); setUidNext(0); setCursor(1); }
+    if (reset) { setCounts(emptyCounts()); setObservations([]); setProcessed(0); setOversized(0); setUidNext(0); setTotalMessages(0); setCursor(1); }
     try {
       while (!stopped.current) {
         const batch = await request<ScanBatch>("POST", { action: "scan", cursor: next });
         setUidNext(batch.uidNext);
+        setTotalMessages(batch.totalMessages);
         setProcessed((value) => value + batch.processed);
         setOversized((value) => value + batch.oversized);
         setCounts((value) => {
@@ -199,7 +202,7 @@ export default function MailPage() {
         </div>
         {(processed > 0 || scanRunning) ? <>
           <div className="border-y border-slate-200/70 py-4 text-sm text-slate-600" aria-live="polite">
-            已扫描 <strong className="text-slate-950">{processed}</strong> 封 · UID 进度 {Math.min(cursor, uidNext)} / {uidNext || "…"}{oversized ? ` · ${oversized} 封大邮件仅检查标题` : ""}
+            已扫描 <strong className="text-slate-950">{processed}</strong> / {totalMessages || "…"} 封{oversized ? ` · ${oversized} 封大邮件仅检查标题` : ""}
           </div>
           <div className="grid gap-3 sm:grid-cols-4">
             {CATEGORY_ORDER.map((category) => <div key={category} className="border-b border-slate-200/70 py-2"><div className="text-xs text-slate-500">{CATEGORY_LABELS[category]}</div><div className="mt-1 text-2xl font-semibold tabular-nums">{counts[category]}</div></div>)}

@@ -2,6 +2,8 @@ import { ImapFlow } from "imapflow";
 import { simpleParser } from "mailparser";
 
 import { classifyMail, sanitizeSnippet, senderDomain, type MailCategory, type MailObservation } from "./analysis";
+import { mailBodyText } from "./content";
+import { selectUidPage } from "./uid-page";
 
 const MAX_SOURCE_BYTES = 1024 * 1024;
 const BATCH_UID_RANGE = 50;
@@ -36,6 +38,7 @@ export interface MailScanBatch {
   uidValidity: string;
   nextUid: number;
   uidNext: number;
+  totalMessages: number;
   processed: number;
   oversized: number;
   categories: Record<MailCategory, number>;
@@ -47,17 +50,18 @@ export async function scan163Batch(address: string, credential: string, cursor: 
   try {
     await client.connect();
     const mailbox = await client.mailboxOpen("INBOX", { readOnly: true });
-    const uidNext = mailbox.uidNext;
-    const start = Math.max(1, Math.min(Math.floor(cursor), uidNext));
-    const end = Math.min(start + BATCH_UID_RANGE - 1, uidNext - 1);
+    // Some IMAP servers omit UIDNEXT and assign large, sparse UIDs. Page through
+    // actual UIDs instead of assuming that the mailbox starts at UID 1.
+    const uids = await client.search({ all: true }, { uid: true });
+    const { selected, nextUid, uidNext, totalMessages } = selectUidPage(Array.isArray(uids) ? uids : [], cursor, BATCH_UID_RANGE);
     const categories: Record<MailCategory, number> = { assessment: 0, written_test: 0, interview: 0, offer: 0, rejection: 0, application: 0, recruitment_other: 0, other: 0 };
     const observations: MailObservation[] = [];
     let processed = 0;
     let oversized = 0;
-    if (end >= start) {
+    if (selected.length) {
       // Fetch metadata first so large attachments never enter the parser.
       const messages = [];
-      for await (const message of client.fetch(`${start}:${end}`, { uid: true, envelope: true, size: true }, { uid: true })) messages.push(message);
+      for await (const message of client.fetch(selected.join(","), { uid: true, envelope: true, size: true }, { uid: true })) messages.push(message);
       for (const message of messages) {
         processed += 1;
         const subject = message.envelope?.subject?.slice(0, 300) ?? "";
@@ -69,7 +73,7 @@ export async function scan163Batch(address: string, credential: string, cursor: 
           const full = await client.fetchOne(String(message.uid), { source: true }, { uid: true });
           if (full && full.source) {
             const parsed = await simpleParser(full.source, { skipHtmlToText: false, skipTextToHtml: true });
-            body = parsed.text ?? "";
+            body = mailBodyText(parsed.text, parsed.html);
           }
         }
         const category = classifyMail(subject, body);
@@ -85,7 +89,7 @@ export async function scan163Batch(address: string, credential: string, cursor: 
         });
       }
     }
-    return { uidValidity: mailbox.uidValidity.toString(), nextUid: Math.min(end + 1, uidNext), uidNext, processed, oversized, categories, observations };
+    return { uidValidity: mailbox.uidValidity.toString(), nextUid, uidNext, totalMessages, processed, oversized, categories, observations };
   } finally {
     if (client.usable) await client.logout().catch(() => client.close());
     else client.close();

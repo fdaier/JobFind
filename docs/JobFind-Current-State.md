@@ -32,10 +32,11 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - 用户已明确授权接入 Supabase 后端并使用其平台令牌。已创建独立 `JobFind` Supabase 项目（`pkrkvnmkqginfkgcneqg`，`ap-southeast-1`）；两张邮件表启用 RLS，浏览器无直连读表权限。Vercel 生产环境变量已配置，敏感值仅保存在服务端 Secret 中。
 - `/mail` 提供 Supabase 邮件链接登录、163 IMAP 客户端授权密码连接、全部收件箱的分批扫描、邮件类型统计、候选招聘邮件主题／发件域／短摘要。每批扫描报告保存在 `mail_scan_batches`，原始邮件正文不入库；断开连接会删除加密凭据与扫描报告。
 - Supabase 默认 SMTP 当前仅给项目组织成员发送认证邮件，因此第一位试用者需先以其 Supabase 团队账号邮箱登录 JobFind，再连接独立的 163 邮箱。若开放给非团队真实用户，须先配置自有 SMTP。
-- 目前是第一阶段：待用户在页面完成 163 邮箱连接和真实全量扫描后，分析邮件样本，再编写岗位匹配与状态识别规则。**不要把此版本描述成已经自动更新看板或自动监控官网。**
+- 目前是第一阶段：用户的 163 邮箱已通过只读 IMAP 验证，并加密连接到其 JobFind 试用账号（登录邮箱 `22***@qq.com`）。已人工核查收件箱全部 50 封、广告邮件 1 封及草稿箱主题；真实反例和下一阶段识别思路见 `docs/superpowers/specs/2026-09-30-jobfind-real-mail-recognition-findings-draft.md`。**不要把此版本描述成已经自动更新看板或自动监控官网。**
+- 真实验证发现 163 IMAP 不提供 `UIDNEXT`，UID 也不是从 1 连续起步；扫描已改为查询真实 UID 后分页。多封通知仅有 HTML 正文，现有文本提取已加 HTML 回退；邮件分类以明确的主题主事件和强结果语句为主，排除宣讲、直播、内推、问卷等非阶段通知。当前 `/mail` 页面只扫描收件箱；广告邮件中的 1 封招聘宣传是本次人工核查范围，不在页面自动扫描范围。
 - 岗位仍在原 localStorage 中，邮箱功能没有迁移或覆盖用户已录入的岗位。Next.js 已从静态导出切换到混合静态页＋Node Route Handler，`npm start` 使用 `next start`。
 - 本地已通过 23 个测试文件、72 个用例、类型检查、lint、生产构建；本地 `/api/mail` 未登录时返回 401，浏览器已检查 `/mail` 登录页。
-- 2026-09-30 已发布：Vercel 部署 `dpl_DF3X2H4qERmcGTmtgYeEnraviDHg` Ready；`https://jobfind.fdaier.xyz/mail` 和 `/board` 均为 HTTP 200，`/api/mail` 未登录为 HTTP 401，生产浏览器无控制台错误。Supabase 邮件链接使用 PKCE，需在发起登录的同一浏览器打开。**尚未输入用户的 163 客户端授权密码，未读取任何真实邮件，也未验证实际 IMAP 登录或扫描结果。**
+- 2026-09-30 已发布的初版：Vercel 部署 `dpl_DF3X2H4qERmcGTmtgYeEnraviDHg` Ready；`https://jobfind.fdaier.xyz/mail` 和 `/board` 均为 HTTP 200，`/api/mail` 未登录为 HTTP 401，生产浏览器无控制台错误。Supabase 邮件链接使用 PKCE，需在发起登录的同一浏览器打开。真实 IMAP 登录和本地全收件箱扫描已验证通过；分页与 HTML 修复待本次发布后更新部署记录。
 
 ## 最近完成：公司池交互优化（已发布）
 
