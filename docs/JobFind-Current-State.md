@@ -5,11 +5,11 @@
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `94ae19a docs: clarify pilot auth email requirement`（邮箱功能主提交 `f90f9fb`）
+- 稳定分支与当前产品提交：`main` / `fadfb94 fix: use PKCE for mail sign-in links`（邮箱功能主提交 `f90f9fb`）
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_3CyrNkC8hfdKKo29CmdwFQDmj53R`（2026-09-30，Ready）
+- 当前生产部署：`dpl_DF3X2H4qERmcGTmtgYeEnraviDHg`（2026-09-30，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -35,7 +35,7 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 - 目前是第一阶段：待用户在页面完成 163 邮箱连接和真实全量扫描后，分析邮件样本，再编写岗位匹配与状态识别规则。**不要把此版本描述成已经自动更新看板或自动监控官网。**
 - 岗位仍在原 localStorage 中，邮箱功能没有迁移或覆盖用户已录入的岗位。Next.js 已从静态导出切换到混合静态页＋Node Route Handler，`npm start` 使用 `next start`。
 - 本地已通过 23 个测试文件、72 个用例、类型检查、lint、生产构建；本地 `/api/mail` 未登录时返回 401，浏览器已检查 `/mail` 登录页。
-- 2026-09-30 已发布：Vercel 部署 `dpl_3CyrNkC8hfdKKo29CmdwFQDmj53R` Ready；`https://jobfind.fdaier.xyz/mail` 和 `/board` 均为 HTTP 200，`/api/mail` 未登录为 HTTP 401，生产浏览器无控制台错误。**尚未输入用户的 163 客户端授权密码，未读取任何真实邮件，也未验证实际 IMAP 登录或扫描结果。**
+- 2026-09-30 已发布：Vercel 部署 `dpl_DF3X2H4qERmcGTmtgYeEnraviDHg` Ready；`https://jobfind.fdaier.xyz/mail` 和 `/board` 均为 HTTP 200，`/api/mail` 未登录为 HTTP 401，生产浏览器无控制台错误。Supabase 邮件链接使用 PKCE，需在发起登录的同一浏览器打开。**尚未输入用户的 163 客户端授权密码，未读取任何真实邮件，也未验证实际 IMAP 登录或扫描结果。**
 
 ## 最近完成：公司池交互优化（已发布）
 
