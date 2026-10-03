@@ -1,15 +1,15 @@
 # JobFind 当前状态与新对话交接
 
-> 最后更新：2026-09-30。新对话在修改本项目之前必须先阅读本文。
+> 最后更新：2026-10-03。新对话在修改本项目之前必须先阅读本文。
 
 ## 当前事实源
 
 - 工作目录：`D:\projects\JobFind`
-- 稳定分支与当前产品提交：`main` / `611819f fix: scan real 163 mail reliably and refine classification`（邮箱功能主提交 `f90f9fb`）
+- 稳定分支与当前产品提交：`main` / `0c5dbcd feat: review mail-driven job stage suggestions`
 - GitHub：<https://github.com/fdaier/JobFind>
 - 生产地址：<https://jobfind.fdaier.xyz>
 - Vercel 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_FKCMn3fYuT41pjG4RuU8AWYC7fJP`（2026-09-30，Ready）
+- 当前生产部署：`dpl_91wBqdAHi52B49s7Z9UsHb9bzchC`（2026-10-03，Ready）
 
 根目录 `main` 是当前实施和发布来源。`.worktrees/jobfind-core-loop`、`CODING-CHAIN-NOTES.md` 和旧 Stage 1/v1.2 文档只保留为历史上下文；不得再把其中“worktree 是唯一事实来源”的表述当作当前部署指令。
 
@@ -21,22 +21,32 @@ JobFind 是面向学生求职的“AI 求职项目经理”原型，核心闭环
 | --- | --- |
 | `/` | 今日作战台、任务排序、风险雷达、转化漏斗 |
 | `/board` | 十阶段校招申请看板、真实 JD 导入（公司/岗位名称/JD）、备注、详情编辑、阶段推进与删除 |
+| `/mail` | 163 收件箱手动扫描、邮件分栏、证据审阅与逐条确认推进 |
 | `/materials` | 材料版本、覆盖关系与缺口提示 |
 | `/review` | 渠道、材料、面试与 Agent 策略复盘 |
 
 技术栈为 Next.js App Router、React、TypeScript、Tailwind CSS、Radix UI、Vitest。岗位、公司池和材料仍使用浏览器 localStorage；邮箱连接功能引入 Supabase Auth／Postgres 与 Vercel Node API。尚无跨设备岗位同步或真实 LLM API。当前 Agent 是可解释的确定性规则运行时。
 
-## 当前实施：163 邮箱连接与邮件样式扫描
+## 当前完成：邮件进度建议与逐条审批（已发布）
+
+- 正式依据：`docs/superpowers/specs/2026-09-30-jobfind-mail-stage-approval-design.md`；计划：`docs/superpowers/plans/2026-09-30-jobfind-mail-stage-approval.md`。产品代码提交 `0c5dbcd`。
+- `/mail` 手动扫描 163 收件箱后，所有扫描邮件会在页面恢复展示；明确且唯一匹配到本浏览器真实岗位、阶段可前进的邮件进入“进度建议”，其余进入“待核对”。未识别邮件只保留主题／发件人／时间等元信息，可能与求职无关，仍可由用户核对，防止规则漏判时完全不可见。旧演示岗位不会被自动匹配。
+- 审阅弹窗逐封展示分类依据、当前／目标阶段、岗位选择；用户可以暂不处理、忽略，或明确点击“应用到看板”。不批量应用、不因扫描自动更新岗位；无明确进度证据和终态改写均需额外确认。只有明确邮件事件才提出阶段建议，链接存在本身不是推进证据。
+- 批次报告和审批决定保存在受认证的 Supabase Node API 后端；邮件正文、专属链接不入库。真实岗位仍在当前浏览器 localStorage；首次邮件推进前额外备份到 `jobfind.jobs.backup.mail-v1`，不覆盖 V3 备份。时间线记录邮件 UID 事件以防重复应用；若回执失败，可重试回执而不重复推进。无跨设备岗位同步。
+- 已在真实 163 收件箱重新扫描并只读核对：当前 48 封，全部 48 封可从服务器恢复，其中 6 封未识别；服务端审批决定仍为 0，未代替用户应用任何岗位。`mail_review_decisions` 迁移已应用且客户端不能直连。测试 27 个文件／91 个用例通过、1 个现场凭据测试按默认跳过；类型检查、lint、本地与 Vercel 生产构建通过。生产部署 `dpl_91wBqdAHi52B49s7Z9UsHb9bzchC` Ready；`jobfind.fdaier.xyz/mail` 和 `/board` 为 HTTP 200，未认证 `/api/mail` 为 401，真实登录只读 `/api/mail` 返回 48 条观察、0 条决定。
+- **边界：目前仅在用户打开页面并手动点击扫描时查信，尚无后台定时监控、系统推送或官网进度抓取。** 扫描后在应用内突出待处理数量并列出邮件。若今后要做自动查信／通知，应另行设计轮询频率、权限、费用和误报控制。未在用户真实浏览器代替其点击过“应用”。
+
+## 历史阶段：163 邮箱连接与邮件样式扫描
 
 - 正式依据：`docs/superpowers/specs/2026-09-30-jobfind-163-mail-status-inbox-design.md`，实施计划：`docs/superpowers/plans/2026-09-30-jobfind-163-mail-status-inbox.md`。
 - 用户已明确授权接入 Supabase 后端并使用其平台令牌。已创建独立 `JobFind` Supabase 项目（`pkrkvnmkqginfkgcneqg`，`ap-southeast-1`）；两张邮件表启用 RLS，浏览器无直连读表权限。Vercel 生产环境变量已配置，敏感值仅保存在服务端 Secret 中。
 - `/mail` 提供 Supabase 邮件链接登录、163 IMAP 客户端授权密码连接、全部收件箱的分批扫描、邮件类型统计、候选招聘邮件主题／发件域／短摘要。每批扫描报告保存在 `mail_scan_batches`，原始邮件正文不入库；断开连接会删除加密凭据与扫描报告。
 - Supabase 默认 SMTP 当前仅给项目组织成员发送认证邮件，因此第一位试用者需先以其 Supabase 团队账号邮箱登录 JobFind，再连接独立的 163 邮箱。若开放给非团队真实用户，须先配置自有 SMTP。
-- 目前是第一阶段：用户的 163 邮箱已通过只读 IMAP 验证，并加密连接到其 JobFind 试用账号（登录邮箱 `22***@qq.com`）。已人工核查收件箱全部 50 封、广告邮件 1 封及草稿箱主题；真实反例和下一阶段识别思路见 `docs/superpowers/specs/2026-09-30-jobfind-real-mail-recognition-findings-draft.md`。**不要把此版本描述成已经自动更新看板或自动监控官网。**
+- 当时的第一阶段：用户的 163 邮箱已通过只读 IMAP 验证，并加密连接到其 JobFind 试用账号（登录邮箱 `22***@qq.com`）。当时人工核查收件箱 50 封、广告邮件 1 封及草稿箱主题；真实反例和下一阶段识别思路见 `docs/superpowers/specs/2026-09-30-jobfind-real-mail-recognition-findings-draft.md`。现在的审批能力见上一节；仍没有自动监控官网。
 - 真实验证发现 163 IMAP 不提供 `UIDNEXT`，UID 也不是从 1 连续起步；扫描已改为查询真实 UID 后分页。多封通知仅有 HTML 正文，现有文本提取已加 HTML 回退；邮件分类以明确的主题主事件和强结果语句为主，排除宣讲、直播、内推、问卷等非阶段通知。当前 `/mail` 页面只扫描收件箱；广告邮件中的 1 封招聘宣传是本次人工核查范围，不在页面自动扫描范围。
 - 岗位仍在原 localStorage 中，邮箱功能没有迁移或覆盖用户已录入的岗位。Next.js 已从静态导出切换到混合静态页＋Node Route Handler，`npm start` 使用 `next start`。
 - 本地已通过 23 个测试文件、72 个用例、类型检查、lint、生产构建；本地 `/api/mail` 未登录时返回 401，浏览器已检查 `/mail` 登录页。
-- 2026-09-30 修复版已发布：Vercel 部署 `dpl_FKCMn3fYuT41pjG4RuU8AWYC7fJP` Ready；自定义域名指向该部署，`/mail` 和 `/board` 均为 HTTP 200。线上 API 经真实账号会话完成一次 50 封收件箱全量扫描并保存 1 个批次、44 条脱敏候选观察：测评 7、笔试 9、面试 5、录用 0、未通过 1、投递回执 11、其他招聘 11、其他邮件 6。线上安全上限让 4 封大于 1 MB 的邮件仅按主题分类；本次人工核查另行只下载了这 4 封的文本部分，均为宣讲／开放日宣传。分类仅供样本分析，不代表已自动匹配岗位或更新看板。数据库中凭据仍为加密密文，短摘要未留原始 HTTP 或短链。Supabase 邮件链接使用 PKCE，用户需在发起登录的同一浏览器打开。
+- 2026-09-30 修复版当时发布为 `dpl_FKCMn3fYuT41pjG4RuU8AWYC7fJP`：曾扫描 50 封并保存 44 条候选观察，另有 6 封其他邮件只计数。当前版本已改为保留所有扫描邮件的最小观察数据，最新数量以本页上方 2026-10-03 验证为准。Supabase 邮件链接使用 PKCE，用户需在发起登录的同一浏览器打开。
 
 ## 最近完成：公司池交互优化（已发布）
 

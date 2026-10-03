@@ -5,9 +5,9 @@
 - 自定义域名：<https://jobfind.fdaier.xyz>
 - Vercel 生产别名：<https://jobfind-core-loop.vercel.app>
 - Vercel 团队 / 项目：`fdaiers-projects/jobfind-core-loop`
-- 当前生产部署：`dpl_FKCMn3fYuT41pjG4RuU8AWYC7fJP`（2026-09-30，Ready）
+- 当前生产部署：`dpl_91wBqdAHi52B49s7Z9UsHb9bzchC`（2026-10-03，Ready；邮箱逐条审批版）
 
-邮箱连接版本起，Next.js 不再使用纯静态导出。`/api/mail` 为 Vercel Node Function。部署前需要确认生产环境变量 `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`、`SUPABASE_SECRET_KEY`、`MAIL_CREDENTIAL_KEY` 已配置。后两者为服务端 Secret，不得进入 `NEXT_PUBLIC_`、客户端代码或仓库。Supabase 项目为独立的 `JobFind`（`pkrkvnmkqginfkgcneqg`，新加坡区域），迁移文件位于 `supabase/migrations/`。本地环境变量示例见根目录 `.env.example`。
+邮箱连接版本起，Next.js 不再使用纯静态导出。`/api/mail` 为 Vercel Node Function。部署前需要确认生产环境变量 `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`、`SUPABASE_SECRET_KEY`、`MAIL_CREDENTIAL_KEY` 已配置。后两者为服务端 Secret，不得进入 `NEXT_PUBLIC_`、客户端代码或仓库。Supabase 项目为独立的 `JobFind`（`pkrkvnmkqginfkgcneqg`，新加坡区域），迁移文件位于 `supabase/migrations/`；邮箱审批功能依赖 `20260930_mail_review_decisions.sql` 已应用。本地环境变量示例见根目录 `.env.example`。
 
 根目录 `D:\projects\JobFind` 的 `main` 是当前发布来源。不要再从历史 `.worktrees/jobfind-core-loop` 发布。
 
@@ -26,6 +26,7 @@ npx vercel deploy . --prod --yes --scope fdaiers-projects
 ```powershell
 npx vercel inspect https://jobfind.fdaier.xyz --scope fdaiers-projects
 Invoke-WebRequest https://jobfind.fdaier.xyz/board -UseBasicParsing
+Invoke-WebRequest https://jobfind.fdaier.xyz/mail -UseBasicParsing
 ```
 
 ## 阿里云域名状态
