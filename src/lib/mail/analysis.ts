@@ -8,6 +8,10 @@ export interface MailObservation {
   subject: string;
   category: MailCategory;
   snippet: string;
+  /** Short, redacted sentence that supports the classification. */
+  evidence?: string;
+  /** A link is supporting evidence, never proof of a stage by itself. */
+  hasLink?: boolean;
 }
 
 const RECRUITMENT = /招聘|应聘|职位|岗位|校招|秋招|春招|实习|投递|申请职位|申请岗位|候选人|人才|测评|笔试|面试|录用|offer|求职|入职|简历|感谢.*申请/i;
@@ -44,4 +48,23 @@ export function sanitizeSnippet(text: string): string {
     .replace(/\b1[3-9]\d{9}\b/g, "[手机号]")
     .replace(/(会议号|通行证|验证码|密码)\s*[:：]\s*[a-z0-9-]{6,}/gi, "$1：[已隐藏]")
     .replace(/\s+/g, " ").trim().slice(0, 180);
+}
+
+const EVIDENCE_PATTERNS: Record<MailCategory, RegExp> = {
+  rejection: /很遗憾地?通知您|将不做下一步安排|未能进入|未通过|不予录用/i,
+  offer: /录用通知|正式.{0,8}offer|offer letter/i,
+  assessment: /邀请.{0,30}(测评|在线测试)|测评截止|测评入口/i,
+  written_test: /邀请.{0,30}(笔试|在线考试)|笔试时间|考试入口/i,
+  interview: /面试邀请|预约面试|面试时间|参加.{0,20}面试/i,
+  application: /投递成功|成功投递|简历已(成功)?(提交|投递)|已经收到.{0,12}(申请|投递)|简历已顺利抵达/i,
+  recruitment_other: /招聘|校招|内推|宣讲|开放日|直播/i,
+  other: /$^/,
+};
+
+export function evidenceForMail(subject: string, body: string, category: MailCategory): string {
+  const compact = body.replace(/\s+/g, " ").trim();
+  const match = EVIDENCE_PATTERNS[category].exec(compact);
+  if (!match) return sanitizeSnippet(subject).slice(0, 160);
+  const start = Math.max(0, match.index - 35);
+  return sanitizeSnippet(compact.slice(start, match.index + Math.max(match[0].length, 60) + 75)).slice(0, 160);
 }

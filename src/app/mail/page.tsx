@@ -6,10 +6,16 @@ import type { Session } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MailReviewDialog } from "@/components/mail/mail-review-dialog";
+import { useJobfindStore } from "@/hooks/use-jobfind-store";
 import { mailAuthClient } from "@/lib/mail/supabase-browser";
 import type { MailCategory, MailObservation } from "@/lib/mail/analysis";
+import { buildReviewItems, type ReviewDecision, type ReviewItem, type ReviewMail } from "@/lib/mail/review";
+import { JOB_STAGE_LABELS } from "@/lib/job-stages";
+import type { JobStage } from "@/lib/types";
 
 type ScanBatch = {
+  uidValidity: string;
   nextUid: number;
   uidNext: number;
   totalMessages: number;
@@ -19,9 +25,19 @@ type ScanBatch = {
   observations: MailObservation[];
 };
 
+type MailboxState = {
+  connected: boolean;
+  address: string | null;
+  observations: ReviewMail[];
+  decisions: ReviewDecision[];
+  processed: number;
+  oversized: number;
+  categories: Record<MailCategory, number>;
+};
+
 const CATEGORY_LABELS: Record<MailCategory, string> = {
   assessment: "测评", written_test: "笔试", interview: "面试", offer: "录用", rejection: "未通过",
-  application: "投递回执", recruitment_other: "其他招聘信息", other: "其他邮件",
+  application: "投递回执", recruitment_other: "其他招聘信息", other: "未识别",
 };
 const CATEGORY_ORDER: MailCategory[] = ["assessment", "written_test", "interview", "offer", "rejection", "application", "recruitment_other", "other"];
 
@@ -34,6 +50,7 @@ function displayDate(value: string | null) {
 }
 
 export default function MailPage() {
+  const { jobs, companies, applyMailStageSuggestion } = useJobfindStore();
   const auth = useMemo(() => mailAuthClient(), []);
   const [session, setSession] = useState<Session | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -51,7 +68,11 @@ export default function MailPage() {
   const [processed, setProcessed] = useState(0);
   const [oversized, setOversized] = useState(0);
   const [counts, setCounts] = useState(emptyCounts);
-  const [observations, setObservations] = useState<MailObservation[]>([]);
+  const [observations, setObservations] = useState<ReviewMail[]>([]);
+  const [decisions, setDecisions] = useState<ReviewDecision[]>([]);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewInitialId, setReviewInitialId] = useState<string | null>(null);
+  const [reviewBusy, setReviewBusy] = useState(false);
   const stopped = useRef(false);
 
   useEffect(() => {
@@ -87,16 +108,28 @@ export default function MailPage() {
     return result as T;
   }, [auth]);
 
+  const loadMailboxState = useCallback(async () => {
+    const result = await request<MailboxState>("GET");
+    setConnectedAddress(result.connected ? result.address : null);
+    setObservations(result.observations ?? []);
+    setDecisions(result.decisions ?? []);
+    setProcessed(result.processed ?? 0);
+    setOversized(result.oversized ?? 0);
+    setCounts({ ...emptyCounts(), ...result.categories });
+    setTotalMessages(result.processed ?? 0);
+    return result;
+  }, [request]);
+
   useEffect(() => {
     if (!session) { setConnectedAddress(null); return; }
     let active = true;
     setCheckingConnection(true);
-    request<{ connected: boolean; address: string | null }>("GET")
-      .then((result) => { if (active) setConnectedAddress(result.connected ? result.address : null); })
+    loadMailboxState()
+      .then((result) => { if (!active) setConnectedAddress(null); else setConnectedAddress(result.connected ? result.address : null); })
       .catch((error) => { if (active) setNotice(error instanceof Error ? error.message : "连接状态读取失败"); })
       .finally(() => { if (active) setCheckingConnection(false); });
     return () => { active = false; };
-  }, [request, session]);
+  }, [loadMailboxState, session]);
 
   async function sendLoginLink() {
     if (!auth || !email.trim()) return;
@@ -123,7 +156,7 @@ export default function MailPage() {
     setWorking(true); setNotice("");
     try {
       await request("POST", { action: "disconnect" });
-      setConnectedAddress(null); setObservations([]); setCounts(emptyCounts()); setCursor(1); setUidNext(0); setTotalMessages(0); setProcessed(0);
+      setConnectedAddress(null); setObservations([]); setDecisions([]); setCounts(emptyCounts()); setCursor(1); setUidNext(0); setTotalMessages(0); setProcessed(0);
       setNotice("邮箱已断开，服务端授权密码已删除。 ");
     } catch (error) { setNotice(error instanceof Error ? error.message : "断开失败"); }
     setWorking(false);
@@ -146,13 +179,48 @@ export default function MailPage() {
           for (const category of CATEGORY_ORDER) updated[category] += batch.categories[category] ?? 0;
           return updated;
         });
-        setObservations((value) => [...value, ...batch.observations]);
+        setObservations((value) => [...value, ...batch.observations.map((item) => ({ ...item, uidValidity: batch.uidValidity }))]);
         next = batch.nextUid;
         setCursor(next);
-        if (next >= batch.uidNext) { setNotice("全量扫描完成。下面是邮件类型与招聘通知样本。 "); break; }
+        if (next >= batch.uidNext) { await loadMailboxState(); setNotice("扫描完成。相关招聘邮件已列出，请逐条核对进度建议。 "); break; }
       }
-    } catch (error) { setNotice(error instanceof Error ? error.message : "扫描中断，可继续扫描"); }
+    } catch (error) {
+      await loadMailboxState().catch(() => undefined);
+      setNotice(error instanceof Error ? error.message : "扫描中断，可继续扫描");
+    }
     setScanRunning(false);
+  }
+
+  const reviewItems = useMemo(() => buildReviewItems(observations, jobs, companies, decisions), [observations, jobs, companies, decisions]);
+  const pending = reviewItems.filter((item) => !item.decision);
+  const ready = pending.filter((item) => item.lane === "ready");
+  const uncertain = pending.filter((item) => item.lane === "uncertain");
+
+  function openReview(id: string | null = null) { setReviewInitialId(id); setReviewOpen(true); }
+
+  async function ignoreReview(item: ReviewItem) {
+    setReviewBusy(true);
+    try {
+      await request("POST", { action: "decision", uidValidity: item.mail.uidValidity, uid: item.mail.uid, status: "ignored" });
+      setDecisions((value) => [...value.filter((decision) => `${decision.uidValidity}:${decision.uid}` !== item.id), { uidValidity: item.mail.uidValidity, uid: item.mail.uid, status: "ignored", jobId: null, targetStage: null }]);
+      setNotice("已忽略这条邮件，岗位没有变化。");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "忽略失败，请重试"); }
+    finally { setReviewBusy(false); }
+  }
+
+  async function applyReview(item: ReviewItem, jobId: string, stage: JobStage, allowTerminalOverride: boolean) {
+    setReviewBusy(true);
+    try {
+      const result = applyMailStageSuggestion(jobId, stage, item.id, allowTerminalOverride);
+      if (result === "missing") throw new Error("此浏览器找不到该岗位，请重新选择");
+      if (result === "blocked") throw new Error("岗位阶段已变化，请重新核对后再应用");
+      try {
+        await request("POST", { action: "decision", uidValidity: item.mail.uidValidity, uid: item.mail.uid, status: "applied", jobId, targetStage: stage });
+        setDecisions((value) => [...value.filter((decision) => `${decision.uidValidity}:${decision.uid}` !== item.id), { uidValidity: item.mail.uidValidity, uid: item.mail.uid, status: "applied", jobId, targetStage: stage }]);
+        setNotice(`已将岗位推进到${JOB_STAGE_LABELS[stage]}。`);
+      } catch { setNotice("岗位已在此浏览器更新，但邮件处理回执未同步。请再次点击应用以重试回执，不会重复推进。"); }
+    } catch (error) { setNotice(error instanceof Error ? error.message : "应用失败，请重试"); }
+    finally { setReviewBusy(false); }
   }
 
   const topDomains = useMemo(() => {
@@ -165,7 +233,7 @@ export default function MailPage() {
     <header className="border-b border-slate-200/70 pb-6">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600"><Inbox className="size-4" /> JobFind · 邮件</div>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">状态收件箱</h1>
-      <p className="mt-2 text-sm text-slate-600">连接 163 邮箱并扫描收件箱，先了解招聘通知的真实写法。</p>
+      <p className="mt-2 text-sm text-slate-600">招聘邮件先列出来；未识别的邮件也进入待核对，避免漏掉。进度建议由你逐条决定是否应用。</p>
     </header>
 
     {!auth ? <section className="border-b border-slate-200/70 pb-6 text-sm text-slate-600">邮箱服务尚未配置，现有看板仍可照常使用。</section> : checkingAuth ? <p className="text-sm text-slate-600">正在检查登录状态…</p> : !session ?
@@ -195,12 +263,22 @@ export default function MailPage() {
 
       {connectedAddress ? <section className="space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div><h2 className="text-lg font-semibold">邮件样式扫描</h2><p className="mt-1 text-sm text-slate-600">从收件箱第一封开始分批读取，包含已读邮件；不会修改邮件状态。大于 1 MB 的邮件只分析标题。</p></div>
+          <div><h2 className="text-lg font-semibold">邮件扫描</h2><p className="mt-1 text-sm text-slate-600">读取收件箱及已读邮件，不修改邮件状态或看板。大于 1 MB 的邮件只分析标题。</p></div>
           <div className="flex gap-2">
             {scanRunning ? <Button variant="outline" onClick={() => { stopped.current = true; }}>暂停</Button> : <Button onClick={() => void scanAll(cursor === 1)}><RefreshCw className="size-4" />{cursor > 1 && cursor < uidNext ? "继续扫描" : "扫描全部邮件"}</Button>}
           </div>
         </div>
         {(processed > 0 || scanRunning) ? <>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-y border-indigo-200 bg-indigo-50/60 px-4 py-4">
+            <div><p className="text-base font-semibold text-slate-950">{pending.length} 条邮件待你处理</p><p className="mt-1 text-sm text-slate-600">进度建议 {ready.length} 条 · 待核对 {uncertain.length} 条（可能含非招聘邮件）。只有你点击应用才会改动岗位。</p></div>
+            <Button disabled={!pending.length} onClick={() => openReview()}>查看与处理</Button>
+          </div>
+          <div className="grid gap-x-8 gap-y-6 lg:grid-cols-2">
+            {([["进度建议", ready], ["待核对", uncertain]] as const).map(([title, list]) => <section key={title} className="min-w-0 border-t border-slate-200 pt-4">
+              <div className="flex items-baseline justify-between"><h3 className="text-base font-semibold">{title}</h3><span className="text-sm tabular-nums text-slate-500">{list.length}</span></div>
+              <div className="mt-3 divide-y divide-slate-200/80">{list.length ? list.map((item) => <button key={item.id} type="button" onClick={() => openReview(item.id)} className="block w-full py-3 text-left transition-colors hover:bg-white/50"><p className="truncate text-sm font-medium text-slate-950">{item.mail.subject || "无主题"}</p><p className="mt-1 text-xs text-slate-500">{item.suggestedStage ? JOB_STAGE_LABELS[item.suggestedStage] : "阶段待核对"} · {item.suggestedJobId ? jobs.find((job) => job.id === item.suggestedJobId)?.position : "选择岗位"} · {displayDate(item.mail.date)}</p></button>) : <p className="py-4 text-sm text-slate-500">暂无邮件</p>}</div>
+            </section>)}
+          </div>
           <div className="border-y border-slate-200/70 py-4 text-sm text-slate-600" aria-live="polite">
             已扫描 <strong className="text-slate-950">{processed}</strong> / {totalMessages || "…"} 封{oversized ? ` · ${oversized} 封大邮件仅检查标题` : ""}
           </div>
@@ -208,9 +286,9 @@ export default function MailPage() {
             {CATEGORY_ORDER.map((category) => <div key={category} className="border-b border-slate-200/70 py-2"><div className="text-xs text-slate-500">{CATEGORY_LABELS[category]}</div><div className="mt-1 text-2xl font-semibold tabular-nums">{counts[category]}</div></div>)}
           </div>
           <div className="border-t border-slate-200/70 pt-5"><h3 className="font-semibold">招聘邮件常见发件域名</h3><p className="mt-2 text-sm text-slate-600">{topDomains.length ? topDomains.map(([domain, count]) => `${domain}（${count}）`).join("、") : "扫描后显示"}</p></div>
-          <div className="border-t border-slate-200/70 pt-5"><h3 className="font-semibold">候选招聘邮件</h3><p className="mt-1 text-xs text-slate-500">仅展示主题和简短文字摘要，完整正文不会保存到 JobFind。</p>
+          <div className="border-t border-slate-200/70 pt-5"><h3 className="font-semibold">所有扫描邮件</h3><p className="mt-1 text-xs text-slate-500">含已处理邮件；未识别邮件仅保留主题和发件人，完整正文不会保存到 JobFind。</p>
             <div className="mt-3 divide-y divide-slate-200/70">
-              {observations.slice(0, 200).map((item) => <div key={item.uid} className="grid gap-1 py-3 text-sm sm:grid-cols-[6rem_1fr] sm:gap-4"><span className="font-medium text-indigo-700">{CATEGORY_LABELS[item.category]}</span><div className="min-w-0"><p className="font-medium text-slate-900">{item.subject || "无主题"}</p><p className="mt-1 text-xs text-slate-500">{item.senderDomain || item.sender} · {displayDate(item.date)}</p>{item.snippet ? <p className="mt-1 truncate text-xs text-slate-600">{item.snippet}</p> : null}</div></div>)}
+              {observations.slice(0, 200).map((item) => <div key={`${item.uidValidity}:${item.uid}`} className="grid gap-1 py-3 text-sm sm:grid-cols-[6rem_1fr] sm:gap-4"><span className="font-medium text-indigo-700">{CATEGORY_LABELS[item.category]}</span><div className="min-w-0"><p className="font-medium text-slate-900">{item.subject || "无主题"}</p><p className="mt-1 text-xs text-slate-500">{item.senderDomain || item.sender} · {displayDate(item.date)}</p>{item.snippet ? <p className="mt-1 truncate text-xs text-slate-600">{item.snippet}</p> : null}</div></div>)}
             </div>
             {observations.length > 200 ? <p className="mt-3 text-xs text-slate-500">共识别 {observations.length} 封候选邮件，页面展示前 200 封。</p> : null}
           </div>
@@ -218,5 +296,6 @@ export default function MailPage() {
       </section> : null}
     </>}
     {notice ? <p className="flex items-center gap-2 rounded-md bg-white/55 px-3 py-2 text-sm text-slate-700" role="status"><Mail className="size-4 shrink-0" />{notice}</p> : null}
+    <MailReviewDialog open={reviewOpen} onOpenChange={setReviewOpen} initialId={reviewInitialId} items={reviewItems} jobs={jobs} busy={reviewBusy} onApply={applyReview} onIgnore={ignoreReview} />
   </div>;
 }

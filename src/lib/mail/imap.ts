@@ -1,7 +1,7 @@
 import { ImapFlow } from "imapflow";
 import { simpleParser } from "mailparser";
 
-import { classifyMail, sanitizeSnippet, senderDomain, type MailCategory, type MailObservation } from "./analysis";
+import { classifyMail, evidenceForMail, sanitizeSnippet, senderDomain, type MailCategory, type MailObservation } from "./analysis";
 import { mailBodyText } from "./content";
 import { selectUidPage } from "./uid-page";
 
@@ -78,14 +78,18 @@ export async function scan163Batch(address: string, credential: string, cursor: 
         }
         const category = classifyMail(subject, body);
         categories[category] += 1;
-        if (category !== "other") observations.push({
+        // Keep minimal metadata even for unclassified mail. A false negative
+        // must remain visible for manual triage rather than silently vanish.
+        observations.push({
           uid: message.uid,
           date: message.envelope?.date ? new Date(message.envelope.date).toISOString() : null,
           sender,
           senderDomain: senderDomain(sender),
           subject,
           category,
-          snippet: sanitizeSnippet(body).slice(0, 180),
+          snippet: category === "other" ? "" : sanitizeSnippet(body).slice(0, 180),
+          evidence: category === "other" ? "" : evidenceForMail(subject, body, category),
+          hasLink: category !== "other" && /https?:\/\/|\b[\w-]+\.[a-z0-9]{2,}\/\S+/i.test(body),
         });
       }
     }

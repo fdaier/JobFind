@@ -9,6 +9,7 @@ const COMPLETED_TASK_IDS_KEY = 'jobfind.completedTasks';
 const DEMO_DATA_VERSION_KEY = 'jobfind.demoDataVersion';
 const JOBS_BACKUP_V3_KEY = 'jobfind.jobs.backup.v3';
 const JOBS_COMPANY_BINDING_BACKUP_KEY = 'jobfind.jobs.backup.company-pool.v1';
+const JOBS_MAIL_APPROVAL_BACKUP_KEY = 'jobfind.jobs.backup.mail-v1';
 const COMPANY_POOL_KEY = 'jobfind.companyPool.v1';
 
 const LEGACY_STAGE_MAP: Record<string, Job['stage']> = {
@@ -85,7 +86,8 @@ function isTimelineEvent(value: unknown): boolean {
     isRecord(value) &&
     isValidDateString(value.date) &&
     typeof value.stage === 'string' &&
-    typeof value.description === 'string'
+    typeof value.description === 'string' &&
+    (typeof value.sourceEventId === 'undefined' || typeof value.sourceEventId === 'string')
   );
 }
 
@@ -254,6 +256,13 @@ function migrateJob(value: unknown): Job | null {
 
 export function saveJobs(jobs: Job[]): void {
   saveJsonValue(JOBS_KEY, jobs);
+}
+
+/** Preserve the exact prior job payload before the first mail-driven stage update. */
+export function backupJobsBeforeMailApproval(): void {
+  if (!hasWindow() || window.localStorage.getItem(JOBS_MAIL_APPROVAL_BACKUP_KEY) !== null) return;
+  const raw = window.localStorage.getItem(JOBS_KEY);
+  if (raw !== null) window.localStorage.setItem(JOBS_MAIL_APPROVAL_BACKUP_KEY, raw);
 }
 
 /** Preserve raw existing jobs before the one-time canonical-company enrichment. */

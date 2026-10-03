@@ -57,6 +57,8 @@ export interface TimelineEvent {
   date: string;
   stage: JobStage;
   description: string;
+  /** Optional idempotency marker for a user-approved mail event. */
+  sourceEventId?: string;
 }
 
 export interface InterviewNote {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { classifyMail, sanitizeSnippet } from "./analysis";
+import { classifyMail, evidenceForMail, sanitizeSnippet } from "./analysis";
 
 describe("mail reconnaissance", () => {
   it("separates recruitment events from ordinary messages", () => {
@@ -44,5 +44,10 @@ describe("mail reconnaissance", () => {
       .toBe("访问 [链接] 联系 [邮箱] 或 [手机号]");
     expect(sanitizeSnippet("测评地址 3.cn/333z-6G8，会议号：6aabbf6e8a4d800f90bf9fbd"))
       .toBe("测评地址 [链接]，会议号：[已隐藏]");
+  });
+
+  it("shows the decisive sentence rather than a generic greeting", () => {
+    expect(evidenceForMail("感谢投递", "同学你好。感谢关注。很遗憾地通知您，本次应聘将不做下一步安排。", "rejection"))
+      .toContain("很遗憾地通知您");
   });
 });

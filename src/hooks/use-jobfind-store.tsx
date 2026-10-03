@@ -15,10 +15,12 @@ import {
   saveJobs,
   saveMaterials,
   backupJobsBeforeCompanyBinding,
+  backupJobsBeforeMailApproval,
 } from '../lib/storage';
 import type { InterviewNote, Job, JobStage, Material, TimelineEvent } from '../lib/types';
 import { JOB_STAGE_LABELS } from '../lib/job-stages';
 import { createSeedCompanies, resolveCompanyId, type Company } from '../lib/company-pool';
+import { isDemoJobId, stageCanAdvance } from '../lib/mail/review';
 
 type EditableJobFields = Pick<
   Job,
@@ -73,6 +75,7 @@ interface JobFindStoreValue {
   updateJobMaterials: (jobId: string, requiredMaterials: Job['requiredMaterials'], boundMaterialIds: string[]) => void;
   deleteJob: (jobId: string) => void;
   advanceJobStage: (jobId: string, stage: JobStage, description?: string) => void;
+  applyMailStageSuggestion: (jobId: string, stage: JobStage, sourceEventId: string, allowTerminalOverride?: boolean) => 'applied' | 'already' | 'missing' | 'blocked';
   addInterviewNote: (jobId: string, note: InterviewNote) => void;
   updateInterviewNote: (jobId: string, noteIndex: number, note: InterviewNote) => void;
   deleteInterviewNote: (jobId: string, noteIndex: number) => void;
@@ -306,6 +309,28 @@ export function JobFindProvider({ children }: { children: React.ReactNode }) {
             };
           }),
         }));
+      },
+      applyMailStageSuggestion: (jobId, stage, sourceEventId, allowTerminalOverride = false) => {
+        const storedJobs = loadJobs();
+        if (window.localStorage.getItem('jobfind.jobs') !== null && !storedJobs) return 'blocked';
+        const latestJobs = storedJobs ?? state.jobs;
+        const job = latestJobs.find((item) => item.id === jobId);
+        if (!job) return 'missing';
+        if (isDemoJobId(job.id)) return 'blocked';
+        if (job.timeline.some((event) => event.sourceEventId === sourceEventId)) return 'already';
+        const terminalConflict = job.stage === 'offer' || job.stage === 'rejected';
+        if (terminalConflict ? !allowTerminalOverride : !stageCanAdvance(job.stage, stage)) return 'blocked';
+        const updatedAt = new Date().toISOString();
+        const nextJob: Job = {
+          ...job,
+          stage,
+          updatedAt,
+          timeline: [{ date: updatedAt, stage, description: `根据招聘邮件确认：${JOB_STAGE_LABELS[stage]}`, sourceEventId }, ...job.timeline],
+        };
+        backupJobsBeforeMailApproval();
+        saveJobs(latestJobs.map((item) => item.id === jobId ? nextJob : item));
+        setState((current) => ({ ...current, jobs: current.jobs.map((item) => item.id === jobId ? nextJob : item) }));
+        return 'applied';
       },
       addInterviewNote: (jobId, note) => {
         setState((current) => ({

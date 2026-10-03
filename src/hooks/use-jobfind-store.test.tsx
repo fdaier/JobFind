@@ -3,6 +3,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { JobFindProvider, useJobfindStore } from './use-jobfind-store';
+import { createMockJobs } from '../lib/mock-data';
 
 function createWrapper() {
   return function Wrapper({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,24 @@ function createWrapper() {
 describe('JobFind store', () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it('backs up the exact jobs and applies a mail stage only once after approval', async () => {
+    const job = { ...createMockJobs()[0], id: 'user-mail-job', stage: 'applied' as const, timeline: [] };
+    const raw = JSON.stringify([job]);
+    localStorage.setItem('jobfind.demoDataVersion', JSON.stringify('2026-04-20-rich-ai-pm-pool'));
+    localStorage.setItem('jobfind.jobs', raw);
+    const { result } = renderHook(() => useJobfindStore(), { wrapper: createWrapper() });
+    await waitFor(() => expect(result.current.jobs[0].id).toBe(job.id));
+    const beforeApply = localStorage.getItem('jobfind.jobs');
+    act(() => { expect(result.current.applyMailStageSuggestion(job.id, 'written_test', '1:42')).toBe('applied'); });
+    expect(localStorage.getItem('jobfind.jobs.backup.mail-v1')).toBe(beforeApply);
+    expect(result.current.jobs[0].stage).toBe('written_test');
+    expect(result.current.jobs[0].timeline[0].sourceEventId).toBe('1:42');
+    act(() => { expect(result.current.applyMailStageSuggestion(job.id, 'written_test', '1:42')).toBe('already'); });
+    expect(result.current.jobs[0].timeline.filter((event) => event.sourceEventId === '1:42')).toHaveLength(1);
+    act(() => { expect(result.current.applyMailStageSuggestion(job.id, 'assessment', '1:43')).toBe('blocked'); });
+    expect(result.current.jobs[0].stage).toBe('written_test');
   });
 
   it('shows seeded mock data on the first render', () => {
